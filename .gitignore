@@ -1,0 +1,14 @@
+#idea config
+.idea/workspace.xml
+
+#idea output
+/out/
+
+#idea/maven output
+target/
+
+#logs
+*.log      
+
+#builders apps logs
+/builders/src/apps/*/logs/
