@@ -1,6 +1,5 @@
 package com.simagis.edi.basex
 
-import com.berryworks.edireader.EDISyntaxException
 import com.berryworks.edireader.demo.EDItoXML
 import org.basex.core.BaseXException
 import org.basex.core.Context
@@ -27,6 +26,7 @@ fun main(args: Array<String>) {
     val context = Context()
     CreateDB(collection).execute(context)
     inputDir.listFiles(FileFilter { it.isFile })?.forEach {
+        println(it.name)
         if (it.name.toLowerCase().endsWith(".xml")) {
             Add(it.name, it.canonicalPath).execute(context)
         } else {
