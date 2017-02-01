@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/edi.iml" filepath="$PROJECT_DIR$/edi.iml" />
       <module fileurl="file://$PROJECT_DIR$/edireader/edireader.iml" filepath="$PROJECT_DIR$/edireader/edireader.iml" />
+      <module fileurl="file://$PROJECT_DIR$/toBaseX/toBaseX.iml" filepath="$PROJECT_DIR$/toBaseX/toBaseX.iml" />
     </modules>
   </component>
 </project>

@@ -11,5 +11,6 @@
 
     <modules>
         <module>edireader</module>
+        <module>toBaseX</module>
     </modules>
 </project>
