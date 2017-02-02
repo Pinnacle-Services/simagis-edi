@@ -76,6 +76,10 @@ class ISA private constructor(private val text: String, private val start: Int, 
         }
     }
 
+    data class Doc(var type: String? = null, var date: String? = null, var time: String? = null)
+
+    data class Counts(var clp: Int = 0)
+
     enum class Status {
         VALID,
         INVALID,
@@ -84,10 +88,8 @@ class ISA private constructor(private val text: String, private val start: Int, 
 
     class Stat(code: String) {
         var status = Status.INVALID
-        var docType: String? = null
-        var date: String? = null
-        var time: String? = null
-        var clpCount: Int = 0
+        val doc = Doc()
+        val counts = Counts()
         var error: Exception? = null
 
         init {
@@ -98,15 +100,15 @@ class ISA private constructor(private val text: String, private val start: Int, 
                     override fun startElement(uri: String?, localName: String?, qName: String?, attributes: Attributes?) {
                         when (qName) {
                             "group" -> {
-                                date = attributes["Date"]
-                                time = attributes["Time"]
+                                doc.date = attributes["Date"]
+                                doc.time = attributes["Time"]
                             }
                             "transaction" -> {
-                                docType = attributes["DocType"]
+                                doc.type = attributes["DocType"]
                             }
                             "segment" -> {
                                 if (attributes["Id"] == "CLP") {
-                                    clpCount++
+                                    counts.clp++
                                 }
                             }
                         }
@@ -115,7 +117,7 @@ class ISA private constructor(private val text: String, private val start: Int, 
                     private operator fun Attributes?.get(name: String): String? = this?.getValue(name)
                 }
                 parser.parse(InputSource(StringReader(code)))
-                status = when (docType) {
+                status = when (doc.type) {
                     "835", "837" -> Status.VALID
                     else -> Status.INVALID
                 }
@@ -126,7 +128,7 @@ class ISA private constructor(private val text: String, private val start: Int, 
         }
 
         override fun toString(): String {
-            return "Stat(status=$status, docType=$docType, date=$date, time=$time, clpCount=$clpCount, error=$error)"
+            return "Stat(status=$status, doc=$doc, counts=$counts, error=$error)"
         }
 
     }
