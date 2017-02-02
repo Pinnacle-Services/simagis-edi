@@ -1,9 +1,7 @@
 package com.simagis.edi.basex
 
 import com.berryworks.edireader.EDISyntaxException
-import org.basex.core.Context
 import org.basex.core.cmd.Add
-import org.basex.core.cmd.CreateDB
 import org.basex.core.cmd.InfoDB
 import org.basex.core.cmd.Optimize
 import java.io.File
@@ -17,69 +15,75 @@ import kotlin.system.exitProcess
  */
 
 fun main(args: Array<String>) {
-    if (args.size < 2) {
-        exit("Usage: ToBaseX <collection> <inputDir> [L:LIMIT]")
+    if (args.isEmpty()) {
+        exit("Usage: ToBaseX <inputDir> [L:LIMIT]")
     }
-    val collection = args[0]
-    val inputDir = File(args[1]).apply { if (!isDirectory) exit("Invalid inputDir: $absolutePath") }
+    val inputDir = File(args[0]).apply { if (!isDirectory) exit("Invalid inputDir: $absolutePath") }
     var limit: Long = args.find { it.startsWith("L:") }?.substring(2)?.toLong() ?: Long.MAX_VALUE
 
-    val context = Context()
-    CreateDB(collection).execute(context)
-    inputDir.listFiles(FileFilter { it.isFile })?.forEach files@ { file ->
-        try {
-            if (file.name.toLowerCase().endsWith(".xml")) {
-                if (limit-- <= 0L) return@files
-                Add(file.name, file.canonicalPath).execute(context)
-            } else {
-                val isaList = ISA.read(file)
-                when {
-                    isaList.isEmpty() -> warning("ISA not found in $file")
-                    isaList.size == 1 -> context.add("${file.name}.xml", isaList.first())
-                    else -> {
-                        isaList.forEachIndexed { i, isa ->
-                            if (limit-- <= 0L) return@files
-                            context.add("${file.name}.part-${i + 1}(${isaList.size}).xml", isa)
+    DBX().use { dbx ->
+        inputDir.listFiles(FileFilter { it.isFile })?.forEach files@ { file ->
+            try {
+                if (file.name.toLowerCase().endsWith(".xml")) {
+                    if (limit-- <= 0L) return@files
+                    dbx.onCollection("any-xml") { context ->
+                        Add(file.name, file.canonicalPath).execute(context)
+                    }
+                } else {
+                    val isaList = ISA.read(file)
+                    when {
+                        isaList.isEmpty() -> warning("ISA not found in $file")
+                        isaList.size == 1 -> dbx.add("${file.name}.xml", isaList.first())
+                        else -> {
+                            isaList.forEachIndexed { i, isa ->
+                                if (limit-- <= 0L) return@files
+                                dbx.add("${file.name}.part-${i + 1}(${isaList.size}).xml", isa)
+                            }
                         }
                     }
                 }
+            } catch (e: Exception) {
+                println("Invalid ${file.name}")
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            println("Invalid ${file.name}")
-            e.printStackTrace()
+        }
+
+        dbx.collections.forEach { collection ->
+            dbx.onCollection(collection) { context ->
+                println("* Collection $collection")
+                println("optimization...")
+                Optimize().execute(context)
+                println("Information:")
+                println(InfoDB().execute(context))
+            }
         }
     }
-    Optimize().execute(context)
+}
 
-    println("* Database information:")
-    println(InfoDB().execute(context))
-
-    context.close()
+private fun DBX.add(path: String, isa: ISA) {
+    println("$path: ${isa.stat} at ${isa.position}")
+    if (isa.valid) {
+        try {
+            onCollection("isa-doc-${isa.stat.doc.type}") { context ->
+                with(Add(path)) {
+                    setInput(isa.toXML().inputStream())
+                    execute(context)
+                }
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            println("ISA: " + isa.code)
+            if (e !is EDISyntaxException) {
+                println("XML: " + isa.toXML().toString(ISA.XML_CHARSET))
+            }
+        }
+    } else {
+        println(isa.code)
+    }
 }
 
 fun warning(message: String) {
     println("WARNING: " + message)
-}
-
-private fun Context.add(path: String, isa: ISA) {
-    println("$path: ${isa.stat} at ${isa.position}")
-    if (!isa.valid) {
-        println(isa.code)
-        return
-    }
-
-    try {
-        with(Add(path)) {
-            setInput(isa.toXML().inputStream())
-            execute(this@add)
-        }
-    } catch(e: Exception) {
-        e.printStackTrace()
-        println("ISA: " + isa.code)
-        if (e !is EDISyntaxException) {
-            println("XML: " + isa.toXML().toString(ISA.XML_CHARSET))
-        }
-    }
 }
 
 private fun exit(message: String) {
