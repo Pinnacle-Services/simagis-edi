@@ -62,26 +62,22 @@ fun warning(message: String) {
 }
 
 private fun Context.add(path: String, isa: ISA) {
-    print("$path: ")
-    if (isa.valid) {
-        println("${isa.stat.docType} CLP: ${isa.stat.clpCount} at ${isa.position}")
-    } else {
-        println("${isa.stat} at ${isa.position}")
+    println("$path: ${isa.stat} at ${isa.position}")
+    if (!isa.valid) {
         println(isa.code)
         return
     }
 
-    val xml = isa.toXML()
     try {
         with(Add(path)) {
-            setInput(xml.inputStream())
+            setInput(isa.toXML().inputStream())
             execute(this@add)
         }
     } catch(e: Exception) {
         e.printStackTrace()
         println("ISA: " + isa.code)
         if (e !is EDISyntaxException) {
-            println("XML: " + xml.toString(ISA.XML_CHARSET))
+            println("XML: " + isa.toXML().toString(ISA.XML_CHARSET))
         }
     }
 }

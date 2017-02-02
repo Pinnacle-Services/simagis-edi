@@ -85,6 +85,8 @@ class ISA private constructor(private val text: String, private val start: Int, 
     class Stat(code: String) {
         var status = Status.INVALID
         var docType: String? = null
+        var date: String? = null
+        var time: String? = null
         var clpCount: Int = 0
         var error: Exception? = null
 
@@ -94,17 +96,23 @@ class ISA private constructor(private val text: String, private val start: Int, 
                 val parser = EDIReaderFactory.createEDIReader(InputSource(StringReader(code)), leftOver)
                 parser.contentHandler = object : DefaultHandler() {
                     override fun startElement(uri: String?, localName: String?, qName: String?, attributes: Attributes?) {
-                        when(qName) {
-                            "transaction" ->
-                                if (docType == null) {
-                                    docType = attributes?.getValue("DocType")
-                                }
-                            "segment" ->
-                                if ("CLP" == attributes?.getValue("Id")) {
+                        when (qName) {
+                            "group" -> {
+                                date = attributes["Date"]
+                                time = attributes["Time"]
+                            }
+                            "transaction" -> {
+                                docType = attributes["DocType"]
+                            }
+                            "segment" -> {
+                                if (attributes["Id"] == "CLP") {
                                     clpCount++
                                 }
+                            }
                         }
                     }
+
+                    private operator fun Attributes?.get(name: String): String? = this?.getValue(name)
                 }
                 parser.parse(InputSource(StringReader(code)))
                 status = when (docType) {
@@ -118,8 +126,9 @@ class ISA private constructor(private val text: String, private val start: Int, 
         }
 
         override fun toString(): String {
-            return "Stat(status=$status, docType=$docType, clpCount=$clpCount, error=$error)"
+            return "Stat(status=$status, docType=$docType, date=$date, time=$time, clpCount=$clpCount, error=$error)"
         }
+
     }
 }
 
