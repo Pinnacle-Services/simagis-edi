@@ -77,7 +77,7 @@ private fun DBX.add(path: String, isa: ISA) {
             e.printStackTrace()
             println("ISA: " + isa.code)
             if (e !is EDISyntaxException) {
-                println("XML: " + isa.toXML().toString(ISA.XML_CHARSET))
+                println("XML: " + isa.toXML().toString(ISA.CHARSET))
             }
         }
     } else {

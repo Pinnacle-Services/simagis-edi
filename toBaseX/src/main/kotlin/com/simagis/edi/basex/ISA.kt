@@ -18,7 +18,7 @@ import javax.xml.transform.stream.StreamResult
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 2/1/2017.
  */
-class ISA private constructor(private val text: String, private val start: Int, private val end: Int) {
+class ISA private constructor(private val text: CharSequence, private val start: Int, private val end: Int) {
     val code: String
         get() = when (end) {
             -1 -> text.substring(start)
@@ -31,7 +31,7 @@ class ISA private constructor(private val text: String, private val start: Int, 
 
     fun toXML(): ByteArray {
         val result = ByteArrayOutputStream()
-        OutputStreamWriter(result, XML_CHARSET).use { writer ->
+        OutputStreamWriter(result, CHARSET).use { writer ->
             val ediReader = EDIReader()
             val source = SAXSource(ediReader, InputSource(StringReader(code)))
             val transformer = TransformerFactory.newInstance().newTransformer()
@@ -43,36 +43,71 @@ class ISA private constructor(private val text: String, private val start: Int, 
     override fun toString(): String = code
 
     companion object {
-        val XML_CHARSET = Charsets.ISO_8859_1
+        val CHARSET = Charsets.ISO_8859_1
 
         fun read(file: File): List<ISA> = mutableListOf<ISA>().apply {
-            val text = file.readText().replace("\n", "").replace("\r", "")
-            val separator = findSeparator(text)
-            var index = 0
-            var next = 0
-            val isaPattern = "ISA$separator"
-            while (index != -1 && next != -1) {
-                next = text.indexOf(isaPattern, index + 4, false)
+            val (terminator, s1) = Delimiters.of(file)
+            val text = file.reader(CHARSET).use {
+                val buff = CharArray(4096)
+                StringBuilder(file.length().toInt()).apply {
+                    while (true) {
+                        val res = it.read(buff)
+                        if (res == -1) break
+                        for (i in 0..res - 1) {
+                            val c = buff[i]
+                            if (c >= ' ') append(c)
+                        }
+                    }
+                }
+            }
+            var index: Int = 0
+            var next: Int
+            val isaPattern = "${terminator}ISA$s1"
+            while (true) {
+                next = text.indexOf(isaPattern, index + isaPattern.length, false)
                 this += ISA(text, index, next)
-                index = text.indexOf(isaPattern, next, false)
+                if (next == -1) break
+                index = next + 1
+                if (index >= text.length) break
             }
         }
 
-        private fun findSeparator(text: String): Char {
-            if (text.length < 108) throw EDISyntaxException("text.length < 108")
-            if (!text.startsWith("ISA")) throw EDISyntaxException("starting 'ISA' not found")
-            val tildeIndex = text.indexOf("~")
-            if (tildeIndex != 105) throw EDISyntaxException("starting '~' not found")
-            val a = text[tildeIndex - 2]
-            val gsIndex = text.indexOf("GS$a", tildeIndex)
-            when {
-                gsIndex == -1 -> throw EDISyntaxException("starting '~GS$a' not found")
-                gsIndex == tildeIndex + 1 -> {
+        private data class Delimiters(
+                val terminator: Char = '~',
+                val separator1: Char = '*',
+                val separator2: Char = ':') {
+            companion object {
+                fun of(file: File): Delimiters {
+                    val header = file.reader(CHARSET).use {
+                        val buff = CharArray(1024)
+                        var offset = 0
+                        var length = buff.size
+                        while (length > 0) {
+                            val res = it.read(buff, offset, length)
+                            if (res == -1) break
+                            length -= res
+                            offset += res
+                        }
+                        StringBuilder(1024).apply {
+                            for (c in buff) if (c >= ' ') append(c)
+                        }.toString()
+                    }
+                    if (!header.startsWith("ISA"))
+                        throw EDISyntaxException("Invalid file $file: starting 'ISA' not found")
+                    if (header.length < 106)
+                        throw EDISyntaxException("Invalid file $file: length < 106")
+                    return Delimiters(
+                            terminator = header[105],
+                            separator1 = header[103],
+                            separator2 = header[104])
+                            .apply {
+                                if (header[3] != separator1) {
+                                    throw EDISyntaxException(
+                                            "Invalid file $file: invalid separator1: '$separator1' or starting 'ISA$separator1' not found")
+                                }
+                            }
                 }
-                text.substring(tildeIndex + 1, gsIndex).isNotBlank() -> throw EDISyntaxException(
-                        "starting '~GS$a' contains not blank separator: ${text.substring(tildeIndex, gsIndex + 2)}")
             }
-            return a
         }
     }
 
