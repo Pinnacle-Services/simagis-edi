@@ -22,29 +22,32 @@ fun main(args: Array<String>) {
     var limit: Long = args.find { it.startsWith("L:") }?.substring(2)?.toLong() ?: Long.MAX_VALUE
 
     DBX().use { dbx ->
-        inputDir.listFiles(FileFilter { it.isFile })?.forEach files@ { file ->
-            try {
-                if (file.name.toLowerCase().endsWith(".xml")) {
-                    if (limit-- <= 0L) return@files
-                    dbx.onCollection("any-xml") { context ->
-                        Add(file.name, file.canonicalPath).execute(context)
-                    }
-                } else {
-                    val isaList = ISA.read(file)
-                    when {
-                        isaList.isEmpty() -> warning("ISA not found in $file")
-                        isaList.size == 1 -> dbx.add("${file.name}.xml", isaList.first())
-                        else -> {
-                            isaList.forEachIndexed { i, isa ->
-                                if (limit-- <= 0L) return@files
+        inputDir.listFiles(FileFilter { it.isFile })?.let files@ { files ->
+            files.forEach { file ->
+                try {
+                    if (file.name.toLowerCase().endsWith(".xml")) {
+                        if (limit-- <= 0L) return@files
+                        dbx.onCollection("any-xml") { context ->
+                            Add(file.name, file.canonicalPath).execute(context)
+                        }
+                    } else {
+                        val isaList = ISA.read(file)
+                        when {
+                            isaList.isEmpty() -> warning("ISA not found in $file")
+                            isaList.size == 1 -> isaList.first().let { isa ->
+                                if (isa.valid && limit-- <= 0L) return@files
+                                dbx.add("${file.name}.xml", isa)
+                            }
+                            isaList.size > 1 -> isaList.forEachIndexed { i, isa ->
+                                if (isa.valid && limit-- <= 0L) return@files
                                 dbx.add("${file.name}.part-${i + 1}(${isaList.size}).xml", isa)
                             }
                         }
                     }
+                } catch (e: Exception) {
+                    println("Invalid ${file.name}")
+                    e.printStackTrace()
                 }
-            } catch (e: Exception) {
-                println("Invalid ${file.name}")
-                e.printStackTrace()
             }
         }
 
