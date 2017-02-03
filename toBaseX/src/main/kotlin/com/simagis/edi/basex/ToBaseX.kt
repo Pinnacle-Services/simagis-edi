@@ -67,7 +67,7 @@ private fun DBX.add(path: String, isa: ISA) {
     println("$path: ${isa.stat} at ${isa.position}")
     if (isa.valid) {
         try {
-            onCollection("isa-doc-${isa.stat.doc.type}") { context ->
+            onCollection(isa.collection) { context ->
                 with(Add(path)) {
                     setInput(isa.toXML().inputStream())
                     execute(context)
@@ -82,6 +82,13 @@ private fun DBX.add(path: String, isa: ISA) {
         }
     } else {
         println(isa.code)
+    }
+}
+
+private val ISA.collection: String get() = with(stat.doc) {
+    when {
+        date?.length == 8 -> "isa-doc-$type-${date?.take(6)}"
+        else -> "isa-doc-$type"
     }
 }
 
