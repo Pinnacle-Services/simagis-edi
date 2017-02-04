@@ -10,10 +10,10 @@ import java.io.Closeable
  */
 class DBX : Closeable {
     private val contextMap = mutableMapOf<String, Context>()
-    val collections: Set<String> get() = contextMap.keys
+    val names: Set<String> get() = contextMap.keys
 
-    fun onCollection(collection: String, action: (Context) -> Unit) = action(
-            contextMap.getOrPut(collection) { Context().apply { CreateDB(collection).execute(this) } }
+    fun on(name: String, action: (Context) -> Unit) = action(
+            contextMap.getOrPut(name) { Context().apply { CreateDB(name).execute(this) } }
     )
 
     override fun close() {

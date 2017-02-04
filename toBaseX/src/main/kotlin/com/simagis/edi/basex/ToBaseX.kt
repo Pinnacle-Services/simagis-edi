@@ -1,6 +1,7 @@
 package com.simagis.edi.basex
 
 import com.berryworks.edireader.EDISyntaxException
+import com.berryworks.edireader.util.CommandLine
 import org.basex.core.cmd.Add
 import org.basex.core.cmd.InfoDB
 import org.basex.core.cmd.Optimize
@@ -15,11 +16,43 @@ import kotlin.system.exitProcess
  */
 
 fun main(args: Array<String>) {
-    if (args.isEmpty()) {
-        exit("Usage: ToBaseX <inputDir> [L:LIMIT]")
+    val defaultBaseXDataDir = File(System.getenv("USERPROFILE") ?: ".").resolve("BaseXData")
+    val defaultPrefix = "isa-doc-"
+    val commandLine = CommandLine(args)
+    if (commandLine.size() == 0) {
+        exit("""Usage: ToBaseX <inputDir> [-x dataDir] [-o outputDir] [-p prefix] [-L LIMIT]
+        default dataDir = $defaultBaseXDataDir
+        default prefix = $defaultPrefix
+""")
     }
-    val inputDir = File(args[0]).apply { if (!isDirectory) exit("Invalid inputDir: $absolutePath") }
-    var limit: Long = args.find { it.startsWith("L:") }?.substring(2)?.toLong() ?: Long.MAX_VALUE
+    val inputDir = commandLine[0]?.let(::File)!!.exitIfNotIsDir("inputDir")
+    val dataDir = commandLine["x"]?.let(::File) ?: defaultBaseXDataDir
+    val outputDir = commandLine["o"]?.let(::File)?.exitIfNotIsDir("outputDir")
+    val prefix = commandLine["p"] ?: defaultPrefix
+    var limit = commandLine["L"]?.let(String::toLong) ?: Long.MAX_VALUE
+    val newNames = mutableListOf<String>()
+
+    fun DBX.add(path: String, isa: ISA) {
+        println("$path: ${isa.stat} at ${isa.position}")
+        if (isa.valid) {
+            try {
+                on(prefix + isa.name) { context ->
+                    with(Add(path)) {
+                        setInput(isa.toXML().inputStream())
+                        execute(context)
+                    }
+                }
+            } catch(e: Exception) {
+                e.printStackTrace()
+                println("ISA: " + isa.code)
+                if (e !is EDISyntaxException) {
+                    println("XML: " + isa.toXML().toString(ISA.CHARSET))
+                }
+            }
+        } else {
+            println(isa.code)
+        }
+    }
 
     DBX().use { dbx ->
         inputDir.listFiles(FileFilter { it.isFile })?.let files@ { files ->
@@ -27,7 +60,7 @@ fun main(args: Array<String>) {
                 try {
                     if (file.name.toLowerCase().endsWith(".xml")) {
                         if (limit-- <= 0L) return@files
-                        dbx.onCollection("any-xml") { context ->
+                        dbx.on("${prefix}any-xml") { context ->
                             Add(file.name, file.canonicalPath).execute(context)
                         }
                     } else {
@@ -51,49 +84,43 @@ fun main(args: Array<String>) {
             }
         }
 
-        dbx.collections.forEach { collection ->
-            dbx.onCollection(collection) { context ->
-                println("* Collection $collection")
-                println("optimization...")
+        dbx.names.forEach { name ->
+            newNames += name
+            dbx.on(name) { context ->
+                println("* Database $name")
+                println("> Optimization...")
                 Optimize().execute(context)
-                println("Information:")
+                println("# Information:")
                 println(InfoDB().execute(context))
             }
         }
     }
-}
 
-private fun DBX.add(path: String, isa: ISA) {
-    println("$path: ${isa.stat} at ${isa.position}")
-    if (isa.valid) {
-        try {
-            onCollection(isa.collection) { context ->
-                with(Add(path)) {
-                    setInput(isa.toXML().inputStream())
-                    execute(context)
+    outputDir?.let { outputDir ->
+        newNames.forEach { name ->
+            val newDataDir = dataDir.resolve(name)
+            val outDataDir = outputDir.resolve(name)
+            if (outDataDir.exists()) {
+                warning("Database ${outDataDir.absolutePath} already exists")
+            } else {
+                if (!newDataDir.renameTo(outDataDir)) {
+                    warning("Unable to rename ${newDataDir.absolutePath} to ${outDataDir.absolutePath}")
                 }
             }
-        } catch(e: Exception) {
-            e.printStackTrace()
-            println("ISA: " + isa.code)
-            if (e !is EDISyntaxException) {
-                println("XML: " + isa.toXML().toString(ISA.CHARSET))
-            }
         }
-    } else {
-        println(isa.code)
     }
 }
 
-private val ISA.collection: String get() = with(stat.doc) {
-    when {
-        date?.length == 8 -> "isa-doc-$type-${date?.take(6)}"
-        else -> "isa-doc-$type"
-    }
-}
+private operator fun CommandLine.get(i: Int): String? = getPosition(i)
 
-fun warning(message: String) {
+private operator fun CommandLine.get(option: String): String? = getOption(option)
+
+private fun warning(message: String) {
     println("WARNING: " + message)
+}
+
+private fun File.exitIfNotIsDir(name: String): File = apply {
+    if (!isDirectory) exit("Invalid $name: $absolutePath")
 }
 
 private fun exit(message: String) {
