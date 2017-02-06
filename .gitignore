@@ -7,6 +7,9 @@
 #idea/maven output
 target/
 
+#idea/maven output
+.idea/dataSources
+
 #logs
 *.log      
 
