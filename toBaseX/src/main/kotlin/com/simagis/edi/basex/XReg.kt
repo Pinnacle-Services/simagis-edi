@@ -4,17 +4,20 @@ import com.microsoft.sqlserver.jdbc.SQLServerDataSource
 import org.apache.commons.dbutils.QueryRunner
 import java.io.Closeable
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.security.MessageDigest
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.*
 
 /**
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 2/6/2017.
  */
-class XReg(private val sessionUUID: String? = null) : Closeable {
+class XReg : Closeable {
     private val opened = mutableListOf<Closeable>()
     private val qr: QueryRunner by lazy {
         QueryRunner(SQLServerDataSource().apply {
@@ -26,43 +29,206 @@ class XReg(private val sessionUUID: String? = null) : Closeable {
             setPassword(properties["password"])
         })
     }
-    val log: Log = Log(this)
-    val session: Session by lazy { Session(this).apply { opened += this } }
-    var file: DBFile? = null
-        set(value) {
-            value?.let { new ->
-                //language=TSQL
-                val oldID = qr.query("SELECT ID FROM [FILE] WHERE DIGEST = ?", {
-                    if (it.next()) it.getLong(1) else null
-                }, arrayOf(new.digest))
 
-                var isNewPathEAlreadyExists = false
-                if (oldID != null) {
-                    new.id = oldID
+    fun newSession(uuid: String? = null, block: XSession.() -> Unit) {
+        XSession(this, uuid).use { it.block() }
+    }
+
+    class XSession(xReg: XReg, uuid: String?) : Closeable {
+        internal val qr = xReg.qr
+        val id: Int
+        val uuid = uuid ?: UUID.randomUUID().toString()
+        val started: LocalDateTime = LocalDateTime.now()
+        val xLog = XLog(this)
+
+        init {
+            //language=TSQL
+            id = qr.insert(
+                    "INSERT INTO SESSION (UUID, STARTED) VALUES (?, ?)",
+                    {
+                        it.next()
+                        it.getInt(1)
+                    },
+                    arrayOf(this.uuid, Timestamp.valueOf(started))
+            )
+        }
+
+        fun withFile(file: File, block: XFile.() -> Unit) {
+            context(XFile.of(this, file), block)
+        }
+
+        private fun context(xFile: XFile, block: XFile.() -> Unit) {
+            val xContext = xLog.xContext
+            try {
+                xLog.xContext = XContext(this, xFile)
+                xFile.block()
+            } finally {
+                xLog.xContext = xContext
+            }
+        }
+
+        override fun close() {
+            //language=TSQL
+            qr.update("UPDATE SESSION SET FINISHED = ?",
+                    *arrayOf(Timestamp.valueOf(LocalDateTime.now()))
+            )
+        }
+    }
+
+    class XFile private constructor(
+            internal val xSession: XSession,
+            val fileID: Long,
+            val fileDigest: String,
+            val filePath: String,
+            val fileName: String,
+            fileStatus: String
+    ) {
+        private var fileStatus_ = fileStatus
+        val fileStatus: String get() = fileStatus_
+
+        fun updateFileStatus(status: String? = null) {
+            if (status != null) {
+                //language=TSQL
+                xSession.qr.update("UPDATE [FILE] SET STATUS = ? WHERE ID = ?", *arrayOf(status, fileID))
+                fileStatus_ = status
+            }
+        }
+
+        fun split(): List<ISA> {
+            try {
+                return ISA.read(File(filePath))
+            } catch(e: Throwable) {
+                xSession.xLog.warning(
+                        message = "ISA.read(File($filePath)) error",
+                        action = "ISA.read",
+                        exception = e
+                )
+                updateFileStatus("INVALID")
+                throw e
+            }
+        }
+
+        fun withISA(isa: ISA, block: XISA.() -> Unit) {
+            context(XISA.of(this, isa), block)
+        }
+
+        private fun context(xISA: XISA, block: XISA.() -> Unit) {
+            val xContext = xSession.xLog.xContext
+            try {
+                xSession.xLog.xContext = xContext.copy(xISA = xISA)
+                xISA.block()
+            } finally {
+                xSession.xLog.xContext = xContext
+            }
+        }
+
+        companion object {
+            fun of(xSession: XSession, file: File): XFile {
+                val id: Long
+                val digest = md.digest(file.readBytes()).toHexString()
+                val path = file.absolutePath
+                val name = file.name
+
+                val qr = xSession.qr
+
+                class REC(val ID: Long, val STATUS: String)
+                //language=TSQL
+                val rec = qr.query(
+                        "SELECT ID, STATUS FROM [FILE] WHERE DIGEST = ?",
+                        { if (it.next()) REC(it.getLong(1), it.getString(2)) else null },
+                        arrayOf(digest))
+
+                var isNewPathAlreadyExists = false
+                if (rec != null) {
+                    id = rec.ID
                     //language=TSQL
-                    isNewPathEAlreadyExists = qr.query(
+                    isNewPathAlreadyExists = qr.query(
                             "SELECT * FROM FILE_PATH WHERE FILE_ID = ? AND PATH = ?",
-                            ResultSet::next, arrayOf(oldID, new.path))
+                            ResultSet::next, arrayOf(id, path))
                 } else {
                     //language=TSQL
-                    new.id = qr.insert(
+                    id = qr.insert(
                             "INSERT INTO [FILE] (DIGEST) VALUES (?)",
-                            {
-                                it.next()
-                                it.getLong(1)
-                            },
-                            arrayOf<Any?>(new.digest))
+                            { it.next(); it.getLong(1) },
+                            arrayOf<Any?>(digest))
                 }
 
-                //language=TSQL
-                if (!isNewPathEAlreadyExists) {
+                if (!isNewPathAlreadyExists) {
+                    //language=TSQL
                     qr.insert(
-                            "INSERT INTO FILE_PATH (FILE_ID, PATH, NAME) VALUES (?, ?, ?)", {},
-                            arrayOf(new.id, new.path, new.name))
+                            "INSERT INTO FILE_PATH (FILE_ID, PATH, NAME) VALUES (?, ?, ?)",
+                            {},
+                            arrayOf(id, path, name))
                 }
+                return XFile(xSession, id, digest, path, name, rec?.STATUS ?: "")
             }
-            field = value
         }
+    }
+
+    class XISA private constructor(
+            internal val xSession: XSession,
+            val isaID: Long,
+            val isaDigest: String,
+            isaStatus: String
+    ) {
+        private var isaStatus_ = isaStatus
+        val isaStatus: String get() = isaStatus_
+
+        fun updateIsaStatus(status: String? = null) {
+            if (status != null) {
+                //language=TSQL
+                xSession.qr.update("UPDATE ISA SET STATUS = ? WHERE ID = ?", *arrayOf(status, isaID))
+                isaStatus_ = status
+            }
+        }
+
+        companion object {
+            fun of(xFile: XFile, isa: ISA): XISA {
+                val id: Long
+                val digest = md.digest(isa.code.toByteArray(ISA.CHARSET)).toHexString()
+                val qr = xFile.xSession.qr
+
+                class REC(val ID: Long, val STATUS: String)
+                //language=TSQL
+                val rec = qr.query(
+                        "SELECT ID, STATUS FROM ISA WHERE DIGEST = ?",
+                        { if (it.next()) REC(it.getLong(1), it.getString(2)) else null },
+                        arrayOf(digest))
+
+
+                var isIsaIdAlreadyInR = false
+                if (rec != null) {
+                    id = rec.ID
+                    //language=TSQL
+                    isIsaIdAlreadyInR = qr.query(
+                            "SELECT * FROM R_ISA_FILE WHERE ISA_ID = ? AND FILE_ID = ?",
+                            ResultSet::next,
+                            arrayOf(rec.ID, xFile.fileID))
+                } else {
+                    //language=TSQL
+                    id = qr.insert(
+                            "INSERT INTO ISA (DIGEST, DOC_TYPE, DATE8, TIME4) VALUES (?,?,?,?)",
+                            { it.next(); it.getLong(1) },
+                            arrayOf<Any?>(
+                                    digest,
+                                    isa.stat.doc.type,
+                                    isa.stat.doc.date,
+                                    isa.stat.doc.time
+                            ))
+                }
+
+                if (!isIsaIdAlreadyInR) {
+                    //language=TSQL
+                    qr.insert(
+                            "INSERT INTO R_ISA_FILE (ISA_ID, FILE_ID) VALUES (?, ?)",
+                            {},
+                            arrayOf(id, xFile.fileID))
+                }
+
+                return XISA(xFile.xSession, id, digest, rec?.STATUS ?: "")
+            }
+        }
+    }
 
     companion object {
         private val md: MessageDigest get() = MessageDigest.getInstance("SHA")
@@ -87,67 +253,81 @@ class XReg(private val sessionUUID: String? = null) : Closeable {
 
         private operator fun Properties.get(name: String): String = getProperty(name, null)
                 ?: throw SQLException("""property "$name" not found in $propertiesFile""")
+
+        private fun ByteArray.toHexString(): String = joinToString(separator = "") {
+            Integer.toHexString(it.toInt().and(0xff))
+        }
     }
 
-    class Log(private val XReg: XReg) {
-        fun info(message: String) {
+    data class XContext(
+            val xSession: XSession? = null,
+            val xFile: XFile? = null,
+            val xISA: XISA? = null
+    )
+
+    class XLog(private val xSession: XSession) {
+        var xContext = XContext()
+
+        fun trace(message: String, action: String? = null, details: String? = null, detailsXml: String? = null) {
+            log(Level.TRACE, message, action, details, detailsXml)
+        }
+
+        fun info(message: String, action: String? = null, details: String? = null, detailsXml: String? = null) {
+            log(Level.INFO, message, action, details, detailsXml)
+        }
+
+        fun warning(message: String, exception: Throwable? = null, action: String? = null, details: String? = null, detailsXml: String? = null) = log(
+                level = Level.WARNING,
+                message = message,
+                action = action,
+                details = details(details, exception),
+                detailsXml = detailsXml
+        )
+
+        fun error(message: String, exception: Throwable? = null, action: String? = null, details: String? = null, detailsXml: String? = null) = log(
+                level = Level.ERROR,
+                message = message,
+                action = action,
+                details = details(details, exception),
+                detailsXml = detailsXml
+        )
+
+        private fun details(details: String?, exception: Throwable?): String? = details ?: exception?.let {
+            StringWriter().apply { it.printStackTrace(PrintWriter(this)) }.toString()
+        }
+
+        private fun log(level: Level, message: String, action: String? = null, details: String? = null, detailsXml: String? = null) {
             //language=TSQL
-            XReg.qr.insert("""
+            xSession.qr.insert("""
                     INSERT INTO LOG (
                             LEVEL,
                             SESSION_ID,
                             FILE_ID,
                             ISA_ID,
-                            MESSAGE)
-                    VALUES (?, ?, ?, ?, ?)""",
+                            MESSAGE,
+                            ACTION,
+                            DETAILS,
+                            DETAILS_XML
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
                     {},
                     arrayOf(
-                            100,
-                            XReg.session.id,
-                            XReg.file?.id,
-                            null,
-                            message
+                            level.value,
+                            xContext.xSession?.id,
+                            xContext.xFile?.fileID,
+                            xContext.xISA?.isaID,
+                            message,
+                            action,
+                            details,
+                            detailsXml
                     ))
         }
 
-    }
-
-    class DBFile(private val file: java.io.File) {
-        val digest: String = md.digest(file.readBytes()).joinToString(separator = "") {
-            Integer.toHexString(it.toInt().and(0xff))
-        }
-
-        val path: String get() = file.absolutePath
-        val name: String get() = file.name
-        var id: Long? = null
-            set(value) {
-                if (field != null) throw AssertionError()
-                field = value
-            }
-    }
-
-    class Session(private val XReg: XReg) : Closeable {
-        val id: Int
-        val uuid = XReg.sessionUUID ?: UUID.randomUUID().toString()
-        val started = System.currentTimeMillis()
-
-        init {
-            //language=TSQL
-            id = XReg.qr.insert(
-                    "INSERT INTO SESSION (UUID, STARTED) VALUES (?, ?)",
-                    {
-                        it.next()
-                        it.getInt(1)
-                    },
-                    arrayOf(uuid, Timestamp(started))
-            )
-        }
-
-        override fun close() {
-            //language=TSQL
-            XReg.qr.update("UPDATE SESSION SET FINISHED = ?",
-                    *arrayOf(Timestamp(System.currentTimeMillis()))
-            )
+        private enum class Level(val value: Int) {
+            TRACE(100),
+            INFO(500),
+            WARNING(1000),
+            ERROR(5000),
         }
     }
 

@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStreamWriter
 import java.io.StringReader
+import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
@@ -39,8 +40,9 @@ class ISA private constructor(private val text: CharSequence, private val start:
         val result = ByteArrayOutputStream()
         OutputStreamWriter(result, CHARSET).use { writer ->
             val ediReader = EDIReader()
-            val source = SAXSource(ediReader, InputSource(StringReader(code)))
+            val source = SAXSource(ediReader, code.inputSource)
             val transformer = TransformerFactory.newInstance().newTransformer()
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
             transformer.transform(source, StreamResult(writer))
         }
         return result.toByteArray()
@@ -51,6 +53,8 @@ class ISA private constructor(private val text: CharSequence, private val start:
     companion object {
         val CHARSET = Charsets.ISO_8859_1
 
+        fun of(code: String): ISA = ISA(code, 0, -1)
+
         fun read(file: File): List<ISA> = mutableListOf<ISA>().apply {
             val (terminator, s1) = Delimiters.of(file)
             val text = file.reader(CHARSET).use {
@@ -59,6 +63,7 @@ class ISA private constructor(private val text: CharSequence, private val start:
                     while (true) {
                         val res = it.read(buff)
                         if (res == -1) break
+                        @Suppress("LoopToCallChain")
                         for (i in 0..res - 1) {
                             val c = buff[i]
                             if (c >= ' ') append(c)
@@ -78,6 +83,8 @@ class ISA private constructor(private val text: CharSequence, private val start:
             }
         }
 
+        private val String.inputSource: InputSource get() = InputSource(StringReader(this))
+
         private data class Delimiters(
                 val terminator: Char = '~',
                 val separator1: Char = '*',
@@ -95,6 +102,7 @@ class ISA private constructor(private val text: CharSequence, private val start:
                             offset += res
                         }
                         StringBuilder(1024).apply {
+                            @Suppress("LoopToCallChain")
                             for (c in buff) if (c >= ' ') append(c)
                         }.toString()
                     }
@@ -135,8 +143,7 @@ class ISA private constructor(private val text: CharSequence, private val start:
 
         init {
             try {
-                val leftOver = null
-                val parser = EDIReaderFactory.createEDIReader(InputSource(StringReader(code)), leftOver)
+                val parser = EDIReaderFactory.createEDIReader(code.inputSource, null)
                 parser.contentHandler = object : DefaultHandler() {
                     override fun startElement(uri: String?, localName: String?, qName: String?, attributes: Attributes?) {
                         when (qName) {
@@ -157,7 +164,7 @@ class ISA private constructor(private val text: CharSequence, private val start:
 
                     private operator fun Attributes?.get(name: String): String? = this?.getValue(name)
                 }
-                parser.parse(InputSource(StringReader(code)))
+                parser.parse(code.inputSource)
                 status = when (doc.type) {
                     "835", "837" -> Status.VALID
                     else -> Status.INVALID
