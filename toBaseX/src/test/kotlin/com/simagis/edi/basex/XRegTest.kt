@@ -12,12 +12,12 @@ import java.io.File
  */
 class XRegTest {
     lateinit var test1: File
-    lateinit var test2: File
+    lateinit var testErr: File
 
     @Before
     fun setUp() {
         test1 = toFile(ISATest.TEST1)
-        test2 = toFile(ISATest.TEST2)
+        testErr = toFile(ISATest.TEST_ERR)
     }
 
     private fun toFile(text: String): File = File.createTempFile("test-", ".bin").apply { writeText(text) }
@@ -25,7 +25,7 @@ class XRegTest {
     @After
     fun tearDown() {
         test1.delete()
-        test2.delete()
+        testErr.delete()
     }
 
     @Test
@@ -50,7 +50,7 @@ class XRegTest {
     @Test(expected = EDISyntaxException::class)
     fun loadingError() {
         XReg().newSession {
-            withFile(test2) {
+            withFile(testErr) {
                 split()
             }
         }

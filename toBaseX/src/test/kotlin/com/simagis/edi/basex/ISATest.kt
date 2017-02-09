@@ -1,8 +1,10 @@
 package com.simagis.edi.basex
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import org.junit.Assert.*
+import java.io.StringReader
+import java.util.*
 import javax.xml.transform.TransformerException
 
 /**
@@ -37,7 +39,20 @@ class ISATest {
                 "GE*1*1~" +
                 "IEA*1*875381672~"
 
-        const val TEST2 = "ERR" + TEST1
+        const val TEST_ERR = "ERR" + TEST1
+
+        fun toRandomFormatted(text: String): String {
+            val formatted = mutableListOf<String>().apply {
+                val random = Random(157)
+                val split = text.split('~')
+                this += split.first()
+                for (i in 1..split.size - 1) {
+                    val randomSpace = ByteArray(random.nextInt(8)) { random.nextInt(32).toByte() }
+                    this += randomSpace.toString(ISA.CHARSET) + split[i]
+                }
+            }.joinToString(separator = "~")
+            return formatted
+        }
     }
 
     @Test
@@ -51,6 +66,13 @@ class ISATest {
 
     @Test(expected = TransformerException::class)
     fun parseError() {
-        ISA.of(TEST2).toXML()
+        ISA.of(TEST_ERR).toXML()
+    }
+
+    @Test
+    fun filter() {
+        assertEquals(
+                ISA.filter(StringReader(toRandomFormatted(TEST1)), '~', StringBuilder()).toString(),
+                TEST1)
     }
 }

@@ -6,10 +6,7 @@ import com.berryworks.edireader.EDISyntaxException
 import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.helpers.DefaultHandler
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.OutputStreamWriter
-import java.io.StringReader
+import java.io.*
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.sax.SAXSource
@@ -58,18 +55,7 @@ class ISA private constructor(private val text: CharSequence, private val start:
         fun read(file: File): List<ISA> = mutableListOf<ISA>().apply {
             val (terminator, s1) = Delimiters.of(file)
             val text = file.reader(CHARSET).use {
-                val buff = CharArray(4096)
-                StringBuilder(file.length().toInt()).apply {
-                    while (true) {
-                        val res = it.read(buff)
-                        if (res == -1) break
-                        @Suppress("LoopToCallChain")
-                        for (i in 0..res - 1) {
-                            val c = buff[i]
-                            if (c >= ' ') append(c)
-                        }
-                    }
-                }
+                filter(it, terminator, StringBuilder(file.length().toInt()))
             }
             var index: Int = 0
             var next: Int
@@ -81,6 +67,29 @@ class ISA private constructor(private val text: CharSequence, private val start:
                 index = next + 1
                 if (index >= text.length) break
             }
+        }
+
+        internal fun filter(reader: Reader, terminator: Char, builder: StringBuilder) : StringBuilder {
+            val buff = CharArray(4096)
+            var tMode = false
+            while (true) {
+                val res = reader.read(buff)
+                if (res == -1) break
+                @Suppress("LoopToCallChain")
+                for (i in 0..res - 1) {
+                    val c = buff[i]
+                    if (tMode) {
+                        if (c > ' ') {
+                            tMode = false
+                            builder.append(c)
+                        }
+                    } else {
+                        if (c >= ' ') builder.append(c)
+                    }
+                    if (c == terminator) tMode = true
+                }
+            }
+            return builder
         }
 
         private val String.inputSource: InputSource get() = InputSource(StringReader(this))
