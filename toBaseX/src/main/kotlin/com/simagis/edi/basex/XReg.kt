@@ -12,23 +12,14 @@ import java.sql.SQLException
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.*
+import javax.sql.DataSource
 
 /**
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 2/6/2017.
  */
-class XReg : Closeable {
-    private val opened = mutableListOf<Closeable>()
-    private val qr: QueryRunner by lazy {
-        QueryRunner(SQLServerDataSource().apply {
-            serverName = properties["serverName"]
-            portNumber = properties["portNumber"].toInt()
-            instanceName = properties["instanceName"]
-            databaseName = properties["databaseName"]
-            user = properties["user"]
-            setPassword(properties["password"])
-        })
-    }
+class XReg {
+    private val qr: QueryRunner by lazy { QueryRunner(SQLServerDataSource().open()) }
 
     fun newSession(uuid: String? = null, block: XSession.() -> Unit) {
         XSession(this, uuid).use { it.block() }
@@ -232,30 +223,36 @@ class XReg : Closeable {
 
     companion object {
         private val md: MessageDigest get() = MessageDigest.getInstance("SHA")
+
+        private fun SQLServerDataSource.open(): DataSource {
+            serverName = properties["serverName"]
+            portNumber = properties["portNumber"].toInt()
+            instanceName = properties["instanceName"]
+            databaseName = properties["databaseName"]
+            user = properties["user"]
+            setPassword(properties["password"])
+            return this
+        }
+
         private val properties: Properties by lazy {
             Properties().apply {
-                if (!propertiesFile.isFile) {
-                    this["serverName"] = "localhost"
-                    this["portNumber"] = "1433"
-                    this["instanceName"] = "MSSQLSERVER"
-                    this["databaseName"] = "master"
-                    this["user"] = "sa"
-                    this["password"] = "#PASSWORD"
-                    propertiesFile.outputStream().use { store(it, "") }
+                if (!propertiesFile.exists()) {
+                    XReg::class.java.getResourceAsStream(propertiesFile.name).use { defaults ->
+                        propertiesFile.outputStream().use { defaults.copyTo(it) }
+                    }
                 }
-
                 propertiesFile.inputStream().use { load(it) }
             }
         }
 
         private val propertiesFile =
-                File(System.getenv("USERPROFILE") ?: ".").resolve(".x-isa.properties")
+                File(System.getenv("USERPROFILE") ?: ".").resolve(".x-reg.properties")
 
         private operator fun Properties.get(name: String): String = getProperty(name, null)
                 ?: throw SQLException("""property "$name" not found in $propertiesFile""")
 
         private fun ByteArray.toHexString(): String = joinToString(separator = "") {
-            Integer.toHexString(it.toInt().and(0xff))
+            Integer.toHexString(it.toInt() and 0xff)
         }
     }
 
@@ -330,15 +327,4 @@ class XReg : Closeable {
             ERROR(5000),
         }
     }
-
-    override fun close() {
-        opened.forEach {
-            try {
-                it.close()
-            } catch(e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
 }
