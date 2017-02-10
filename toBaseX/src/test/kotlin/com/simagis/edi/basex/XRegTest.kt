@@ -34,14 +34,14 @@ class XRegTest {
             withFile(test1) {
                 split().forEach { isa ->
                     withISA(isa) {
-                        updateIsaStatus("READY")
+                        isaStatus = "READY"
                         xLog.info("ISA: ${isa.name}",
                                 details = isa.code,
                                 detailsXml = isa.toXML().toString(ISA.CHARSET)
                         )
                     }
                 }
-                updateFileStatus("READY")
+                fileStatus = "READY"
                 xLog.info("File: $test1")
             }
         }

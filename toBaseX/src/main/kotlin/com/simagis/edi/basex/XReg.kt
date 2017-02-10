@@ -106,20 +106,20 @@ class XReg {
             fileStatus: String
     ) {
         val asFile = File(filePath)
-        private var fileStatus_ = fileStatus
-        val fileStatus: String get() = fileStatus_
+        var fileStatus: String = fileStatus
+            set(value) {
+                updateFileStatus(value)
+                field = value
+            }
 
-        fun updateFileStatus(status: String? = null) {
-            if (status != null) {
-                when (status) {
-                    "REGISTERED" -> xSession.qr.update(// language=TSQL
-                            "UPDATE [FILE] SET STATUS = ?, REGISTERED = ? WHERE ID = ?",
-                            *arrayOf(status, Timestamp.valueOf(LocalDateTime.now()), fileID))
-                    else -> xSession.qr.update(// language=TSQL
-                            "UPDATE [FILE] SET STATUS = ? WHERE ID = ?",
-                            *arrayOf(status, fileID))
-                }
-                fileStatus_ = status
+        private fun updateFileStatus(status: String): Unit {
+            when (status) {
+                "REGISTERED" -> xSession.qr.update(// language=TSQL
+                        "UPDATE [FILE] SET STATUS = ?, REGISTERED = ? WHERE ID = ?",
+                        *arrayOf(status, Timestamp.valueOf(LocalDateTime.now()), fileID))
+                else -> xSession.qr.update(// language=TSQL
+                        "UPDATE [FILE] SET STATUS = ? WHERE ID = ?",
+                        *arrayOf(status, fileID))
             }
         }
 
@@ -197,15 +197,15 @@ class XReg {
             val isaDigest: String,
             isaStatus: String
     ) {
-        private var isaStatus_ = isaStatus
-        val isaStatus: String get() = isaStatus_
-
-        fun updateIsaStatus(status: String? = null) {
-            if (status != null) {
-                //language=TSQL
-                xSession.qr.update("UPDATE ISA SET STATUS = ? WHERE ID = ?", *arrayOf(status, isaID))
-                isaStatus_ = status
+        var isaStatus: String = isaStatus
+            set(value) {
+                updateIsaStatus(value)
+                field = value
             }
+
+        private fun updateIsaStatus(status: String): Unit {
+            //language=TSQL
+            xSession.qr.update("UPDATE ISA SET STATUS = ? WHERE ID = ?", *arrayOf(status, isaID))
         }
 
         companion object {

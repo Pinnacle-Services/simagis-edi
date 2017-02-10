@@ -74,7 +74,7 @@ fun main(args: Array<String>) {
                             split()
                         } catch(e: Exception) {
                             xLog.warning("error on split($asFile)", e)
-                            updateFileStatus("INVALID")
+                            fileStatus = "INVALID"
                             return@withFile
                         }
                         isaList.forEachIndexed { i, isa ->
@@ -83,16 +83,16 @@ fun main(args: Array<String>) {
                                     if (limitCount++ < limit) {
                                         if (dbx.add("${file.name}.part-${i + 1}(${isaList.size}).xml", isa)) {
                                             validISA++
-                                            updateIsaStatus("LOCAL")
+                                            isaStatus = "LOCAL"
                                         } else {
                                             invalidISA++
-                                            updateIsaStatus("INVALID")
+                                            isaStatus = "INVALID"
                                         }
                                     }
                                 }
                             }
                         }
-                        updateFileStatus("REGISTERED")
+                        fileStatus = "REGISTERED"
                         if (invalidISA != 0) {
                             xLog.warning("$invalidISA invalid ISA(s) in file: $file")
                         }
