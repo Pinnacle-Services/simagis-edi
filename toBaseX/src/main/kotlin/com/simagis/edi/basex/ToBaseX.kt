@@ -7,7 +7,6 @@ import org.basex.core.cmd.InfoDB
 import org.basex.core.cmd.Optimize
 import java.io.File
 import java.io.FileFilter
-import kotlin.system.exitProcess
 
 
 /**
@@ -109,21 +108,4 @@ fun main(args: Array<String>) {
             }
         }
     }
-}
-
-private operator fun CommandLine.get(i: Int): String? = getPosition(i)
-
-private operator fun CommandLine.get(option: String): String? = getOption(option)
-
-private fun warning(message: String) {
-    println("WARNING: " + message)
-}
-
-private fun File.exitIfNotIsDir(name: String): File = apply {
-    if (!isDirectory) exit("Invalid $name: $absolutePath")
-}
-
-private fun exit(message: String) {
-    println(message)
-    exitProcess(1)
 }

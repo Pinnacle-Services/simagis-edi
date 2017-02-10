@@ -1,12 +1,14 @@
 package com.simagis.edi.basex
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource
+import org.apache.commons.dbutils.DbUtils
 import org.apache.commons.dbutils.QueryRunner
 import java.io.Closeable
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.security.MessageDigest
+import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Timestamp
@@ -64,6 +66,35 @@ class XReg {
                     *arrayOf(Timestamp.valueOf(LocalDateTime.now()))
             )
         }
+
+        fun forEachInputFile(function: (File) -> Unit) {
+            XInput.list(this).forEach { input -> input.forEachFile(function) }
+        }
+    }
+
+    private class XInput(val PATH: String, val MODE: String) {
+        companion object {
+            fun list(session: XReg.XSession): List<XInput> = session.qr
+                    .query(/* language=TSQL */ "SELECT PATH, MODE FROM INPUT", {
+                        mutableListOf<XInput>().apply {
+                            while (it.next()) {
+                                this += XInput(it.getString(1), it.getString(2))
+                            }
+                        }
+                    })
+        }
+
+        fun forEachFile(block: (File) -> Unit): Unit {
+            when (MODE) {
+                "R" -> File(PATH).walk().forEach { if (it.isFile) forFile(it, block) }
+                "D" -> File(PATH).listFiles()?.forEach { if (it.isFile) forFile(it, block) }
+                "F" -> forFile(File(PATH), block)
+            }
+        }
+
+        private fun forFile(file: File, block: (File) -> Unit) {
+            block(file)
+        }
     }
 
     class XFile private constructor(
@@ -79,8 +110,14 @@ class XReg {
 
         fun updateFileStatus(status: String? = null) {
             if (status != null) {
-                //language=TSQL
-                xSession.qr.update("UPDATE [FILE] SET STATUS = ? WHERE ID = ?", *arrayOf(status, fileID))
+                when (status) {
+                    "REGISTERED" -> xSession.qr.update(// language=TSQL
+                            "UPDATE [FILE] SET STATUS = ?, REGISTERED = ? WHERE ID = ?",
+                            *arrayOf(status, Timestamp.valueOf(LocalDateTime.now()), fileID))
+                    else -> xSession.qr.update(// language=TSQL
+                            "UPDATE [FILE] SET STATUS = ? WHERE ID = ?",
+                            *arrayOf(status, fileID))
+                }
                 fileStatus_ = status
             }
         }
@@ -253,6 +290,21 @@ class XReg {
 
         private fun ByteArray.toHexString(): String = joinToString(separator = "") {
             Integer.toHexString(it.toInt() and 0xff)
+        }
+
+        private fun QueryRunner.tx(block: QueryRunner.(Connection) -> Unit) {
+            val connection: Connection = dataSource.connection
+            try {
+                block(connection)
+                DbUtils.commitAndClose(connection)
+            } catch(e: Throwable) {
+                try {
+                    DbUtils.rollbackAndClose(connection)
+                } catch(r: SQLException) {
+                    throw r.apply { nextException = SQLException(e) }
+                }
+                throw e
+            }
         }
     }
 
