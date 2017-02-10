@@ -315,7 +315,7 @@ class XReg {
     )
 
     class XLog(private val xSession: XSession) {
-        var xContext = XContext()
+        var xContext = XContext(xSession)
 
         fun trace(message: String, action: String? = null, details: String? = null, detailsXml: String? = null) {
             log(Level.TRACE, message, action, details, detailsXml)
@@ -346,6 +346,9 @@ class XReg {
         }
 
         private fun log(level: Level, message: String, action: String? = null, details: String? = null, detailsXml: String? = null) {
+            System.err.println("${"[$level]".padEnd(10)} $message")
+            if (details != null) System.err.println(" details:  $details")
+            if (detailsXml != null) System.err.println(" detailsXml: $detailsXml")
             //language=TSQL
             xSession.qr.insert("""
                     INSERT INTO LOG (
