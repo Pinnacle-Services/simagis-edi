@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
     val defaultSession = UUID.randomUUID().toString()
     val defaultPrefix = "isa-doc-"
     val commandLine = com.berryworks.edireader.util.CommandLine(args)
-    if (commandLine.size() == 0) {
+    if (commandLine["?"] != null) {
         exit("""Usage: ToBaseXReg [-s session] [-p prefix] [-o outputDir] [-x dataDir] [-L LIMIT]
         auto session = $defaultSession
         auto prefix  = $defaultSession-$defaultPrefix
