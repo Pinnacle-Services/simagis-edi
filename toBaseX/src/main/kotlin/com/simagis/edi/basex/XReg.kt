@@ -105,6 +105,7 @@ class XReg {
             val fileName: String,
             fileStatus: String
     ) {
+        val asFile = File(filePath)
         private var fileStatus_ = fileStatus
         val fileStatus: String get() = fileStatus_
 
@@ -122,19 +123,7 @@ class XReg {
             }
         }
 
-        fun split(): List<ISA> {
-            try {
-                return ISA.read(File(filePath))
-            } catch(e: Throwable) {
-                xSession.xLog.warning(
-                        message = "ISA.read(File($filePath)) error",
-                        action = "ISA.read",
-                        exception = e
-                )
-                updateFileStatus("INVALID")
-                throw e
-            }
-        }
+        fun split(): List<ISA> = ISA.read(asFile)
 
         fun withISA(isa: ISA, block: XISA.() -> Unit) {
             context(XISA.of(this, isa), block)
@@ -153,7 +142,16 @@ class XReg {
         companion object {
             fun of(xSession: XSession, file: File): XFile {
                 val id: Long
-                val digest = md.digest(file.readBytes()).toHexString()
+                val digest = file.inputStream().use { stream ->
+                    md.apply {
+                        val bytes = ByteArray(4096)
+                        while (true) {
+                            val len = stream.read(bytes)
+                            if (len == -1) break
+                            update(bytes, 0, len)
+                        }
+                    }.digest().toHexString()
+                }
                 val path = file.absolutePath
                 val name = file.name
 

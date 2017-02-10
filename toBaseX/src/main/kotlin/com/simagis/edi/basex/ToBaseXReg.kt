@@ -70,7 +70,13 @@ fun main(args: Array<String>) {
                     if (fileStatus == "") {
                         var validISA = 0
                         var invalidISA = 0
-                        val isaList = split()
+                        val isaList: List<ISA> = try {
+                            split()
+                        } catch(e: Exception) {
+                            xLog.warning("error on split($asFile)", e)
+                            updateFileStatus("INVALID")
+                            return@withFile
+                        }
                         isaList.forEachIndexed { i, isa ->
                             withISA(isa) {
                                 if (isaStatus == "") {
