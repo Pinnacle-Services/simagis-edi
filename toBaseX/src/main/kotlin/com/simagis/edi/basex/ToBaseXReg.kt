@@ -81,7 +81,7 @@ fun main(args: Array<String>) {
                             withISA(isa) {
                                 if (isaStatus == "") {
                                     if (limitCount++ < limit) {
-                                        if (dbx.add("${file.name}.part-${i + 1}(${isaList.size}).xml", isa)) {
+                                        if (dbx.add("$isaDigest.xml", isa)) {
                                             validISA++
                                             isaStatus = "LOCAL"
                                         } else {
