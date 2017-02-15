@@ -240,7 +240,7 @@ class XReg {
                 } else {
                     //language=TSQL
                     id = qr.insert(
-                            "INSERT INTO ISA (DIGEST, DOC_TYPE, DATE8, TIME4) VALUES (?,?,?,?)",
+                            "INSERT INTO ISA (DIGEST, DOC_TYPE, DATE8, TIME8) VALUES (?,?,?,?)",
                             { it.next(); it.getLong(1) },
                             arrayOf<Any?>(
                                     digest,
