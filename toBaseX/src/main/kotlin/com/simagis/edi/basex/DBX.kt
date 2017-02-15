@@ -2,6 +2,7 @@ package com.simagis.edi.basex
 
 import org.basex.core.Context
 import org.basex.core.cmd.CreateDB
+import org.basex.core.cmd.Open
 import java.io.Closeable
 
 /**
@@ -13,7 +14,13 @@ class DBX : Closeable {
     val names: Set<String> get() = contextMap.keys
 
     fun on(name: String, action: (Context) -> Unit) = action(
-            contextMap.getOrPut(name) { Context().apply { CreateDB(name).execute(this) } }
+            contextMap.getOrPut(name) {
+                Context().apply {
+                    if (soptions.dbPath(name).exists())
+                        Open(name).execute(this) else
+                        CreateDB(name).execute(this)
+                }
+            }
     )
 
     override fun close() {

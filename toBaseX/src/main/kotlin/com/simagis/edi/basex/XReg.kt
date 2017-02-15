@@ -32,7 +32,14 @@ class XReg {
         val id: Int
         val uuid = uuid ?: UUID.randomUUID().toString()
         val started: LocalDateTime = LocalDateTime.now()
-        val xLog = XLog(this)
+        val xLog: XLog get() = xLogDB
+
+        private val xLogDB = XLogDB(this)
+        internal var xContext: XContext
+            get() = xLogDB.xContext
+            set(value) {
+                xLogDB.xContext = value
+            }
 
         init {
             //language=TSQL
@@ -51,12 +58,12 @@ class XReg {
         }
 
         private fun context(xFile: XFile, block: XFile.() -> Unit) {
-            val xContext = xLog.xContext
+            val xContext = this.xContext
             try {
-                xLog.xContext = XContext(this, xFile)
+                this.xContext = XContext(this, xFile)
                 xFile.block()
             } finally {
-                xLog.xContext = xContext
+                this.xContext = xContext
             }
         }
 
@@ -130,12 +137,12 @@ class XReg {
         }
 
         private fun context(xISA: XISA, block: XISA.() -> Unit) {
-            val xContext = xSession.xLog.xContext
+            val xContext = xSession.xContext
             try {
-                xSession.xLog.xContext = xContext.copy(xISA = xISA)
+                xSession.xContext = xContext.copy(xISA = xISA)
                 xISA.block()
             } finally {
-                xSession.xLog.xContext = xContext
+                xSession.xContext = xContext
             }
         }
 
@@ -312,18 +319,18 @@ class XReg {
             val xISA: XISA? = null
     )
 
-    class XLog(private val xSession: XSession) {
+    private class XLogDB(private val xSession: XSession) : XLog {
         var xContext = XContext(xSession)
 
-        fun trace(message: String, action: String? = null, details: String? = null, detailsXml: String? = null) {
+        override fun trace(message: String, action: String?, details: String?, detailsXml: String?) {
             log(Level.TRACE, message, action, details, detailsXml)
         }
 
-        fun info(message: String, action: String? = null, details: String? = null, detailsXml: String? = null) {
+        override fun info(message: String, action: String?, details: String?, detailsXml: String?) {
             log(Level.INFO, message, action, details, detailsXml)
         }
 
-        fun warning(message: String, exception: Throwable? = null, action: String? = null, details: String? = null, detailsXml: String? = null) = log(
+        override fun warning(message: String, exception: Throwable?, action: String?, details: String?, detailsXml: String?) = log(
                 level = Level.WARNING,
                 message = message,
                 action = action,
@@ -331,7 +338,7 @@ class XReg {
                 detailsXml = detailsXml
         )
 
-        fun error(message: String, exception: Throwable? = null, action: String? = null, details: String? = null, detailsXml: String? = null) = log(
+        override fun error(message: String, exception: Throwable?, action: String?, details: String?, detailsXml: String?) = log(
                 level = Level.ERROR,
                 message = message,
                 action = action,

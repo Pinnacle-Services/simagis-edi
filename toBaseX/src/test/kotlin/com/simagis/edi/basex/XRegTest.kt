@@ -35,7 +35,7 @@ class XRegTest {
                 split().forEach { isa ->
                     withISA(isa) {
                         isaStatus = "READY"
-                        xLog.info("ISA: ${isa.name}",
+                        xLog.info("ISA: ${isa.dbName}",
                                 details = isa.code,
                                 detailsXml = isa.toXML().toString(ISA.CHARSET)
                         )

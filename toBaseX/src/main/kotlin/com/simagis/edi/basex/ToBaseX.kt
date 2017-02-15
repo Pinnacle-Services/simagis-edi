@@ -35,7 +35,7 @@ fun main(args: Array<String>) {
         println("$path: ${isa.stat} at ${isa.position}")
         if (isa.valid) {
             try {
-                on(prefix + isa.name) { context ->
+                on(prefix + isa.dbName) { context ->
                     with(Add(path)) {
                         setInput(isa.toXML().inputStream())
                         execute(context)

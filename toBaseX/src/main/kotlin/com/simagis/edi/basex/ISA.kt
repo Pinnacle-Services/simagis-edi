@@ -26,7 +26,7 @@ class ISA private constructor(private val text: CharSequence, private val start:
     val position: String get() = "$start.." + if (end == -1) "end" else "$end"
     val valid: Boolean get() = stat.status == Status.VALID
     val stat: Stat by lazy { Stat(code) }
-    val name: String get() = with(stat.doc) {
+    val dbName: String get() = with(stat.doc) {
         when {
             date?.length == 8 -> "$type-${date?.take(6)}"
             else -> type ?: "unknown"

@@ -58,7 +58,7 @@ class ISATest {
     @Test
     fun parse() {
         val isa = ISA.of(TEST1)
-        assertEquals(isa.name, "835-201609")
+        assertEquals(isa.dbName, "835-201609")
         assertEquals(isa.stat.toString(), "Stat(status=VALID, doc=Doc(type=835, date=20160923, time=1607), counts=Counts(clp=1), error=null)")
         assertEquals(isa.toXML().size, 3128)
         assertTrue("xml contains Control=\"875381672\"", isa.toXML().toString(ISA.CHARSET).contains("Control=\"875381672\""))
