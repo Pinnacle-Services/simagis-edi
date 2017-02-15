@@ -40,7 +40,7 @@ fun main(args: Array<String>) {
         fun DBX.replace(path: String, isa: ISA): Boolean {
             xLog.trace("replacing ISA $path: ${isa.stat} at ${isa.position}")
             if (isa.valid) try {
-                on(isa.dbName) { context ->
+                on("isa-doc-${isa.dbName}") { context ->
                     with(Replace(path)) {
                         setInput(isa.toXML().inputStream())
                         execute(context)
