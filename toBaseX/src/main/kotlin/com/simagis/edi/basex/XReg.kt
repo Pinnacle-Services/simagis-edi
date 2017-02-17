@@ -32,6 +32,38 @@ class XReg {
         val id: Int
         val uuid = uuid ?: UUID.randomUUID().toString()
         val started: LocalDateTime = LocalDateTime.now()
+
+        internal val xIsaMap: MutableMap<String, XISA> by lazy {
+            mutableMapOf<String, XISA>().apply {
+                xLog.info("Loading ISA table...")
+                qr.query(/* language=TSQL */ "SELECT ID, DIGEST, STATUS FROM ISA") {
+                    while (it.next()) {
+                        val xIsa = XISA(
+                                xSession = this@XSession,
+                                isaID = it.getLong(1),
+                                isaDigest = it.getString(2).trim(),
+                                isaStatus = it.getString(3).trim())
+                        this[xIsa.isaDigest] = xIsa
+                    }
+                }
+
+                xLog.info("Loading R_ISA_FILE table...")
+                qr.query(/* language=TSQL */ """
+                    SELECT ISA.DIGEST, [FILE].DIGEST
+                        FROM R_ISA_FILE
+                        INNER JOIN ISA ON ISA_ID = ISA.ID
+                        INNER JOIN [FILE] ON FILE_ID = [FILE].ID
+                    """) { record ->
+                    while (record.next()) {
+                        this[record.getString(1).trim()]
+                                ?.isaFiles
+                                ?.add(record.getString(2).trim())
+                    }
+                }
+                xLog.info("Loading of tables completed")
+            }
+        }
+
         val xLog: XLog get() = xLogDB
 
         private val xLogDB = XLogDB(this)
@@ -198,12 +230,17 @@ class XReg {
         }
     }
 
-    class XISA private constructor(
+    class XISA internal constructor(
             internal val xSession: XSession,
             val isaID: Long,
             val isaDigest: String,
             isaStatus: String
     ) {
+        internal var isaFiles: MutableSet<String> = mutableSetOf()
+            set(value) {
+                field = value
+            }
+
         var isaStatus: String = isaStatus
             set(value) {
                 updateIsaStatus(value)
@@ -217,48 +254,32 @@ class XReg {
 
         companion object {
             fun of(xFile: XFile, isa: ISA): XISA {
-                val id: Long
                 val digest = md.digest(isa.code.toByteArray(ISA.CHARSET)).toHexString()
+                return xFile.xSession.xIsaMap[digest] ?: insert(xFile, isa, digest)
+            }
+
+            private fun insert(xFile: XFile, isa: ISA, digest: String): XISA {
                 val qr = xFile.xSession.qr
-
-                class REC(val ID: Long, val STATUS: String)
                 //language=TSQL
-                val rec = qr.query(
-                        "SELECT ID, STATUS FROM ISA WHERE DIGEST = ?",
-                        { if (it.next()) REC(it.getLong(1), it.getString(2)) else null },
-                        arrayOf(digest))
+                val id: Long = qr.insert(
+                        "INSERT INTO ISA (DIGEST, DOC_TYPE, DATE8, TIME8) VALUES (?,?,?,?)",
+                        { it.next(); it.getLong(1) },
+                        arrayOf<Any?>(
+                                digest,
+                                isa.stat.doc.type,
+                                isa.stat.doc.date,
+                                isa.stat.doc.time
+                        ))
+                //language=TSQL
+                qr.insert(
+                        "INSERT INTO R_ISA_FILE (ISA_ID, FILE_ID) VALUES (?,?)",
+                        {},
+                        arrayOf(id, xFile.fileID))
 
-
-                var isIsaIdAlreadyInR = false
-                if (rec != null) {
-                    id = rec.ID
-                    //language=TSQL
-                    isIsaIdAlreadyInR = qr.query(
-                            "SELECT * FROM R_ISA_FILE WHERE ISA_ID = ? AND FILE_ID = ?",
-                            ResultSet::next,
-                            arrayOf(rec.ID, xFile.fileID))
-                } else {
-                    //language=TSQL
-                    id = qr.insert(
-                            "INSERT INTO ISA (DIGEST, DOC_TYPE, DATE8, TIME8) VALUES (?,?,?,?)",
-                            { it.next(); it.getLong(1) },
-                            arrayOf<Any?>(
-                                    digest,
-                                    isa.stat.doc.type,
-                                    isa.stat.doc.date,
-                                    isa.stat.doc.time
-                            ))
+                return XISA(xFile.xSession, id, digest, "").apply {
+                    isaFiles.add(xFile.fileDigest)
+                    xFile.xSession.xIsaMap[digest] = this
                 }
-
-                if (!isIsaIdAlreadyInR) {
-                    //language=TSQL
-                    qr.insert(
-                            "INSERT INTO R_ISA_FILE (ISA_ID, FILE_ID) VALUES (?, ?)",
-                            {},
-                            arrayOf(id, xFile.fileID))
-                }
-
-                return XISA(xFile.xSession, id, digest, rec?.STATUS ?: "")
             }
         }
     }
