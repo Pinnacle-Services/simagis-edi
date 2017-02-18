@@ -71,7 +71,7 @@ fun main(args: Array<String>) {
                                 fileStatus = "INVALID"
                                 return@withFile
                             }
-                            isaList.forEachIndexed { i, isa ->
+                            isaList.forEach { isa ->
                                 withISA(isa) {
                                     if (isaStatus == "") {
                                         if (limitCount++ < limit) {
@@ -90,7 +90,7 @@ fun main(args: Array<String>) {
                             if (invalidISA != 0) {
                                 xLog.warning("$invalidISA invalid ISA(s) in file: $file")
                             }
-                            xLog.info("File $file is registered")
+                            xLog.info("File $file is registered with $validISA new valid ISA(s) of ${isaList.size}")
                         }
                     }
                 }
