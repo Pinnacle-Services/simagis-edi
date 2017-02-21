@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="toBaseXReg.zip">
+    <output-path>$PROJECT_DIR$/out/artifacts/toBaseXReg_zip</output-path>
+    <root id="archive" name="toBaseXReg.zip">
+      <element id="artifact" artifact-name="toBaseXRef:cmd" />
+    </root>
+  </artifact>
+</component>

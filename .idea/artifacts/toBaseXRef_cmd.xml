@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact name="toBaseXRef:cmd">
+    <output-path>$PROJECT_DIR$/out/artifacts/toBaseXRef_cmd</output-path>
+    <root id="root">
+      <element id="directory" name="lib">
+        <element id="artifact" artifact-name="toBaseX:jar" />
+      </element>
+      <element id="file-copy" path="$PROJECT_DIR$/toBaseX/toBaseXReg.cmd" />
+    </root>
+  </artifact>
+</component>
