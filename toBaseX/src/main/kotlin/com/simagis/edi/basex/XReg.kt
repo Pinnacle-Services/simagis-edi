@@ -101,8 +101,8 @@ class XReg {
 
         override fun close() {
             //language=TSQL
-            qr.update("UPDATE SESSION SET FINISHED = ?",
-                    *arrayOf(Timestamp.valueOf(LocalDateTime.now()))
+            qr.update("UPDATE SESSION SET FINISHED = ? WHERE ID = ?",
+                    *arrayOf(Timestamp.valueOf(LocalDateTime.now()), id)
             )
         }
 
