@@ -59,7 +59,12 @@ fun main(args: Array<String>) {
 
         DBX().use { dbx ->
             try {
-                forEachInputFile { file ->
+                status = "SCANNING"
+                val inputFiles = listInputFiles()
+                filesIn = inputFiles.size
+                status = "PROCESSING"
+
+                inputFiles.forEach { file ->
                     withFile(file) {
                         if (fileStatus == "") {
                             var validISA = 0
@@ -93,19 +98,23 @@ fun main(args: Array<String>) {
                             xLog.info("File $file is registered with $validISA new valid ISA(s) of ${isaList.size}")
                         }
                     }
+                    filesDone++
                 }
             } catch(e: Throwable) {
                 xLog.error("File processing error", e)
                 exitCode = 2
             }
 
+            status = "OPTIMIZATION"
             try {
+                optimizationsIn = dbx.names.size
                 dbx.names.forEach { name ->
                     dbx.on(name) { context ->
                         xLog.info("> Database $name: Optimization...")
                         Optimize().execute(context)
                         xLog.info("> Database $name: Information:", details = InfoDB().execute(context))
                     }
+                    optimizationsDone++
                 }
             } catch(e: Throwable) {
                 xLog.error("Database optimization error", e)

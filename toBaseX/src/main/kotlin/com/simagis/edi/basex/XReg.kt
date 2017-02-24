@@ -12,9 +12,12 @@ import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Timestamp
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
 import javax.sql.DataSource
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 /**
  * <p>
@@ -24,7 +27,16 @@ class XReg {
     private val qr: QueryRunner by lazy { QueryRunner(SQLServerDataSource().open()) }
 
     fun newSession(uuid: String? = null, block: XSession.() -> Unit) {
-        XSession(this, uuid).use { it.block() }
+        XSession(this, uuid).use {
+            it.status = "STARTING"
+            try {
+                it.block()
+                it.status = "FINISHED"
+            } catch(e: Exception) {
+                it.status = "FAILED"
+                throw e
+            }
+        }
     }
 
     class XSession(xReg: XReg, uuid: String?) : Closeable {
@@ -32,6 +44,25 @@ class XReg {
         val id: Int
         val uuid = uuid ?: UUID.randomUUID().toString()
         val started: LocalDateTime = LocalDateTime.now()
+
+        // language=TSQL
+        var status: String by UpdateSessionByID("", "UPDATE SESSION SET STATUS = ?, STATUS_TIME = ? WHERE ID = ?")
+        // language=TSQL
+        var filesIn: Int by UpdateSessionByID(0, "UPDATE SESSION SET FILES_IN = ?, STATUS_TIME = ? WHERE ID = ?")
+        // language=TSQL
+        var filesDone: Int by UpdateSessionByID(0, "UPDATE SESSION SET FILES_DONE = ?, STATUS_TIME = ? WHERE ID = ?")
+        // language=TSQL
+        var optimizationsIn: Int by UpdateSessionByID(0, "UPDATE SESSION SET OPTIMIZATIONS_IN = ?, STATUS_TIME = ? WHERE ID = ?")
+        // language=TSQL
+        var optimizationsDone: Int by UpdateSessionByID(0, "UPDATE SESSION SET OPTIMIZATIONS_DONE = ?, STATUS_TIME = ? WHERE ID = ?")
+
+        private class UpdateSessionByID<T>(var value: T, val sql: String) : ReadWriteProperty<XReg.XSession, T> {
+            override fun getValue(thisRef: XReg.XSession, property: KProperty<*>): T = value
+            override fun setValue(thisRef: XReg.XSession, property: KProperty<*>, value: T) {
+                thisRef.qr.update(sql, *arrayOf(value, Timestamp.from(Instant.now()), thisRef.id))
+                this.value = value
+            }
+        }
 
         internal val xIsaMap: MutableMap<String, XISA> by lazy {
             mutableMapOf<String, XISA>().apply {
@@ -106,6 +137,10 @@ class XReg {
             )
         }
 
+        fun listInputFiles(): List<File> = XInput
+                .list(this)
+                .flatMap { it.listFiles() }
+
         fun forEachInputFile(function: (File) -> Unit) {
             XInput.list(this).forEach { input -> input.forEachFile(function) }
         }
@@ -121,6 +156,15 @@ class XReg {
                             }
                         }
                     })
+        }
+
+        fun listFiles(): List<File> = when (MODE) {
+            "R" -> File(PATH).walk().toList()
+            "D" -> File(PATH).listFiles()?.asList() ?: emptyList()
+            "F" -> listOf(File(PATH))
+            else -> emptyList()
+        }.filter {
+            it.isFile
         }
 
         fun forEachFile(block: (File) -> Unit): Unit {
