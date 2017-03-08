@@ -45,6 +45,12 @@
         </dependency>
 
         <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.simagis.edi</groupId>
             <artifactId>edireader</artifactId>
             <version>4.7.3.0</version>
@@ -77,6 +83,13 @@
             <groupId>org.basex</groupId>
             <artifactId>basex-api</artifactId>
             <version>${basex.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.0.4</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
