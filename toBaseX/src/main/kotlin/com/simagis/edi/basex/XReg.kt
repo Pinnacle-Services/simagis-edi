@@ -332,12 +332,12 @@ class XReg {
         private val md: MessageDigest get() = MessageDigest.getInstance("SHA")
 
         private fun SQLServerDataSource.open(): DataSource {
-            serverName = properties["serverName"]
-            portNumber = properties["portNumber"].toInt()
-            instanceName = properties["instanceName"]
-            databaseName = properties["databaseName"]
-            user = properties["user"]
-            setPassword(properties["password"])
+            serverName = properties("serverName")
+            portNumber = properties("portNumber").toInt()
+            instanceName = properties("instanceName")
+            databaseName = properties("databaseName")
+            user = properties("user")
+            setPassword(properties("password"))
             return this
         }
 
@@ -355,7 +355,7 @@ class XReg {
         private val propertiesFile =
                 File(System.getenv("USERPROFILE") ?: ".").resolve(".x-reg.properties")
 
-        private operator fun Properties.get(name: String): String = getProperty(name, null)
+        private operator fun Properties.invoke(name: String): String = getProperty(name, null)
                 ?: throw SQLException("""property "$name" not found in $propertiesFile""")
 
         private fun ByteArray.toHexString(): String = joinToString(separator = "") {
