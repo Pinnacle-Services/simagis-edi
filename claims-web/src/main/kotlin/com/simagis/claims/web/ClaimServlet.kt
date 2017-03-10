@@ -47,6 +47,7 @@ class ClaimServlet : HttpServlet() {
 
         var count = 0
         response.status = HTTP_OK
+        response.contentType = "text/plain"
         val writer = response.writer
         documents.forEach { document ->
             if (count > 0) {
@@ -56,6 +57,6 @@ class ClaimServlet : HttpServlet() {
             count++
         }
         writer.println()
-        writer.println("found $count claims")
+        writer.println("found: $count")
     }
 }
