@@ -37,26 +37,31 @@ import kotlin.system.exitProcess
 fun main(args: Array<String>) {
     val commandLine = com.berryworks.edireader.util.CommandLine(args)
     val host = commandLine["host"] ?: "localhost"
-    val xq = commandLine["xq"] ?: File("claims.xq").absolutePath
+    val xq = commandLine["xq"] ?: File("isa-claims-xq").absolutePath
     val db = commandLine["db"] ?: "claims"
-    val collection = commandLine["c"] ?: "claims"
     val mode = commandLine["code"] ?: "R"
 
     if (commandLine.size() == 0)
         exit("""
-        Usage: ToMongoDB.kt [-host host] [-xq file.xq] [-db database] [-c collection] [-mode R|D|F] <path>
+        Usage: ToMongoDB.kt [-host host] [-xq path] [-db database] [-mode R|D|F] <path>
             host: $host
             xq: $xq
             database: $db
-            collection: $collection
             mode: $mode""")
 
-    val xqText = File(xq).readText()
+    val xqDir = File(xq)
+    val xqTypes: MutableMap<String, String> = Collections.synchronizedMap(mutableMapOf<String, String>())
 
     val mongoClient = MongoClient(host)
-    val mongoDBs: ThreadLocal<MongoDatabase> = ThreadLocal.withInitial { mongoClient.getDatabase(db) }
-    val mongoOut: ThreadLocal<MongoCollection<Document>> = ThreadLocal.withInitial { mongoDBs.get().getCollection(collection) }
-    val mongoLog: ThreadLocal<MongoCollection<Document>> = ThreadLocal.withInitial { mongoDBs.get().getCollection("claimsLog") }
+    class MongoClaims {
+        val database: MongoDatabase = mongoClient.getDatabase(db)
+        val log: MongoCollection<Document> = database.getCollection("claimsLog")
+        operator fun get(type: String): MongoCollection<Document> = claimTypeMap.getOrPut(type) {
+            database.getCollection("claims_$type")
+        }
+        private var claimTypeMap: MutableMap<String, MongoCollection<Document>> = mutableMapOf()
+    }
+    val mongoClaims: ThreadLocal<MongoClaims> = ThreadLocal.withInitial { MongoClaims() }
 
     val printLogLock = ReentrantLock()
     fun log(level: String, message: String, error: Throwable? = null, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) {
@@ -94,7 +99,7 @@ fun main(args: Array<String>) {
                     append("detailsXml", detailsXml)
                 }
             }
-            mongoLog.get().insertOne(document)
+            mongoClaims.get().log.insertOne(document)
             printLog(message, document["_id"])
         } catch(e: Throwable) {
             e.printStackTrace()
@@ -153,6 +158,23 @@ fun main(args: Array<String>) {
         )
 
         if (valid) try {
+
+            val xqText = stat.doc.type?.let { type ->
+                xqTypes.getOrPut(type) {
+                    xqDir.resolve("isa-claims-$type.xq").let { file ->
+                        if (file.isFile) file.readText() else {
+                            warning("$file not found")
+                            ""
+                        }
+                    }
+                }
+            } ?: ""
+
+            if (xqText.isEmpty()) {
+                warning("Unsupported isa type: ${stat.doc.type}")
+                return null
+            }
+
             val context = inMemoryBaseX.get()
 
             with(Replace("doc")) {
@@ -212,25 +234,30 @@ fun main(args: Array<String>) {
                 fun String.name() = substringBefore('-')
                 keys.toList().forEach { key ->
                     try {
+                        fun append(value: String?, cast: (String) -> Any) {
+                            if (value != null && value.isNotBlank())
+                                append(key.name(), cast(value))
+                        }
                         when (key.type()) {
-                            "I" -> getString(key)?.also { value -> append(key.name(), value.toInt()) }
-                            "L" -> getString(key)?.also { value -> append(key.name(), value.toLong()) }
-                            "F" -> getString(key)?.also { value -> append(key.name(), value.toDouble()) }
+                            "I" -> append(getString(key), String::toInt)
+                            "L" -> append(getString(key), String::toLong)
+                            "F" -> append(getString(key), String::toDouble)
                             "DT8" -> getString(key)?.also { value ->
                                 when (value.length) {
                                     8 -> append(key.name(), DT8.parse(value))
                                     6 -> append(key.name(), DT6.parse(value))
                                     4 -> append(key.name(), DT4.parse(value))
+                                    0 -> Unit
                                     else -> {
-                                        warning("Invalid DT8 value at $_id $key: ${getString(key)}", detailsJson = this)
+                                        warning("Invalid DT8 value at $_id $key: '${getString(key)}'", detailsJson = this)
                                     }
                                 }
                             }
                         }
                     } catch(e: Exception) {
                         when (e) {
-                            is ParseException -> warning("Invalid date format at $_id $key: ${getString(key)}", detailsJson = this)
-                            is NumberFormatException -> warning("Invalid number format at $_id $key: ${getString(key)}", detailsJson = this)
+                            is ParseException -> warning("Invalid date format at $_id $key: '${getString(key)}'", detailsJson = this)
+                            is NumberFormatException -> warning("Invalid number format at $_id $key: '${getString(key)}'", detailsJson = this)
                             else -> throw e
                         }
                     }
@@ -247,7 +274,7 @@ fun main(args: Array<String>) {
             return this
         }
 
-        info("Starting import $path into $host $db $collection")
+        info("Starting import $path into $host $db")
         listFiles.stream().parallel().forEach { file ->
             val isaList: List<ISA>
             try {
@@ -266,7 +293,7 @@ fun main(args: Array<String>) {
                         if (it is JsonObject) {
                             val document = Document.parse(it.toString()).prepare()
                             try {
-                                mongoOut.get().insertOne(document)
+                                mongoClaims.get()[isa.type].insertOne(document)
                                 claimCount.incrementAndGet()
                             } catch(e: Throwable) {
                                 if (e is MongoWriteException && ErrorCategory.fromErrorCode(e.code)
@@ -287,7 +314,7 @@ fun main(args: Array<String>) {
                 }
             }
         }
-        info("DONE for $path into $host $db $collection ${details()}")
+        info("DONE for $path into $host $db ${details()}")
     } catch(e: Throwable) {
         error("ERROR: ${e.message} ${details()}", e)
         exitProcess(2)

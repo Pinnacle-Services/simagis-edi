@@ -34,7 +34,7 @@ declare option output:method "json";
             <frmid>{$from_id}</frmid>,
             <prid>{$payer_id}</prid>,
             <prn>{$payer_name}</prn>,
-            <fl-I>{$filing}</fl-I>,
+            <fl>{$filing}</fl>,
             <clmAsk-F>{$ask_amt}</clmAsk-F>,
             <clmPay-F>{$pay_amt}</clmPay-F>,
             <pr-F>{$pr}</pr-F>,
