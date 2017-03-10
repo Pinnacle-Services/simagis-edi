@@ -242,6 +242,13 @@ fun main(args: Array<String>) {
                             "I" -> append(getString(key), String::toInt)
                             "L" -> append(getString(key), String::toLong)
                             "F" -> append(getString(key), String::toDouble)
+                            "CC" -> append(getString(key)) {
+                                it.split("[\\s,;.]".toRegex())
+                                        .filter(String::isNotEmpty)
+                                        .map(String::toLowerCase)
+                                        .map(String::capitalize)
+                                        .joinToString(separator = "")
+                            }
                             "DT8" -> getString(key)?.also { value ->
                                 when (value.length) {
                                     8 -> append(key.name(), DT8.parse(value))
@@ -300,10 +307,11 @@ fun main(args: Array<String>) {
                                 if (e is MongoWriteException && ErrorCategory.fromErrorCode(e.code)
                                         == ErrorCategory.DUPLICATE_KEY) {
                                     claimCountDuplicate.incrementAndGet()
-                                    val old: Document? = collection.find(Document("_id", document["_id"])).first()
-                                    if (old != document) {
-                                        warning("DUPLICATE", detailsJson = document)
-                                    }
+// TODO: compare document by content or digest
+//                                    val old: Document? = collection.find(Document("_id", document["_id"])).first()
+//                                    if (old != document) {
+//                                        warning("DUPLICATE", detailsJson = document)
+//                                    }
                                 } else {
                                     claimCountInvalid.incrementAndGet()
                                     warning("insertOne error: ${e.message}", e,
