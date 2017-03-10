@@ -43,6 +43,7 @@ fun main(args: Array<String>) {
     jsonArray.forEach {
         if (it is JsonObject) {
             val document = Document.parse(it.toString())
+            document.append("_id", document.remove("id"))
             try {
                 collection.insertOne(document)
             } catch(e: MongoWriteException) {
