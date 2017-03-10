@@ -1,7 +1,9 @@
 package com.simagis.claims.web
 
 import com.mongodb.MongoClient
+import com.mongodb.client.FindIterable
 import org.bson.Document
+import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
@@ -31,19 +33,29 @@ class ClaimServlet : HttpServlet() {
             return
         }
         val collectionName = "claims_${path[1]}"
-        val documentId = path[2]
+        val id = path[2]
 
         val mongoClient = MongoClient(mongoHost)
         val db = mongoClient.getDatabase(mongoDB)
         val collection = db.getCollection(collectionName)
-        val document: Document? = collection.find(Document("_id", documentId)).first()
 
-        if (document == null) {
-            response.status = HTTP_NOT_FOUND
-            return
+        val documents: FindIterable<Document> = when {
+            id.contains("-R-") -> collection.find(Document("_id", id))
+            id.startsWith("{") -> collection.find(Document.parse(id))
+            else -> collection.find(Document("acn", id))
         }
 
+        var count = 0
         response.status = HTTP_OK
-        response.writer.print(document.toJson(JsonWriterSettings(true)))
+        val writer = response.writer
+        documents.forEach { document ->
+            if (count > 0) {
+                writer.println(",")
+            }
+            writer.print(document.toJson(JsonWriterSettings(JsonMode.SHELL, true)))
+            count++
+        }
+        writer.println()
+        writer.println("found $count claims")
     }
 }
