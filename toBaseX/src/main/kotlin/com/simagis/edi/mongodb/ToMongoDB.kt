@@ -291,15 +291,19 @@ fun main(args: Array<String>) {
                     isaCount.incrementAndGet()
                     claims.forEach {
                         if (it is JsonObject) {
+                            val collection = mongoClaims.get()[isa.type]
                             val document = Document.parse(it.toString()).prepare()
                             try {
-                                mongoClaims.get()[isa.type].insertOne(document)
+                                collection.insertOne(document)
                                 claimCount.incrementAndGet()
                             } catch(e: Throwable) {
                                 if (e is MongoWriteException && ErrorCategory.fromErrorCode(e.code)
                                         == ErrorCategory.DUPLICATE_KEY) {
                                     claimCountDuplicate.incrementAndGet()
-                                    warning("DUPLICATE", detailsJson = document)
+                                    val old: Document? = collection.find(Document("_id", document["_id"])).first()
+                                    if (old != document) {
+                                        warning("DUPLICATE", detailsJson = document)
+                                    }
                                 } else {
                                     claimCountInvalid.incrementAndGet()
                                     warning("insertOne error: ${e.message}", e,
