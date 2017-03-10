@@ -14,6 +14,7 @@ import org.basex.core.MainOptions
 import org.basex.core.cmd.CreateDB
 import org.basex.core.cmd.Replace
 import org.basex.core.cmd.XQuery
+import org.bson.BsonSerializationException
 import org.bson.Document
 import java.io.File
 import java.io.PrintWriter
@@ -57,9 +58,17 @@ fun main(args: Array<String>) {
     val mongoOut: ThreadLocal<MongoCollection<Document>> = ThreadLocal.withInitial { mongoDBs.get().getCollection(collection) }
     val mongoLog: ThreadLocal<MongoCollection<Document>> = ThreadLocal.withInitial { mongoDBs.get().getCollection("claimsLog") }
 
-    val logLock = ReentrantLock()
+    val printLogLock = ReentrantLock()
     fun log(level: String, message: String, error: Throwable? = null, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) {
         val now = Date()
+        fun printLog(message: String, _id: Any?) {
+            """[${level.padEnd(8)}] $message at $now log: ObjectId("$_id}")""".also {
+                printLogLock.withLock {
+                    System.err.println(it)
+                    error?.printStackTrace()
+                }
+            }
+        }
         try {
             val document = Document().apply {
                 append("level", level)
@@ -86,13 +95,13 @@ fun main(args: Array<String>) {
                 }
             }
             mongoLog.get().insertOne(document)
-            logLock.withLock {
-                System.err.println("""[${level.padEnd(8)}] $message at $now log: ObjectId("${document["_id"]}")""")
-                error?.printStackTrace()
-            }
+            printLog(message, document["_id"])
         } catch(e: Throwable) {
             e.printStackTrace()
-            exit("Logging error: ${e.message}")
+            printLog("${e.javaClass.simpleName} on $message", null)
+            if (e !is BsonSerializationException) {
+                exit("Logging error: ${e.message}")
+            }
         }
     }
 
