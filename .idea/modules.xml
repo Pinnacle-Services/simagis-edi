@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/claims-web/claims-web.iml" filepath="$PROJECT_DIR$/claims-web/claims-web.iml" />
       <module fileurl="file://$PROJECT_DIR$/edi.iml" filepath="$PROJECT_DIR$/edi.iml" />
       <module fileurl="file://$PROJECT_DIR$/edireader/edireader.iml" filepath="$PROJECT_DIR$/edireader/edireader.iml" />
       <module fileurl="file://$PROJECT_DIR$/toBaseX/toBaseX.iml" filepath="$PROJECT_DIR$/toBaseX/toBaseX.iml" />
