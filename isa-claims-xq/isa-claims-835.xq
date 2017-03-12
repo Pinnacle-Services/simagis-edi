@@ -60,6 +60,19 @@ declare option output:method "json";
                         <ask-F>{$cpt_ask}</ask-F>,
                         <pay-F>{$cpt_ask}</pay-F>,
                         <srv-DT8 >{$date_srv[1]}</srv-DT8>
+                        (: adjustments information:)
+                        <adj type = 'array'> {
+                        for $adj in $cpt/segment[@Id="CAS"]
+                        let $adj_group := $adj/element[@Id="CAS01"]/text()
+                        let $adj_reason := $adj/element[@Id="CAS02"]/text()
+                        let $adj_amount := $adj/element[@Id="CAS03"]/text()
+                        return 
+                            <_ type='object'>{
+                            <adjGrp>{$adj_group}</adjGrp>,
+                            <adjReason>{$adj_reason}</adjReason>,
+                            <adjAmt-F>{$adj_amount}</adjAmt-F>
+                            }</_>
+                        }</adj>
                     } </_>
             }</svc>
         }</_>
