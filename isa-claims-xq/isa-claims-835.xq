@@ -27,14 +27,14 @@ declare option output:method "json";
             <acn>{$acn_id}</acn>,
             <ref>{$ref}</ref>,
             <status>{$status}</status>,
-            <proc-DT8>{$date_tr}</proc-DT8>,
+            <procDate-DT8>{$date_tr}</procDate-DT8>,
             <loc>{$loc}</loc>,
-            <freq>{$freq}</freq>,
-            <frmn>{$from_name}</frmn>,
+            <freq-I>{$freq}</freq-I>,
+            <frmn-CC>{$from_name}</frmn-CC>,
             <frmid>{$from_id}</frmid>,
             <prid>{$payer_id}</prid>,
             <prn-CC>{$payer_name}</prn-CC>,
-            <fl>{$filing}</fl>,
+            <fCode>{$filing}</fCode>,
             <clmAsk-F>{$ask_amt}</clmAsk-F>,
             <clmPay-F>{$pay_amt}</clmPay-F>,
             <pr-F>{$pr}</pr-F>,
@@ -53,13 +53,13 @@ declare option output:method "json";
                 return
                     <_ type='object'>{
                         <cpt >{$cpt_id}</cpt>,
-                        <mod1>{$cpt_mod}</mod1>,
-                        <mod2 >{$cpt_mod2}</mod2>,
-                        <mod3 >{$cpt_mod3}</mod3>,
-                        <qty >{$cpt_qty}</qty>,
-                        <ask-F>{$cpt_ask}</ask-F>,
-                        <pay-F>{$cpt_ask}</pay-F>,
-                        <srv-DT8 >{$date_srv[1]}</srv-DT8>
+                        <cptMod1>{$cpt_mod}</CptMod1>,
+                        <mod2>{$cpt_mod2}</mod2>,
+                        <mod3>{$cpt_mod3}</mod3>,
+                        <qty-I>{$cpt_qty}</qty-I>,
+                        <cptAsk-F>{$cpt_ask}</cptAsk-F>,
+                        <cptPay-F>{$cpt_ask}</cptPay-F>,
+                        <srvDate-DT8>{$date_srv[1]}</srvDate-DT8>
                         (: adjustments information:)
                         <adj type = 'array'> {
                         for $adj in $cpt/segment[@Id="CAS"]
