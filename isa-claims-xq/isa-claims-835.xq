@@ -59,7 +59,7 @@ declare option output:method "json";
                         <qty-I>{$cpt_qty}</qty-I>,
                         <cptAsk-F>{$cpt_ask}</cptAsk-F>,
                         <cptPay-F>{$cpt_ask}</cptPay-F>,
-                        <srvDate-DT8>{$date_srv[1]}</srvDate-DT8>
+                        <srvDate-DT8>{$date_srv[1]}</srvDate-DT8>,
                         (: adjustments information:)
                         <adj type = 'array'> {
                         for $adj in $cpt/segment[@Id="CAS"]
