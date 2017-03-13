@@ -247,7 +247,7 @@ fun main(args: Array<String>) {
                                         .filter(String::isNotEmpty)
                                         .map(String::toLowerCase)
                                         .map(String::capitalize)
-                                        .joinToString(separator = "")
+                                        .joinToString(separator = " ")
                             }
                             "DT8" -> getString(key)?.also { value ->
                                 when (value.length) {
