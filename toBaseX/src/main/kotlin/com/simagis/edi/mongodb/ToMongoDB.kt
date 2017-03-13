@@ -223,9 +223,9 @@ fun main(args: Array<String>) {
         }
 
         fun Document.prepare(): Document {
-            val DT8 by lazy { SimpleDateFormat("YYYYMMDD") }
-            val DT6 by lazy { SimpleDateFormat("YYYYMM") }
-            val DT4 by lazy { SimpleDateFormat("YYYYMM") }
+            val DT8 by lazy { SimpleDateFormat("yyyyMMdd") }
+            val DT6 by lazy { SimpleDateFormat("yyyyMM") }
+            val DT4 by lazy { SimpleDateFormat("yyyy") }
             val _id = remove("id")
             append("_id", _id)
             fun Document.fixTypes() {
