@@ -52,13 +52,14 @@ declare option output:method "json";
 
                 return
                     <_ type='object'>{
+                        <cptId >{concat($cpt_id,$cpt_mod)}</cptId>,
                         <cpt >{$cpt_id}</cpt>,
                         <cptMod1>{$cpt_mod}</cptMod1>,
                         <mod2>{$cpt_mod2}</mod2>,
                         <mod3>{$cpt_mod3}</mod3>,
                         <qty-I>{$cpt_qty}</qty-I>,
                         <cptAsk-F>{$cpt_ask}</cptAsk-F>,
-                        <cptPay-F>{$cpt_ask}</cptPay-F>,
+                        <cptPay-F>{$cpt_pay}</cptPay-F>,
                         <srvDate-DT8>{$date_srv[1]}</srvDate-DT8>,
                         (: adjustments information:)
                         <adj type = 'array'> {
