@@ -53,7 +53,7 @@ declare option output:method "json";
                 return
                     <_ type='object'>{
                         <cpt >{$cpt_id}</cpt>,
-                        <cptMod1>{$cpt_mod}</CptMod1>,
+                        <cptMod1>{$cpt_mod}</cptMod1>,
                         <mod2>{$cpt_mod2}</mod2>,
                         <mod3>{$cpt_mod3}</mod3>,
                         <qty-I>{$cpt_qty}</qty-I>,
