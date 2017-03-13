@@ -175,7 +175,6 @@ fun main(args: Array<String>) {
             } ?: ""
 
             if (xqText.isEmpty()) {
-                warning("Unsupported isa type: ${stat.doc.type}")
                 return null
             }
 
