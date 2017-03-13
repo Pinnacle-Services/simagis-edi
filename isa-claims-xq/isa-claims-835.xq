@@ -29,7 +29,7 @@ declare option output:method "json";
             <status>{$status}</status>,
             <procDate-DT8>{$date_tr}</procDate-DT8>,
             <loc>{$loc}</loc>,
-            <freq-I>{$freq}</freq-I>,
+            <freq>{$freq}</freq>,
             <frmn-CC>{$from_name}</frmn-CC>,
             <frmid>{$from_id}</frmid>,
             <prid>{$payer_id}</prid>,
