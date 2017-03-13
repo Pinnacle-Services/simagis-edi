@@ -57,7 +57,7 @@ declare option output:method "json";
                         <cptMod1>{$cpt_mod}</cptMod1>,
                         <mod2>{$cpt_mod2}</mod2>,
                         <mod3>{$cpt_mod3}</mod3>,
-                        <qty-I>{$cpt_qty}</qty-I>,
+                        <qty-F>{$cpt_qty}</qty-F>,
                         <cptAsk-F>{$cpt_ask}</cptAsk-F>,
                         <cptPay-F>{$cpt_pay}</cptPay-F>,
                         <srvDate-DT8>{$date_srv[1]}</srvDate-DT8>,
