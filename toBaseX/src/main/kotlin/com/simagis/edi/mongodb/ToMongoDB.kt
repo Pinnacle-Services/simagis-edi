@@ -40,6 +40,7 @@ fun main(args: Array<String>) {
     val xq = commandLine["xq"] ?: File("isa-claims-xq").absolutePath
     val db = commandLine["db"] ?: "claims"
     val mode = commandLine["code"] ?: "R"
+    val after = commandLine["after"]?.let { java.sql.Date.valueOf(it) }
 
     if (commandLine.size() == 0)
         exit("""
@@ -53,14 +54,17 @@ fun main(args: Array<String>) {
     val xqTypes: MutableMap<String, String> = Collections.synchronizedMap(mutableMapOf<String, String>())
 
     val mongoClient = MongoClient(host)
+
     class MongoClaims {
         val database: MongoDatabase = mongoClient.getDatabase(db)
         val log: MongoCollection<Document> = database.getCollection("claimsLog")
         operator fun get(type: String): MongoCollection<Document> = claimTypeMap.getOrPut(type) {
             database.getCollection("claims_$type")
         }
+
         private var claimTypeMap: MutableMap<String, MongoCollection<Document>> = mutableMapOf()
     }
+
     val mongoClaims: ThreadLocal<MongoClaims> = ThreadLocal.withInitial { MongoClaims() }
 
     val printLogLock = ReentrantLock()
@@ -301,8 +305,10 @@ fun main(args: Array<String>) {
                             val collection = mongoClaims.get()[isa.type]
                             val document = Document.parse(it.toString()).prepare()
                             try {
-                                collection.insertOne(document)
-                                claimCount.incrementAndGet()
+                                if (after == null || document.getDate("procDate")?.after(after) ?: false) {
+                                    collection.insertOne(document)
+                                    claimCount.incrementAndGet()
+                                }
                             } catch(e: Throwable) {
                                 if (e is MongoWriteException && ErrorCategory.fromErrorCode(e.code)
                                         == ErrorCategory.DUPLICATE_KEY) {
