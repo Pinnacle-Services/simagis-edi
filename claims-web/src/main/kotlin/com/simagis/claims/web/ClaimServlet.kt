@@ -3,10 +3,10 @@ package com.simagis.claims.web
 import com.mongodb.MongoClient
 import com.mongodb.client.FindIterable
 import org.bson.Document
-import org.bson.json.JsonMode
-import org.bson.json.JsonWriterSettings
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
+import javax.json.Json
+import javax.json.JsonObject
 import javax.servlet.annotation.WebServlet
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -42,6 +42,11 @@ class ClaimServlet : HttpServlet() {
         val documents: FindIterable<Document> = when {
             id.contains("-R-") -> collection.find(Document("_id", id))
             id.startsWith("{") -> collection.find(Document.parse(id))
+            id.startsWith("[") -> Json.createReader(id.reader()).readArray().let {
+                collection
+                        .find(Document.parse((it[0] as JsonObject).toString()))
+                        .projection(Document.parse((it[1] as JsonObject).toString()))
+            }
             else -> collection.find(Document("acn", id))
         }
 
