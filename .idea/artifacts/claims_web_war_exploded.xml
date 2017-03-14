@@ -12,6 +12,8 @@
           <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver:3.4.2" />
           <element id="library" level="project" name="Maven: org.mongodb:bson:3.4.2" />
           <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver-core:3.4.2" />
+          <element id="library" level="project" name="Maven: javax.json:javax.json-api:1.0" />
+          <element id="library" level="project" name="Maven: org.glassfish:javax.json:1.0.4" />
         </element>
       </element>
       <element id="directory" name="META-INF">

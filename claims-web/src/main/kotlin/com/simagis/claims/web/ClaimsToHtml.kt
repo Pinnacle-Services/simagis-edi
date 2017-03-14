@@ -3,6 +3,9 @@ package com.simagis.claims.web
 import org.bson.Document
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.json.Json
+import javax.json.JsonObject
+import javax.json.JsonString
 
 /**
  * <p>
@@ -12,15 +15,70 @@ class ClaimsToHtml(val maxCount: Int = 100) {
     private var count = 0
     private var indent = 0
     private val html = StringBuilder()
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
 
-    private fun formatKey(key: String, value: Any?): String = when {
-        else -> key
-    }
+    private fun formatKey(key: String, value: Any?): String = keys.map.getOrDefault(key, key)
 
     private fun formatValue(key: String, value: Any?): String = when {
+        key == "cpt" && value is String -> value + " " + cptCodes.optString(value)
+        key == "adjGrp" && value is String -> value + " " + adjustmentGroupCodes.optString(value)
+        key == "adjReason" && value is String -> value + " " + adjustmentCodes.optString(value)
         value is Date -> dateFormat.format(value)
         else -> value.asHTML
+    }
+
+    private class Keys(private val order: List<String>, val map: Map<String, String>) {
+
+        fun orderedKeys(claim: Document): List<String> = mutableListOf<String>().apply {
+            val inst = claim.keys.sorted()
+            this += order.filter { inst.contains(it) }
+            this += inst.filter { !order.contains(it) }
+        }
+
+    }
+
+    companion object {
+        private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+
+        private val keys: Keys by lazy {
+            val order = mutableListOf<String>()
+            val map = loadAsMap("keyNames.json", {
+                val key = it.getString("key")
+                order+= key
+                key to it.getString("name")
+            })
+            Keys(order, map)
+        }
+
+        private val cptCodes: Map<String, String> by lazy {
+            loadAsMap("cptCodes.json", {
+                it.getString("cpt_code") to it.getString("short_description")
+            })
+        }
+        private val adjustmentGroupCodes: Map<String, String> by lazy {
+            loadAsMap("adjustmentGroupCodes.json", {
+                it.getString("id") to it.getString("caption")
+            })
+        }
+        private val adjustmentCodes: Map<String, String> by lazy {
+            loadAsMap("adjustmentCodes.json", { json ->
+                val reason = json.getString("Reason")
+                val description = json["Description"]
+                if (reason is String && description is JsonString)
+                    reason to description.string else null
+            })
+        }
+
+        private fun loadAsMap(name: String, map: (JsonObject) -> Pair<String, String>?): Map<String, String> = mutableMapOf<String, String>().apply {
+            ClaimsToHtml::class.java.getResourceAsStream(name).use { Json.createReader(it).readArray() }.forEach {
+                if (it is JsonObject) {
+                    map(it)?.let { this += it }
+                }
+            }
+        }
+
+        private fun Map<String, String>.optString(key: String, def: String = ""): String {
+            return this[key] ?: def
+        }
     }
 
     init {
@@ -49,7 +107,7 @@ class ClaimsToHtml(val maxCount: Int = 100) {
 
     private fun addDoc(doc: Document) {
         val maxKeyLength: Int = doc.keys.map { formatKey(it, null).length }.max() ?: 0
-        for (key in orderedKeys(doc)) {
+        for (key in keys.orderedKeys(doc)) {
             val value = doc[key]
             when (value) {
                 is Document -> addDocBody(key, value)
@@ -94,7 +152,9 @@ class ClaimsToHtml(val maxCount: Int = 100) {
     }
 
     private fun addProperty(maxKeyLength: Int, key: String, value: Any?) {
-        addIndentedText("${keyToHTML(formatKey(key, value))}: ${"&nbsp;".repeat(maxKeyLength - key.length)}${formatValue(key, value).esc}")
+        val formattedKey = formatKey(key, value)
+        val separator = "&nbsp;".repeat(maxKeyLength - formattedKey.length)
+        addIndentedText(keyToHTML(formattedKey) + ": " + separator + formatValue(key, value).esc)
     }
 
     private fun addClaimFooter(claim: Document) {
@@ -116,7 +176,6 @@ class ClaimsToHtml(val maxCount: Int = 100) {
         html.append("</body>")
     }
 
-    private fun orderedKeys(claim: Document) = claim.keys.sorted()
 
     private fun keyToHTML(key: String) = "<span style='color:gray'>${key.esc}</span>"
 

@@ -1,0 +1,1712 @@
+[
+  {
+    "Reason": "",
+    "Recoverable": null,
+    "Party": null,
+    "Description": null
+  },
+  {
+    "Reason": "1",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Deductible Amount"
+  },
+  {
+    "Reason": "10",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The diagnosis is inconsistent with the patient's gender. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "100",
+    "Recoverable": "Non-recoverable",
+    "Party": "Patient",
+    "Description": "Payment made to patient/insured/responsible party/employer."
+  },
+  {
+    "Reason": "101",
+    "Recoverable": "Recoverable",
+    "Party": null,
+    "Description": "Predetermination: anticipated payment upon completion of services or claim adjudication."
+  },
+  {
+    "Reason": "102",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Major Medical Adjustment."
+  },
+  {
+    "Reason": "103",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "Provider promotional discount (e.g., Senior citizen discount)."
+  },
+  {
+    "Reason": "104",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Managed care withholding."
+  },
+  {
+    "Reason": "105",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Tax withholding."
+  },
+  {
+    "Reason": "106",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Patient payment option/election not in effect."
+  },
+  {
+    "Reason": "107",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "The related or qualifying claim/service was not identified on this claim. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "108",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Rent/purchase guidelines were not met. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "109",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Claim/service not covered by this payer/contractor. You must send the claim/service to the correct payer/contractor."
+  },
+  {
+    "Reason": "11",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The diagnosis is inconsistent with the procedure. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "110",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "Billing date predates service date."
+  },
+  {
+    "Reason": "111",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Not covered unless the provider accepts assignment."
+  },
+  {
+    "Reason": "112",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Service not furnished directly to the patient and/or not documented."
+  },
+  {
+    "Reason": "114",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Procedure/product not approved by the Food and Drug Administration."
+  },
+  {
+    "Reason": "115",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Procedure postponed, canceled, or delayed."
+  },
+  {
+    "Reason": "116",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "The advance indemnification notice signed by the patient did not comply with requirements."
+  },
+  {
+    "Reason": "117",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Transportation is only covered to the closest facility that can provide the necessary care."
+  },
+  {
+    "Reason": "118",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "ESRD network support adjustment."
+  },
+  {
+    "Reason": "119",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Benefit maximum for this time period or occurrence has been reached."
+  },
+  {
+    "Reason": "12",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The diagnosis is inconsistent with the provider type. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "121",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Indemnification adjustment - compensation for outstanding member responsibility."
+  },
+  {
+    "Reason": "122",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Psychiatric reduction."
+  },
+  {
+    "Reason": "125",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "Payment adjusted due to a submission/billing error(s)"
+  },
+  {
+    "Reason": "128",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Newborn's services are covered in the mother's Allowance."
+  },
+  {
+    "Reason": "129",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "Prior processing information appears incorrect. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.)"
+  },
+  {
+    "Reason": "13",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The date of death precedes the date of service."
+  },
+  {
+    "Reason": "130",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Claim submission fee."
+  },
+  {
+    "Reason": "131",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Claim specific negotiated discount."
+  },
+  {
+    "Reason": "132",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Prearranged demonstration project adjustment."
+  },
+  {
+    "Reason": "133",
+    "Recoverable": "Recoverable",
+    "Party": "Insurance",
+    "Description": "The disposition of this service line is pending further review. (Use only with Group Code OA). Note: Use of this code requires a reversal and correction when the service line is finalized (use only in Loop 2110 CAS segment of the 835 or Loop 2430 of the 837)."
+  },
+  {
+    "Reason": "134",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Technical fees removed from charges."
+  },
+  {
+    "Reason": "135",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Interim bills cannot be processed."
+  },
+  {
+    "Reason": "136",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Failure to follow prior payer's coverage rules. (Use only with Group Code OA)"
+  },
+  {
+    "Reason": "137",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Regulatory Surcharges, Assessments, Allowances or Health Related Taxes."
+  },
+  {
+    "Reason": "138",
+    "Recoverable": "Recoverable",
+    "Party": "Insurance",
+    "Description": "Appeal procedures not followed or time limits not met."
+  },
+  {
+    "Reason": "139",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "Contracted funding agreement - Subscriber is employed by the provider of services."
+  },
+  {
+    "Reason": "14",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The date of birth follows the date of service."
+  },
+  {
+    "Reason": "140",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Patient/Insured health identification number and name do not match."
+  },
+  {
+    "Reason": "141",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "Claim adjustment because the claim spans eligible and ineligible periods of coverage."
+  },
+  {
+    "Reason": "142",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Monthly Medicaid patient liability amount."
+  },
+  {
+    "Reason": "143",
+    "Recoverable": "Recoverable",
+    "Party": "Insurance",
+    "Description": "Portion of payment deferred."
+  },
+  {
+    "Reason": "144",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Incentive adjustment, e.g. preferred product/service."
+  },
+  {
+    "Reason": "146",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Diagnosis was invalid for the date(s) of service reported."
+  },
+  {
+    "Reason": "147",
+    "Recoverable": "Recoverable",
+    "Party": "Insurance",
+    "Description": "Provider contracted/negotiated rate expired or not on file."
+  },
+  {
+    "Reason": "148",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Information from another provider was not provided or was insufficient/incomplete. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.)"
+  },
+  {
+    "Reason": "149",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Lifetime benefit maximum has been reached for this service/benefit category."
+  },
+  {
+    "Reason": "15",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The authorization number is missing, invalid, or does not apply to the billed services or provider."
+  },
+  {
+    "Reason": "150",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Payer deems the information submitted does not support this level of service."
+  },
+  {
+    "Reason": "151",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Payment adjusted because the payer deems the information submitted does not support this many/frequency of services."
+  },
+  {
+    "Reason": "152",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Payer deems the information submitted does not support this length of service. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "153",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Payer deems the information submitted does not support this dosage."
+  },
+  {
+    "Reason": "154",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Payer deems the information submitted does not support this day's supply."
+  },
+  {
+    "Reason": "155",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Patient refused the service/procedure."
+  },
+  {
+    "Reason": "157",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Service/procedure was provided as a result of an act of war."
+  },
+  {
+    "Reason": "158",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Service/procedure was provided outside of the United States."
+  },
+  {
+    "Reason": "159",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Service/procedure was provided as a result of terrorism."
+  },
+  {
+    "Reason": "16",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "Claim/service lacks information or has submission/billing error(s) which is needed for adjudication. Do not use this code for claims attachment(s)/other documentation. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.) Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "160",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Injury/illness was the result of an activity that is a benefit exclusion."
+  },
+  {
+    "Reason": "161",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Provider performance bonus"
+  },
+  {
+    "Reason": "163",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "Attachment/other documentation referenced on the claim was not received."
+  },
+  {
+    "Reason": "164",
+    "Recoverable": "Recoverable",
+    "Party": "Insurance",
+    "Description": "Attachment/other documentation referenced on the claim was not received in a timely fashion."
+  },
+  {
+    "Reason": "165",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Referral absent or exceeded."
+  },
+  {
+    "Reason": "166",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "These services were submitted after this payers responsibility for processing claims under this plan ended."
+  },
+  {
+    "Reason": "167",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "This (these) diagnosis(es) is (are) not covered. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "168",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Service(s) have been considered under the patient's medical plan. Benefits are not available under this dental plan."
+  },
+  {
+    "Reason": "169",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Alternate benefit has been provided."
+  },
+  {
+    "Reason": "17",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "\tPayment adjusted because requested information was not provided or was insufficient/incomplete. Additional information is supplied using the remittance advice remarks codes whenever appropria,  at least one rema code co must be provided"
+  },
+  {
+    "Reason": "170",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Payment is denied when performed/billed by this type of provider. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "171",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Payment is denied when performed/billed by this type of provider in this type of facility. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "172",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Payment is adjusted when performed/billed by a provider of this specialty. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "173",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Service/equipment was not prescribed by a physician."
+  },
+  {
+    "Reason": "174",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Service was not prescribed prior to delivery."
+  },
+  {
+    "Reason": "175",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Prescription is incomplete."
+  },
+  {
+    "Reason": "176",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Prescription is not current."
+  },
+  {
+    "Reason": "177",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Patient has not met the required eligibility requirements."
+  },
+  {
+    "Reason": "178",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Patient has not met the required spend down requirements."
+  },
+  {
+    "Reason": "179",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Patient has not met the required waiting requirements. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "18",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Exact duplicate claim/service (Use only with Group Code OA except where state workers' compensation regulations requires CO)"
+  },
+  {
+    "Reason": "180",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Patient has not met the required residency requirements."
+  },
+  {
+    "Reason": "181",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Procedure code was invalid on the date of service."
+  },
+  {
+    "Reason": "182",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Procedure modifier was invalid on the date of service."
+  },
+  {
+    "Reason": "183",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The referring provider is not eligible to refer the service billed. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "184",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The prescribing/ordering provider is not eligible to prescribe/order the service billed. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "185",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The rendering provider is not eligible to perform the service billed. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "186",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Level of care change adjustment."
+  },
+  {
+    "Reason": "187",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Consumer Spending Account payments (includes but is not limited to Flexible Spending Account, Health Savings Account, Health Reimbursement Account, etc.)"
+  },
+  {
+    "Reason": "188",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "This product/procedure is only covered when used according to FDA recommendations."
+  },
+  {
+    "Reason": "189",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "'Not otherwise classified' or 'unlisted' procedure code (CPT/HCPCS) was billed when there is a specific procedure code for this procedure/service"
+  },
+  {
+    "Reason": "19",
+    "Recoverable": "Recoverable",
+    "Party": "Insurance",
+    "Description": "This is a work-related injury/illness and thus the liability of the Worker's Compensation Carrier."
+  },
+  {
+    "Reason": "190",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Payment is included in the allowance for a Skilled Nursing Facility (SNF) qualified stay."
+  },
+  {
+    "Reason": "192",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "Non standard adjustment code from paper remittance. Note: This code is to be used by providers/payers providing Coordination of Benefits information to another payer in the 837 transaction only. This code is only used when the non-standard code cannot be reasonably mapped to an existing Claims Adjustment Reason Code, specifically Deductible, Coinsurance and Co-payment."
+  },
+  {
+    "Reason": "193",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Original payment decision is being maintained. Upon review, it was determined that this claim was processed properly."
+  },
+  {
+    "Reason": "194",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Anesthesia performed by the operating physician, the assistant surgeon or the attending physician."
+  },
+  {
+    "Reason": "195",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Refund issued to an erroneous priority payer for this claim/service."
+  },
+  {
+    "Reason": "197",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Precertification/authorization/notification absent."
+  },
+  {
+    "Reason": "198",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Precertification/authorization exceeded."
+  },
+  {
+    "Reason": "199",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Revenue code and Procedure code do not match."
+  },
+  {
+    "Reason": "2",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Coinsurance Amount"
+  },
+  {
+    "Reason": "20",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "This injury/illness is covered by the liability carrier."
+  },
+  {
+    "Reason": "200",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Expenses incurred during lapse in coverage"
+  },
+  {
+    "Reason": "201",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Patient is responsible for amount of this claim/service through 'set aside arrangement' or other agreement. (Use only with Group Code PR) At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.)"
+  },
+  {
+    "Reason": "202",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Non-covered personal comfort or convenience services."
+  },
+  {
+    "Reason": "203",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Discontinued or reduced service."
+  },
+  {
+    "Reason": "204",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "This service/equipment/drug is not covered under the patient’s current benefit plan"
+  },
+  {
+    "Reason": "205",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Pharmacy discount card processing fee"
+  },
+  {
+    "Reason": "206",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "National Provider Identifier - missing."
+  },
+  {
+    "Reason": "207",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "National Provider identifier - Invalid format"
+  },
+  {
+    "Reason": "208",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "National Provider Identifier - Not matched."
+  },
+  {
+    "Reason": "209",
+    "Recoverable": "Recoverable",
+    "Party": "Insurance",
+    "Description": "Per regulatory or other agreement. The provider cannot collect this amount from the patient. However, this amount may be billed to subsequent payer. Refund to patient if collected. (Use only with Group code OA)"
+  },
+  {
+    "Reason": "21",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "This injury/illness is the liability of the no-fault carrier."
+  },
+  {
+    "Reason": "210",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Payment adjusted because pre-certification/authorization not received in a timely fashion"
+  },
+  {
+    "Reason": "211",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "National Drug Codes (NDC) not eligible for rebate, are not covered."
+  },
+  {
+    "Reason": "212",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Administrative surcharges are not covered"
+  },
+  {
+    "Reason": "213",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Non-compliance with the physician self referral prohibition legislation or payer policy."
+  },
+  {
+    "Reason": "215",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Based on subrogation of a third party settlement"
+  },
+  {
+    "Reason": "216",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Based on the findings of a review organization"
+  },
+  {
+    "Reason": "219",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Based on extent of injury. Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Insurance Policy Number Segment (Loop 2100 Other Claim Related Information REF qualifier 'IG') for the jurisdictional regulation. If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF)."
+  },
+  {
+    "Reason": "22",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "This care may be covered by another payer per coordination of benefits."
+  },
+  {
+    "Reason": "222",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Exceeds the contracted maximum number of hours/days/units by this provider for this period. This is not patient specific. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "223",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Adjustment code for mandated federal, state or local law/regulation that is not already covered by another code and is mandated before a new code can be created."
+  },
+  {
+    "Reason": "224",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Patient identification compromised by identity theft. Identity verification required for processing this and future claims."
+  },
+  {
+    "Reason": "225",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Penalty or Interest Payment by Payer (Only used for plan to plan encounter reporting within the 837)"
+  },
+  {
+    "Reason": "226",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Information requested from the Billing/Rendering Provider was not provided or not provided timely or was insufficient/incomplete. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.)"
+  },
+  {
+    "Reason": "227",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Information requested from the patient/insured/responsible party was not provided or was insufficient/incomplete. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.)"
+  },
+  {
+    "Reason": "228",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Denied for failure of this provider, another provider or the subscriber to supply requested information to a previous payer for their adjudication"
+  },
+  {
+    "Reason": "229",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Partial charge amount not considered by Medicare due to the initial claim Type of Bill being 12X. Note: This code can only be used in the 837 transaction to convey Coordination of Benefits information when the secondary payer's cost avoidance policy allows providers to bypass claim submission to a prior payer. (Use only with Group Code PR)"
+  },
+  {
+    "Reason": "23",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "The impact of prior payer(s) adjudication including payments and/or adjustments. (Use only with Group Code OA)"
+  },
+  {
+    "Reason": "231",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Mutually exclusive procedures cannot be done in the same day/setting. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "232",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Institutional Transfer Amount. Note - Applies to institutional claims only and explains the DRG amount difference when the patient care crosses multiple institutions."
+  },
+  {
+    "Reason": "233",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Services/charges related to the treatment of a hospital-acquired condition or preventable medical error."
+  },
+  {
+    "Reason": "234",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "This procedure is not paid separately. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.)"
+  },
+  {
+    "Reason": "235",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Sales Tax"
+  },
+  {
+    "Reason": "236",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "This procedure or procedure/modifier combination is not compatible with another procedure or procedure/modifier combination provided on the same day according to the National Correct Coding Initiative or workers compensation state regulations/ fee schedule requirements."
+  },
+  {
+    "Reason": "237",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Legislated/Regulatory Penalty. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.)"
+  },
+  {
+    "Reason": "238",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Claim spans eligible and ineligible periods of coverage, this is the reduction for the ineligible period. (Use only with Group Code PR)"
+  },
+  {
+    "Reason": "239",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "Claim spans eligible and ineligible periods of coverage. Rebill separate claims."
+  },
+  {
+    "Reason": "24",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Charges are covered under a capitation agreement/managed care plan."
+  },
+  {
+    "Reason": "240",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "The diagnosis is inconsistent with the patient's birth weight. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "241",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Low Income Subsidy (LIS) Co-payment Amount"
+  },
+  {
+    "Reason": "242",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Services not provided by network/primary care providers."
+  },
+  {
+    "Reason": "243",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Services not authorized by network/primary care providers."
+  },
+  {
+    "Reason": "245",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Provider performance program withhold."
+  },
+  {
+    "Reason": "246",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "This non-payable code is for required reporting only."
+  },
+  {
+    "Reason": "247",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Deductible for Professional service rendered in an Institutional setting and billed on an Institutional claim."
+  },
+  {
+    "Reason": "248",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Coinsurance for Professional service rendered in an Institutional setting and billed on an Institutional claim."
+  },
+  {
+    "Reason": "249",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "This claim has been identified as a readmission. (Use only with Group Code CO)"
+  },
+  {
+    "Reason": "250",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "The attachment/other documentation that was received was the incorrect attachment/document. The expected attachment/document is still missing. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT)."
+  },
+  {
+    "Reason": "251",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "The attachment/other documentation that was received was incomplete or deficient. The necessary information is still needed to process the claim. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT)."
+  },
+  {
+    "Reason": "252",
+    "Recoverable": "Recoverable",
+    "Party": "Lab",
+    "Description": "An attachment/other documentation is required to adjudicate this claim/service. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT)."
+  },
+  {
+    "Reason": "253",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Sequestration - reduction in federal payment"
+  },
+  {
+    "Reason": "254",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Claim received by the dental plan, but benefits not available under this plan. Submit these services to the patient's medical plan for further consideration."
+  },
+  {
+    "Reason": "256",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Service not payable per managed care contract."
+  },
+  {
+    "Reason": "257",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "The disposition of the claim/service is undetermined during the premium payment grace period, per Health Insurance Exchange requirements. This claim/service will be reversed and corrected when the grace period ends (due to premium payment or lack of premium payment). (Use only with Group Code OA)"
+  },
+  {
+    "Reason": "258",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Claim/service not covered when patient is in custody/incarcerated. Applicable federal, state or local authority may cover the claim/service."
+  },
+  {
+    "Reason": "259",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Additional payment for Dental/Vision service utilization."
+  },
+  {
+    "Reason": "26",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Expenses incurred prior to coverage."
+  },
+  {
+    "Reason": "260",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Processed under Medicaid ACA Enhanced Fee Schedule"
+  },
+  {
+    "Reason": "261",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "The procedure or service is inconsistent with the patient's history."
+  },
+  {
+    "Reason": "262",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Adjustment for delivery cost. Note: To be used for pharmaceuticals only."
+  },
+  {
+    "Reason": "263",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Adjustment for shipping cost. Note: To be used for pharmaceuticals only."
+  },
+  {
+    "Reason": "264",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Adjustment for postage cost. Note: To be used for pharmaceuticals only."
+  },
+  {
+    "Reason": "265",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Adjustment for administrative cost. Note: To be used for pharmaceuticals only."
+  },
+  {
+    "Reason": "266",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Adjustment for compound preparation cost. Note: To be used for pharmaceuticals only."
+  },
+  {
+    "Reason": "267",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Claim/service spans multiple months. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.)"
+  },
+  {
+    "Reason": "268",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "The Claim spans two calendar years. Please resubmit one claim per calendar year."
+  },
+  {
+    "Reason": "269",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Anesthesia not covered for this service/procedure. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "27",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Expenses incurred after coverage terminated."
+  },
+  {
+    "Reason": "270",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Claim received by the medical plan, but benefits not available under this plan. Submit these services to the patient’s dental plan for further consideration."
+  },
+  {
+    "Reason": "271",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Prior contractual reductions related to a current periodic payment as part of a contractual payment schedule when deferred amounts have been previously reported. (Use only with group code OA)"
+  },
+  {
+    "Reason": "272",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Coverage/program guidelines were not met."
+  },
+  {
+    "Reason": "273",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Coverage/program guidelines were exceeded."
+  },
+  {
+    "Reason": "274",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Fee/Service not payable per patient Care Coordination arrangement."
+  },
+  {
+    "Reason": "275",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Prior payer's (or payers') patient responsibility (deductible, coinsurance, co-payment) not covered. (Use only with Group Code PR)"
+  },
+  {
+    "Reason": "276",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Services denied by the prior payer(s) are not covered by this payer."
+  },
+  {
+    "Reason": "277",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "The disposition of the claim/service is undetermined during the premium payment grace period, per Health Insurance SHOP Exchange requirements. This claim/service will be reversed and corrected when the grace period ends (due to premium payment or lack of premium payment). (Use only with Group Code OA)"
+  },
+  {
+    "Reason": "278",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Performance program proficiency requirements not met. (Use only with Group Codes CO or PI) Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "279",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "Deduction taken for bills previously paid on a claim which has subsequently been rejected."
+  },
+  {
+    "Reason": "28",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Coverage not in effect at the time the service was provided"
+  },
+  {
+    "Reason": "29",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "The time limit for filing has expired."
+  },
+  {
+    "Reason": "3",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Co-payment Amount"
+  },
+  {
+    "Reason": "31",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Patient cannot be identified as our insured."
+  },
+  {
+    "Reason": "32",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Our records indicate that this dependent is not an eligible dependent as defined."
+  },
+  {
+    "Reason": "33",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Insured has no dependent coverage."
+  },
+  {
+    "Reason": "34",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Insured has no coverage for newborns."
+  },
+  {
+    "Reason": "35",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Lifetime benefit maximum has been reached."
+  },
+  {
+    "Reason": "38",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "Services not provided or authorized by designated (network/primary care) providers"
+  },
+  {
+    "Reason": "39",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Services denied at the time authorization/pre-certification was requested."
+  },
+  {
+    "Reason": "4",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The procedure code is inconsistent with the modifier used or a required modifier is missing. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "40",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Charges do not meet qualifications for emergent/urgent care. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "42",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "Charges exceed our fee schedule or maximum allowable amount"
+  },
+  {
+    "Reason": "44",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Prompt-pay discount."
+  },
+  {
+    "Reason": "45",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Charge exceeds fee schedule/maximum allowable or contracted/legislated fee arrangement. Note: This adjustment amount cannot equal the total service or claim charge amount; and must not duplicate provider adjustment amounts (payments and contractual reductions) that have resulted from prior payer(s) adjudication. (Use only with Group Codes PR or CO depending upon liability)"
+  },
+  {
+    "Reason": "46",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "This (these) service(s) is (are) not covered."
+  },
+  {
+    "Reason": "49",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "This is a non-covered service because it is a routine/preventive exam or a diagnostic/screening procedure done in conjunction with a routine/preventive exam. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "5",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The procedure code/bill type is inconsistent with the place of service. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "50",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "These are non-covered services because this is not deemed a 'medical necessity' by the payer. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "51",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "These are non-covered services because this is a pre-existing condition. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "53",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Services by an immediate relative or a member of the same household are not covered."
+  },
+  {
+    "Reason": "54",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Multiple physicians/assistants are not covered in this case. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "55",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Procedure/treatment/drug is deemed experimental/investigational by the payer. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "56",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Procedure/treatment has not been deemed 'proven to be effective' by the payer. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "57",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "Payment denied/reduced because the payer deems the information submitted does not support this level of service, this many services, this length of service, this dosage, or this day's supply."
+  },
+  {
+    "Reason": "58",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Treatment was deemed by the payer to have been rendered in an inappropriate or invalid place of service. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "59",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Processed based on multiple or concurrent procedure rules. (For example multiple surgery or diagnostic imaging, concurrent anesthesia.) Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "6",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The procedure/revenue code is inconsistent with the patient's age. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "60",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Charges for outpatient services are not covered when performed within a period of time prior to or after inpatient services."
+  },
+  {
+    "Reason": "61",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Penalty for failure to obtain second surgical opinion. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present. This change effective 1/1/2017: Adjusted for failure to obtain second surgical opinion"
+  },
+  {
+    "Reason": "63",
+    "Recoverable": null,
+    "Party": null,
+    "Description": null
+  },
+  {
+    "Reason": "66",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Blood Deductible."
+  },
+  {
+    "Reason": "69",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Day outlier amount."
+  },
+  {
+    "Reason": "7",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The procedure/revenue code is inconsistent with the patient's gender. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "70",
+    "Recoverable": "Recoverable",
+    "Party": "Insurance",
+    "Description": "Cost outlier - Adjustment to compensate for additional costs."
+  },
+  {
+    "Reason": "74",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Indirect Medical Education Adjustment."
+  },
+  {
+    "Reason": "75",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Direct Medical Education Adjustment."
+  },
+  {
+    "Reason": "76",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "Disproportionate Share Adjustment."
+  },
+  {
+    "Reason": "78",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Non-Covered days/Room charge adjustment."
+  },
+  {
+    "Reason": "8",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The procedure code is inconsistent with the provider type/specialty (taxonomy). Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "85",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Patient Interest Adjustment (Use Only Group code PR)"
+  },
+  {
+    "Reason": "88",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "Adjustment amount represents collection against receivable created in prior overpayment."
+  },
+  {
+    "Reason": "89",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Professional fees removed from charges."
+  },
+  {
+    "Reason": "9",
+    "Recoverable": "Recoverable",
+    "Party": "Client",
+    "Description": "The diagnosis is inconsistent with the patient's age. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "90",
+    "Recoverable": "Non-recoverable",
+    "Party": null,
+    "Description": "Ingredient cost adjustment. Note: To be used for pharmaceuticals only."
+  },
+  {
+    "Reason": "91",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Dispensing fee adjustment."
+  },
+  {
+    "Reason": "94",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Processed in Excess of charges."
+  },
+  {
+    "Reason": "95",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Plan procedures not followed."
+  },
+  {
+    "Reason": "96",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": "Non-covered charge(s). At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.) Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "97",
+    "Recoverable": "Recoverable",
+    "Party": "Insurance",
+    "Description": "The benefit for this service is included in the payment/allowance for another service/procedure that has already been adjudicated. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "A0",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Patient refund amount."
+  },
+  {
+    "Reason": "A1",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Claim/Service denied. At least one Remark Code must be provided (may be comprised of either the NCPDP Reject Reason Code, or Remittance Advice Remark Code that is not an ALERT.)"
+  },
+  {
+    "Reason": "A2",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "Contractual adjustment."
+  },
+  {
+    "Reason": "A4",
+    "Recoverable": null,
+    "Party": null,
+    "Description": null
+  },
+  {
+    "Reason": "A5",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Medicare Claim PPS Capital Cost Outlier Amount."
+  },
+  {
+    "Reason": "A6",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Prior hospitalization or 30 day transfer requirement not met."
+  },
+  {
+    "Reason": "A7",
+    "Recoverable": null,
+    "Party": null,
+    "Description": null
+  },
+  {
+    "Reason": "A8",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Ungroupable DRG."
+  },
+  {
+    "Reason": "B1",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Non-covered visits."
+  },
+  {
+    "Reason": "B10",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Allowed amount has been reduced because a component of the basic procedure/test was paid. The beneficiary is not liable for more than the charge limit for the basic procedure/test."
+  },
+  {
+    "Reason": "B11",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "The claim/service has been transferred to the proper payer/processor for processing. Claim/service not covered by this payer/processor."
+  },
+  {
+    "Reason": "B12",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Services not documented in patients' medical records."
+  },
+  {
+    "Reason": "B13",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Previously paid. Payment for this claim/service may have been provided in a previous payment."
+  },
+  {
+    "Reason": "B14",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Only one visit or consultation per physician per day is covered."
+  },
+  {
+    "Reason": "B15",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "This service/procedure requires that a qualifying service/procedure be received and covered. The qualifying other service/procedure has not been received/adjudicated. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "B16",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "'New Patient' qualifications were not met."
+  },
+  {
+    "Reason": "B20",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Procedure/service was partially or fully furnished by another provider."
+  },
+  {
+    "Reason": "B22",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "This payment is adjusted based on the diagnosis."
+  },
+  {
+    "Reason": "B23",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Procedure billed is not authorized per your Clinical Laboratory Improvement Amendment (CLIA) proficiency test."
+  },
+  {
+    "Reason": "B4",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Late filing penalty."
+  },
+  {
+    "Reason": "B5",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "Payment adjusted because coverage/program guidelines were not met or were exceeded."
+  },
+  {
+    "Reason": "B7",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "This provider was not certified/eligible to be paid for this procedure/service on this date of service. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "B8",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Alternative services were available, and should have been utilized. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present."
+  },
+  {
+    "Reason": "B9",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Patient is enrolled in a Hospice."
+  },
+  {
+    "Reason": "CO",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": null
+  },
+  {
+    "Reason": "D16",
+    "Recoverable": "Non-Recoverable",
+    "Party": null,
+    "Description": "Denied. Third Party billers must submit all bills through L&I point-of-sale (POS) system, excluding adjustments."
+  },
+  {
+    "Reason": "D222",
+    "Recoverable": null,
+    "Party": null,
+    "Description": null
+  },
+  {
+    "Reason": "P1",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "State-mandated Requirement for Property and Casualty, see Claim Payment Remarks Code for specific explanation. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P10",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Payment reduced to zero due to litigation. Additional information will be sent following the conclusion of litigation. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P11",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "The disposition of the related Property & Casualty claim (injury or illness) is pending due to litigation. To be used for Property and Casualty only. (Use only with Group Code OA)"
+  },
+  {
+    "Reason": "P12",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Workers' compensation jurisdictional fee schedule adjustment. Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Class of Contract Code Identification Segment (Loop 2100 Other Claim Related Information REF). If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF) if the regulations apply. To be used for Workers' Compensation only."
+  },
+  {
+    "Reason": "P13",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Payment reduced or denied based on workers' compensation jurisdictional regulations or payment policies, use only if no other code is applicable. Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Insurance Policy Number Segment (Loop 2100 Other Claim Related Information REF qualifier 'IG') if the jurisdictional regulation applies. If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF) if the regulations apply. To be used for Workers' Compensation only."
+  },
+  {
+    "Reason": "P14",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "The Benefit for this Service is included in the payment/allowance for another service/procedure that has been performed on the same day. Note: Refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information REF), if present. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P15",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Workers' Compensation Medical Treatment Guideline Adjustment. To be used for Workers' Compensation only."
+  },
+  {
+    "Reason": "P16",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Medical provider not authorized/certified to provide treatment to injured workers in this jurisdiction. To be used for Workers' Compensation only. (Use with Group Code CO or OA)"
+  },
+  {
+    "Reason": "P17",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Referral not authorized by attending physician per regulatory requirement. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P18",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Procedure is not listed in the jurisdiction fee schedule. An allowance has been made for a comparable service. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P19",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Procedure has a relative value of zero in the jurisdiction fee schedule, therefore no payment is due. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P2",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Not a work related injury/illness and thus not the liability of the workers' compensation carrier Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Insurance Policy Number Segment (Loop 2100 Other Claim Related Information REF qualifier 'IG') for the jurisdictional regulation. If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF). To be used for Workers' Compensation only."
+  },
+  {
+    "Reason": "P20",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Service not paid under jurisdiction allowed outpatient facility fee schedule. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P21",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Payment denied based on Medical Payments Coverage (MPC) or Personal Injury Protection (PIP) Benefits jurisdictional regulations or payment policies, use only if no other code is applicable. Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Insurance Policy Number Segment (Loop 2100 Other Claim Related Information REF qualifier 'IG') if the jurisdictional regulation applies. If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF) if the regulations apply. To be used for Property and Casualty Auto only."
+  },
+  {
+    "Reason": "P22",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Payment adjusted based on Medical Payments Coverage (MPC) or Personal Injury Protection (PIP) Benefits jurisdictional regulations or payment policies, use only if no other code is applicable. Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Insurance Policy Number Segment (Loop 2100 Other Claim Related Information REF qualifier 'IG') if the jurisdictional regulation applies. If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF) if the regulations apply. To be used for Property and Casualty Auto only."
+  },
+  {
+    "Reason": "P23",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Medical Payments Coverage (MPC) or Personal Injury Protection (PIP) Benefits jurisdictional fee schedule adjustment. Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Class of Contract Code Identification Segment (Loop 2100 Other Claim Related Information REF). If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF) if the regulations apply. To be used for Property and Casualty Auto only."
+  },
+  {
+    "Reason": "P3",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Workers' Compensation case settled. Patient is responsible for amount of this claim/service through WC 'Medicare set aside arrangement' or other agreement. To be used for Workers' Compensation only. (Use only with Group Code PR)"
+  },
+  {
+    "Reason": "P4",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Workers' Compensation claim adjudicated as non-compensable. This Payer not liable for claim or service/treatment. Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Insurance Policy Number Segment (Loop 2100 Other Claim Related Information REF qualifier 'IG') for the jurisdictional regulation. If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF). To be used for Workers' Compensation only"
+  },
+  {
+    "Reason": "P5",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Based on payer reasonable and customary fees. No maximum allowable defined by legislated fee arrangement. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P6",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Based on entitlement to benefits. Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Insurance Policy Number Segment (Loop 2100 Other Claim Related Information REF qualifier 'IG') for the jurisdictional regulation. If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF). To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P7",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "The applicable fee schedule/fee database does not contain the billed code. Please resubmit a bill with the appropriate fee schedule/fee database code(s) that best describe the service(s) provided and supporting documentation if required. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P8",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "Claim is under investigation. Note: If adjustment is at the Claim Level, the payer must send and the provider should refer to the 835 Insurance Policy Number Segment (Loop 2100 Other Claim Related Information REF qualifier 'IG') for the jurisdictional regulation. If adjustment is at the Line Level, the payer must send and the provider should refer to the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment information REF). To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "P9",
+    "Recoverable": null,
+    "Party": null,
+    "Description": "No available or correlating CPT/HCPCS code to describe this service. To be used for Property and Casualty only."
+  },
+  {
+    "Reason": "PI",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": null
+  },
+  {
+    "Reason": "PR",
+    "Recoverable": "Recoverable",
+    "Party": "Patient",
+    "Description": null
+  },
+  {
+    "Reason": "YDR",
+    "Recoverable": null,
+    "Party": null,
+    "Description": null
+  },
+  {
+    "Reason": "YDS",
+    "Recoverable": null,
+    "Party": null,
+    "Description": null
+  }
+]
