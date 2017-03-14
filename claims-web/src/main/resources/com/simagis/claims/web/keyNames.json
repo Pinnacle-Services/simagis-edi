@@ -13,6 +13,7 @@
   {"key": "cpt", "name": "CPT Code"},
   {"key": "cptMod1", "name": "CPT Modifier"},
   {"key": "qty", "name": "Quantity"},
+  {"key": "srvDate", "name": "Date of Service"},
   {"key": "cptAsk", "name": "CPT Total Bill"},
   {"key": "cptPay", "name": "CPT Insurance Payment"},
   {"key": "adj", "name": "CPT Adjustments"},
