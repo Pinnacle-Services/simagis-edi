@@ -45,18 +45,17 @@ class ClaimServlet : HttpServlet() {
             else -> collection.find(Document("acn", id))
         }
 
-        var count = 0
-        response.status = HTTP_OK
-        response.contentType = "text/plain"
-        val writer = response.writer
-        documents.forEach { document ->
-            if (count > 0) {
-                writer.println(",")
+        val html = ClaimsToHtml().apply {
+            documents.forEach { document ->
+                if (!append(document)) return@apply
             }
-            writer.print(document.toJson(JsonWriterSettings(JsonMode.SHELL, true)))
-            count++
         }
-        writer.println()
-        writer.println("found: $count")
+        val bytes = html.toBytes()
+
+        response.status = HTTP_OK
+        response.contentType = "text/html"
+        response.characterEncoding = "UTF-8"
+        response.setContentLength(bytes.size)
+        response.outputStream.write(bytes)
     }
 }
