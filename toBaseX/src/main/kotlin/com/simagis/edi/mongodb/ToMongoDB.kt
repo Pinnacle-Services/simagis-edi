@@ -6,9 +6,7 @@ import com.mongodb.MongoClient
 import com.mongodb.MongoWriteException
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
-import com.simagis.edi.basex.ISA
-import com.simagis.edi.basex.exit
-import com.simagis.edi.basex.get
+import com.simagis.edi.basex.*
 import org.basex.core.Context
 import org.basex.core.MainOptions
 import org.basex.core.cmd.CreateDB
@@ -19,6 +17,7 @@ import org.bson.Document
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.security.MessageDigest
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -39,8 +38,9 @@ fun main(args: Array<String>) {
     val host = commandLine["host"] ?: "localhost"
     val xq = commandLine["xq"] ?: File("isa-claims-xq").absolutePath
     val db = commandLine["db"] ?: "claims"
-    val mode = commandLine["code"] ?: "R"
+    val mode = commandLine["mode"] ?: "R"
     val after = commandLine["after"]?.let { java.sql.Date.valueOf(it) }
+    val insert = commandLine["insert"] ?: "true" == "true"
 
     if (commandLine.size() == 0)
         exit("""
@@ -52,6 +52,22 @@ fun main(args: Array<String>) {
 
     val xqDir = File(xq)
     val xqTypes: MutableMap<String, String> = Collections.synchronizedMap(mutableMapOf<String, String>())
+
+    val digests: MutableSet<String> = Collections.synchronizedSet(mutableSetOf<String>())
+    fun File.digest() = inputStream().use { stream ->
+        fun md(): MessageDigest = MessageDigest.getInstance("SHA")
+        fun ByteArray.toHexString(): String = joinToString(separator = "") {
+            Integer.toHexString(it.toInt() and 0xff)
+        }
+        md().apply {
+            val bytes = ByteArray(4096)
+            while (true) {
+                val len = stream.read(bytes)
+                if (len == -1) break
+                update(bytes, 0, len)
+            }
+        }.digest().toHexString()
+    }
 
     val mongoClient = MongoClient(host)
 
@@ -71,7 +87,7 @@ fun main(args: Array<String>) {
     fun log(level: String, message: String, error: Throwable? = null, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) {
         val now = Date()
         fun printLog(message: String, _id: Any?) {
-            """[${level.padEnd(8)}] $message at $now log: ObjectId("$_id}")""".also {
+            """${level.padEnd(7)} $message at $now log: ObjectId("$_id}")""".also {
                 printLogLock.withLock {
                     System.err.println(it)
                     error?.printStackTrace()
@@ -198,6 +214,7 @@ fun main(args: Array<String>) {
     }
 
     val fileCount = AtomicLong()
+    val fileCountDuplicate = AtomicLong()
     val fileCountInvalid = AtomicLong()
     val isaCount = AtomicLong()
     val isaCountInvalid = AtomicLong()
@@ -207,6 +224,7 @@ fun main(args: Array<String>) {
     fun details() = """
         DETAILS:
             file: ${fileCount.get()}
+            file duplicate: ${fileCountDuplicate.get()}
             file invalid: ${fileCountInvalid.get()}
             isa: ${isaCount.get()}
             isa invalid: ${isaCountInvalid.get()}
@@ -286,6 +304,12 @@ fun main(args: Array<String>) {
 
         info("Starting import $path into $host $db")
         listFiles.stream().parallel().forEach { file ->
+            if (!digests.add(file.digest())) {
+                fileCountDuplicate.incrementAndGet()
+                info("Duplicate file $file")
+                return@forEach
+            }
+
             val isaList: List<ISA>
             try {
                 isaList = ISA.read(file)
@@ -305,7 +329,9 @@ fun main(args: Array<String>) {
                             val document = Document.parse(it.toString()).prepare()
                             try {
                                 if (after == null || document.getDate("procDate")?.after(after) ?: false) {
-                                    collection.insertOne(document)
+                                    if (insert) {
+                                        collection.insertOne(document)
+                                    }
                                     claimCount.incrementAndGet()
                                 }
                             } catch(e: Throwable) {
