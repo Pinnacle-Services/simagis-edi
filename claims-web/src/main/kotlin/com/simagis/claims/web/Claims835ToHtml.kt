@@ -20,6 +20,7 @@ class Claims835ToHtml(val maxCount: Int = 100) {
 
     private fun formatValue(key: String, value: Any?): String = when {
         key == "cpt" && value is String -> value + " " + cptCodes.optString(value)
+        key == "status" && value is String -> value + " " + statusCodes.optString(value)
         key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value)
         key == "adjReason" && value is String -> value + " " + adjReasonCodes.optString(value)
         value is Date -> dateFormat.format(value)
@@ -52,6 +53,11 @@ class Claims835ToHtml(val maxCount: Int = 100) {
         private val cptCodes: Map<String, String> by lazy {
             loadAsMap("claim835-cpt-codes.json", {
                 it.getString("cpt_code") to it.getString("short_description")
+            })
+        }
+        private val statusCodes: Map<String, String> by lazy {
+            loadAsMap("claim835-status-codes.json", {
+                it.getString("id") to it.getString("caption")
             })
         }
         private val adjGrpCodes: Map<String, String> by lazy {
