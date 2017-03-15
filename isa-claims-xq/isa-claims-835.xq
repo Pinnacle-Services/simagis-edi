@@ -7,6 +7,9 @@ declare option output:method "json";
     (: Payer:)
     let $payer_name := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PR"]/element[@Id = "N102"]/text()
     let $payer_id := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PR"]/element[@Id = "N104"]/text()
+    (:Payment:)
+    let $payby := $trn/segment[@Id="BPR"]/element[@Id="BPR04"]/text()
+    let $paydt := $trn/segment[@Id="BPR"]/element[@Id="BPR16"]/text()
     (: Sender:)
     let $from_name := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PE"]/element[@Id = "N102"]/text()
     let $from_id := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PE"]/element[@Id = "N104"]/text()
@@ -28,6 +31,8 @@ declare option output:method "json";
             <ref>{$ref}</ref>,
             <status>{$status}</status>,
             <procDate-DT8>{$date_tr}</procDate-DT8>,
+            <payBy>{$payby}</payBy>,
+            <payDate-DT8>{$paydt}</payDate-DT8>,
             <loc>{$loc}</loc>,
             <freq>{$freq}</freq>,
             <frmn-CC>{$from_name}</frmn-CC>,
@@ -38,6 +43,17 @@ declare option output:method "json";
             <clmAsk-F>{$ask_amt}</clmAsk-F>,
             <clmPay-F>{$pay_amt}</clmPay-F>,
             <pr-F>{$pr}</pr-F>,
+            
+            (:Claim Remarks:)            
+            <remarks type='array'>{
+              for $rem in $clp/segment[@Id="MOA" or @Id="MIA"]/element
+              return
+              <_ type = 'object'>{
+                <rem>{$rem/text()}</rem>
+              }</_>
+            }</remarks>,
+            
+            (: CPT Level:)
             <svc type='array'>{
                 for $cpt in $clp/loop[@Id = "2110"]
                 let $cpt_id := $cpt/segment[@Id = "SVC"]/element[@Id = "SVC01"]/subelement[@Sequence = "2"]/text()
@@ -79,6 +95,3 @@ declare option output:method "json";
         }</_>
 }
 </json>
-
-
-
