@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+    <title>Claims Viewer</title>
+    <script>
+        function toText(id) {
+            return document.getElementById(id).value;
+        }
+
+        function buildLink() {
+            var href = "/claim/" + toText("claim") + "/"
+                + "[" + toText("find") + ","
+                + toText("projection") + ","
+                + toText("sort") + ","
+                + toText("skip") + ","
+                + toText("limit") + "]";
+            document.getElementById("link").innerHTML = "<a target='_blank' href='" + href + "'>" + href + "</a>"
+        }
+    </script>
+</head>
+<body>
+<table width="50%">
+    <tr>
+        <td><label for="claim">claim</label></td>
+        <td width="80%"><input id="claim" type="text" value="835"><br></td>
+    </tr>
+    <tr>
+        <td><label for="find">find</label></td>
+        <td width="80%"><input style="width: 100%" id="find" type="text" value="{}"><br></td>
+    </tr>
+    <tr>
+        <td><label for="projection">projection</label></td>
+        <td width="80%"><input style="width: 100%" id="projection" type="text" value="{}"><br></td>
+    </tr>
+    <tr>
+        <td><label for="sort">sort</label></td>
+        <td width="80%"><input style="width: 100%" id="sort" type="text" value="{}"><br></td>
+    </tr>
+    <tr>
+        <td><label for="skip">skip</label></td>
+        <td width="80%"><input id="skip" type="number" value="0"><br></td>
+    </tr>
+    <tr>
+        <td><label for="limit">limit</label></td>
+        <td width="80%"><input id="limit" type="number" value="100"><br></td>
+    </tr>
+</table>
+<button onclick="buildLink()">build</button>
+<br>
+<div id="link"></div>
+</body>
+</html>

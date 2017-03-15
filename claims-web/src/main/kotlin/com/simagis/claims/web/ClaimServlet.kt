@@ -6,6 +6,7 @@ import org.bson.Document
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
 import javax.json.Json
+import javax.json.JsonNumber
 import javax.json.JsonObject
 import javax.servlet.annotation.WebServlet
 import javax.servlet.http.HttpServlet
@@ -43,9 +44,17 @@ class ClaimServlet : HttpServlet() {
             id.contains("-R-") -> collection.find(Document("_id", id))
             id.startsWith("{") -> collection.find(Document.parse(id))
             id.startsWith("[") -> Json.createReader(id.reader()).readArray().let {
-                collection
-                        .find(Document.parse((it[0] as JsonObject).toString()))
-                        .projection(Document.parse((it[1] as JsonObject).toString()))
+                fun JsonObject.toDocument(): Document = Document.parse((this).toString())
+                collection.find((it[0] as JsonObject).toDocument()).apply {
+                    for (i in 1..it.size) {
+                        when(i) {
+                            1 -> projection((it[i] as JsonObject).toDocument())
+                            2 -> sort((it[i] as JsonObject).toDocument())
+                            3 -> skip((it[i] as JsonNumber).intValue())
+                            4 -> limit((it[i] as JsonNumber).intValue())
+                        }
+                    }
+                }
             }
             else -> collection.find(Document("acn", id))
         }
