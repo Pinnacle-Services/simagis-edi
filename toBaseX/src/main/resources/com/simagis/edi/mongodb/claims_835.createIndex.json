@@ -1,11 +1,5 @@
 [
-  {
-    "acn": 1
-  },
-  {
-    "procDate": -1
-  },
-  { 
-    "svc.cpt" : 1
-}
+  {"acn": 1},
+  {"procDate": -1},
+  {"svc.cpt": 1}
 ]
