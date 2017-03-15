@@ -43,15 +43,15 @@ class ClaimServlet : HttpServlet() {
         val documents: FindIterable<Document> = when {
             id.contains("-R-") -> collection.find(Document("_id", id))
             id.startsWith("{") -> collection.find(Document.parse(id))
-            id.startsWith("[") -> Json.createReader(id.reader()).readArray().let {
+            id.startsWith("[") -> Json.createReader(id.reader()).readArray().let { json ->
                 fun JsonObject.toDocument(): Document = Document.parse((this).toString())
-                collection.find((it[0] as JsonObject).toDocument()).apply {
-                    for (i in 1..it.size) {
+                collection.find((json[0] as JsonObject).toDocument()).apply {
+                    for (i in 1..json.size - 1) {
                         when(i) {
-                            1 -> projection((it[i] as JsonObject).toDocument())
-                            2 -> sort((it[i] as JsonObject).toDocument())
-                            3 -> skip((it[i] as JsonNumber).intValue())
-                            4 -> limit((it[i] as JsonNumber).intValue())
+                            1 -> projection((json[i] as JsonObject).toDocument())
+                            2 -> sort((json[i] as JsonObject).toDocument())
+                            3 -> skip((json[i] as JsonNumber).intValue())
+                            4 -> limit((json[i] as JsonNumber).intValue())
                         }
                     }
                 }
