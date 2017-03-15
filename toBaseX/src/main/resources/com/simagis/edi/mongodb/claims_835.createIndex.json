@@ -1,5 +1,6 @@
 [
   {"acn": 1},
   {"procDate": -1},
-  {"svc.cpt": 1}
+  {"svc.cpt": 1},
+  {"svc.adj.adjReason": 1}
 ]
