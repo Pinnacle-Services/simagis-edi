@@ -72,10 +72,11 @@ fun main(args: Array<String>) {
     val mongoClient = MongoClient(host)
 
     class MongoClaims {
+        val collectionNameFormat = System.getProperty("claims.collection.nameFormat", "claims_%s")
         val database: MongoDatabase = mongoClient.getDatabase(db)
         val log: MongoCollection<Document> = database.getCollection("claimsLog")
         operator fun get(type: String): MongoCollection<Document> = claimTypeMap.getOrPut(type) {
-            database.getCollection("claims_$type")
+            database.getCollection(collectionNameFormat.format(type))
         }
 
         private var claimTypeMap: MutableMap<String, MongoCollection<Document>> = mutableMapOf()
