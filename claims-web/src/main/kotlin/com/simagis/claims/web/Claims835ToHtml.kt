@@ -23,6 +23,7 @@ class Claims835ToHtml(val maxCount: Int = 100) {
         key == "status" && value is String -> value + " " + statusCodes.optString(value)
         key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value)
         key == "adjReason" && value is String -> value + " " + adjReasonCodes.optString(value)
+        key == "rem" && value is String -> value + " " + remCodes.optString(value)
         value is Date -> dateFormat.format(value)
         else -> value.asHTML
     }
@@ -71,6 +72,11 @@ class Claims835ToHtml(val maxCount: Int = 100) {
                 val description = json["Description"]
                 if (reason is String && description is JsonString)
                     reason to description.string else null
+            })
+        }
+        private val remCodes: Map<String, String> by lazy {
+            loadAsMap("claim835-rem-codes.json", {
+                it.getString("Remark") to it.getString("Description")
             })
         }
 

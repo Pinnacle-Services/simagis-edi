@@ -1,0 +1,5282 @@
+[
+  {
+    "Remark": "N599",
+    "Description": "Our payment for this service is based upon a reasonable amount pursuant to both the terms and conditions of the policy of insurance under which the subject claim is being made as well as the Florida No-Fault Statute, which permits, when determining a reasonable charge for a service, an insurer to consider usual and customary charges and payments accepted by the provider, reimbursement levels in the community and various federal and state fee schedules applicable to automobile and other insurance coverages, and other information relevant to the reasonableness of the reimbursement for the service. The payment for this service is based upon 200% of the Participating Level of Medicare Part B fee schedule for the locale in which the services were rendered.",
+    "Length": 761
+  },
+  {
+    "Remark": "M25",
+    "Description": "The information furnished does not substantiate the need for this level of service. If you believe the service should have been fully covered as billed, or if you did not know and could not reasonably have been expected to know that we would not pay for this level of service, or if you notified the patient in writing in advance that we would not pay for this level of service and he/she agreed in writing to pay, ask us to review your claim within 120 days of the date of this notice. If you do not request an appeal, we will, upon application from the patient, reimburse him/her for the amount you have collected from him/her in excess of any deductible and coinsurance amounts. We will recover the reimbursement from you as an overpayment.",
+    "Length": 743
+  },
+  {
+    "Remark": "N125",
+    "Description": "Payment has been (denied for the/made only for a less extensive) service/item because the information furnished does not substantiate the need for the (more extensive) service/item. If you have collected any amount from the patient, you must refund that amount to the patient within 30 days of receiving this notice. The requirements for a refund are in §1834(a)(18) of the Social Security Act (and in §§1834(j)(4) and 1879(h) by cross-reference to §1834(a)(18)). Section 1834(a)(18)(B) specifies that suppliers which knowingly and willfully fail to make appropriate refunds may be subject to civil money penalties and/or exclusion from the Medicare program. If you have any questions about this notice, please contact this office.",
+    "Length": 731
+  },
+  {
+    "Remark": "M27",
+    "Description": "Alert: The patient has been relieved of liability of payment of these items and services under the limitation of liability provision of the law. The provider is ultimately liable for the patient's waived charges, including any charges for coinsurance, since the items or services were not reasonable and necessary or constituted custodial care, and you knew or could reasonably have been expected to know, that they were not covered. You may appeal this determination. You may ask for an appeal regarding both the coverage determination and the issue of whether you exercised due care. The appeal request must be filed within 120 days of the date you receive this notice. You must make the request through this office.",
+    "Length": 718
+  },
+  {
+    "Remark": "M26",
+    "Description": "The information furnished does not substantiate the need for this level of service. If you have collected any amount from the patient for this level of service /any amount that exceeds the limiting charge for the less extensive service, the law requires you to refund that amount to the patient within 30 days of receiving this notice. The requirements for refund are in 1824(I) of the Social Security Act and 42CFR411.408. The section specifies that physicians who knowingly and willfully fail to make appropriate refunds may be subject to civil monetary penalties and/or exclusion from the program. If you have any questions about this notice, please contact this office.",
+    "Length": 673
+  },
+  {
+    "Remark": "N67",
+    "Description": "Professional provider services not paid separately. Included in facility payment under a demonstration project. Apply to that facility for payment, or resubmit your claim if: the facility notifies you the patient was excluded from this demonstration; or if you furnished these services in another location on the date of the patient’s admission or discharge from a demonstration hospital. If services were furnished in a facility not involved in the demonstration on the same date the patient was discharged from or admitted to a demonstration facility, you must report the provider ID number for the non-demonstration facility on the new claim.",
+    "Length": 645
+  },
+  {
+    "Remark": "N103",
+    "Description": "Records indicate this patient was a prisoner or in custody of a Federal, State, or local authority when the service was rendered. This payer does not cover items and services furnished to an individual while he or she is in custody under a penal statute or rule, unless under State or local law, the individual is personally liable for the cost of his or her health care while in custody and the State or local government pursues the collection of such debt in the same way and with the same vigor as the collection of its other debts. The provider can collect from the Federal/State/ Local Authority as appropriate.",
+    "Length": 616
+  },
+  {
+    "Remark": "N139",
+    "Description": "Alert: Under the Code of Federal Regulations, Chapter 32, Section 199.13 a non-participating provider is not an appropriate appealing party. Therefore, if you disagree with the Dental Advisor's opinion, you may appeal the determination if appointed in writing, by the beneficiary, to act as his/her representative. Should you be appointed as a representative, submit a copy of this letter, a signed statement explaining the matter in which you disagree, and any radiographs and relevant information to the subscriber's Dental insurance carrier within 90 days from the date of this letter.",
+    "Length": 588
+  },
+  {
+    "Remark": "N116",
+    "Description": "This payment is being made conditionally because the service was provided in the home, and it is possible that the patient is under a home health episode of care. When a patient is treated under a home health episode of care, consolidated billing requires that certain therapy services and supplies, such as this, be included in the home health agency’s (HHA’s) payment. This payment will need to be recouped from you if we establish that the patient is concurrently receiving treatment under an HHA episode of care.",
+    "Length": 516
+  },
+  {
+    "Remark": "N140",
+    "Description": "Alert: You have not been designated as an authorized OCONUS provider therefore are not considered an appropriate appealing party. If the beneficiary has appointed you, in writing, to act as his/her representative and you disagree with the Dental Advisor's opinion, you may appeal by submitting a copy of this letter, a signed statement explaining the matter in which you disagree, and any relevant information to the subscriber's Dental insurance carrier within 90 days from the date of this letter.",
+    "Length": 499
+  },
+  {
+    "Remark": "N615",
+    "Description": "Alert: This enrollee receiving advance payments of the premium tax credit is in the grace period of three consecutive months for non-payment of premium. Under the Code of Federal Regulations, Title 45, Part 156.270, a Qualified Health Plan issuer must pay all appropriate claims for services rendered to the enrollee during the first month of the grace period and may pend claims for services rendered to the enrollee in the second and third months of the grace period.",
+    "Length": 469
+  },
+  {
+    "Remark": "N88",
+    "Description": "Alert: This payment is being made conditionally. An HHA episode of care notice has been filed for this patient. When a patient is treated under a HHA episode of care, consolidated billing requires that certain therapy services and supplies, such as this, be included in the HHA's payment. This payment will need to be recouped from you if we establish that the patient is concurrently receiving treatment under a HHA episode of care.",
+    "Length": 433
+  },
+  {
+    "Remark": "MA01",
+    "Description": "Alert: If you do not agree with what we approved for these services, you may appeal our decision. To make sure that we are fair to you, we require another individual that did not process your initial claim to conduct the appeal. However, in order to be eligible for an appeal, you must write to us within 120 days of the date you received this notice, unless you have a good reason for being late.",
+    "Length": 397
+  },
+  {
+    "Remark": "N355",
+    "Description": "The law also permits you to request an appeal at any time within 120 days of the date you receive this notice. However, an appeal request that is received more than 30 days after the date of this notice, does not permit you to delay making the refund. Regardless of when a review is requested, the patient will be notified that you have requested one, and will receive a copy of the determination.",
+    "Length": 397
+  },
+  {
+    "Remark": "N137",
+    "Description": "Alert: The provider acting on the Member's behalf, may file an appeal with the Payer. The provider, acting on the Member's behalf, may file a complaint with the State Insurance Regulatory Authority without first filing an appeal, if the coverage decision involves an urgent condition for which care has not been rendered. The address may be obtained from the State Insurance Regulatory Authority.",
+    "Length": 396
+  },
+  {
+    "Remark": "N613",
+    "Description": "Alert: Although this was paid, you have billed with an ordering provider that needs to update their enrollment record. Please verify that the ordering provider information you submitted on the claim is accurate and if it is, contact the ordering provider instructing them to update their enrollment record. Unless corrected, a claim with this ordering provider will not be paid in the future.",
+    "Length": 392
+  },
+  {
+    "Remark": "N355",
+    "Description": "Alert: The law permits exceptions to the refund requirement in two cases: - If you did not know, and could not have reasonably been expected to know, that we would not pay for this service; or - If you notified the patient in writing before providing the service that you believed that we were likely to deny the service, and the patient signed a statement agreeing to pay for the service.",
+    "Length": 389
+  },
+  {
+    "Remark": "N355",
+    "Description": "If you request an appeal within 30 days of receiving this notice, you may delay refunding the amount to the patient until you receive the results of the review. If the review decision is favorable to you, you do not need to make any refund. If, however, the review is unfavorable, the law specifies that you must make the refund within 15 days of receiving the unfavorable review decision.",
+    "Length": 389
+  },
+  {
+    "Remark": "N68",
+    "Description": "Prior payment being cancelled as we were subsequently notified this patient was covered by a demonstration project in this site of service. Professional services were included in the payment made to the facility. You must contact the facility for your payment. Prior payment made to you by the patient or another insurer for this claim must be refunded to the payer within 30 days.",
+    "Length": 381
+  },
+  {
+    "Remark": "N124",
+    "Description": "Payment has been denied for the/made only for a less extensive service/item because the information furnished does not substantiate the need for the (more extensive) service/item. The patient is liable for the charges for this service/item as you informed the patient in writing before the service/item was furnished that we would not pay for it, and the patient agreed to pay.",
+    "Length": 377
+  },
+  {
+    "Remark": "N101",
+    "Description": "Additional information is needed in order to process this claim. Please resubmit the claim with the identification number of the provider where this service took place. The Medicare number of the site of service provider should be preceded with the letters 'HSP' and entered into item #32 on the claim form. You may bill only one site of service provider number per claim.",
+    "Length": 372
+  },
+  {
+    "Remark": "MA113",
+    "Description": "Incomplete/invalid taxpayer identification number (TIN) submitted by you per the Internal Revenue Service. Your claims cannot be processed without your correct TIN, and you may not bill the patient pending correction of your TIN. There are no appeal rights for unprocessable claims, but you may resubmit this claim after you have notified this office of your correct TIN.",
+    "Length": 371
+  },
+  {
+    "Remark": "MA03",
+    "Description": "If you do not agree with the approved amounts and $100 or more is in dispute (less deductible and coinsurance), you may ask for a hearing within six months of the date of this notice. To meet the $100, you may combine amounts on other claims that have been denied, including reopened appeals if you received a revised decision. You must appeal each claim on time.",
+    "Length": 363
+  },
+  {
+    "Remark": "MA28",
+    "Description": "Alert: Receipt of this notice by a physician or supplier who did not accept assignment is for information only and does not make the physician or supplier a party to the determination. No additional rights to appeal this decision, above those rights already provided for by regulation/instruction, are conferred by receipt of this notice.",
+    "Length": 338
+  },
+  {
+    "Remark": "N355",
+    "Description": "The patient has received a separate notice of this denial decision. The notice advises that he/she may be entitled to a refund of any amounts paid, if you should have known that we would not pay and did not tell him/her. It also instructs the patient to contact our office if he/she does not hear anything about a refund within 30 days",
+    "Length": 335
+  },
+  {
+    "Remark": "N355",
+    "Description": "If you come within either exception, or if you believe the carrier was wrong in its determination that we do not pay for this service, you should request appeal of this determination within 30 days of the date of this notice. Your request for review should include any additional information necessary to support your position.",
+    "Length": 327
+  },
+  {
+    "Remark": "M32",
+    "Description": "Alert: This is a conditional payment made pending a decision on this service by the patient's primary payer. This payment may be subject to refund upon your receipt of any additional payment for this service from another payer. You must contact this office immediately upon receipt of an additional payment for this service.",
+    "Length": 324
+  },
+  {
+    "Remark": "N114",
+    "Description": "During the transition to the Ambulance Fee Schedule, payment is based on the lesser of a blended amount calculated using a percentage of the reasonable charge/cost and fee schedule amounts, or the submitted charge for the service. You will be notified yearly what the percentages for the blended payment calculation will be.",
+    "Length": 324
+  },
+  {
+    "Remark": "N510",
+    "Description": "Alert: A current inquiry shows the member’s Consumer Spending Account does not contain sufficient funds to cover the member's liability for this claim/service. Actual payment from the Consumer Spending Account will depend on the availability of funds and determination of eligible services at the time of payment processing.",
+    "Length": 324
+  },
+  {
+    "Remark": "N386",
+    "Description": "This decision was based on a National Coverage Determination (NCD). An NCD provides a coverage determination as to whether a particular item or service is covered. A copy of this policy is available at www.cms.gov/mcd/search.asp. If you do not have web access, you may contact the contractor to request a copy of the NCD.",
+    "Length": 321
+  },
+  {
+    "Remark": "MA11",
+    "Description": "Payment is being issued on a conditional basis. If no-fault insurance, liability insurance, Workers' Compensation, Department of Veterans Affairs, or a group health plan for employees and dependents also covers this claim, a refund may be due us. Please contact us if the patient is covered by any of these sources.",
+    "Length": 315
+  },
+  {
+    "Remark": "N509",
+    "Description": "Alert: A current inquiry shows the member’s Consumer Spending Account contains sufficient funds to cover the member liability for this claim/service. Actual payment from the Consumer Spending Account will depend on the availability of funds and determination of eligible services at the time of payment processing.",
+    "Length": 314
+  },
+  {
+    "Remark": "N115",
+    "Description": "This decision was based on a Local Coverage Determination (LCD). An LCD provides a guide to assist in determining whether a particular item or service is covered. A copy of this policy is available at www.cms.gov/mcd, or if you do not have web access, you may contact the contractor to request a copy of the LCD.",
+    "Length": 312
+  },
+  {
+    "Remark": "M66",
+    "Description": "Our records indicate that you billed diagnostic tests subject to price limitations and the procedure code submitted includes a professional component. Only the technical component is subject to price limitations. Please submit the technical and professional components of this service as separate line items.",
+    "Length": 308
+  },
+  {
+    "Remark": "MA84",
+    "Description": "Patient identified as participating in the National Emphysema Treatment Trial but our records indicate that this patient is either not a participant, or has not yet been approved for this phase of the study. Contact Johns Hopkins University, the study coordinator, to resolve if there was a discrepancy.",
+    "Length": 303
+  },
+  {
+    "Remark": "MA56",
+    "Description": "Our records show you have opted out of Medicare, agreeing with the patient not to bill Medicare for services/tests/supplies furnished. As result, we cannot pay this claim. The patient is responsible for payment, but under Federal law, you cannot charge the patient more than the limiting charge amount.",
+    "Length": 302
+  },
+  {
+    "Remark": "M103",
+    "Description": "Information supplied supports a break in therapy. However, the medical information we have for this patient does not support the need for this item as billed. We have approved payment for this item at a reduced level, and a new capped rental period will begin with the delivery of this equipment.",
+    "Length": 296
+  },
+  {
+    "Remark": "N98",
+    "Description": "Patient must have had a successful test stimulation in order to support subsequent implantation. Before a patient is eligible for permanent implantation, he/she must demonstrate a 50 percent or greater improvement through test stimulation. Improvement is measured through voiding diaries.",
+    "Length": 288
+  },
+  {
+    "Remark": "N742",
+    "Description": "Alert: This claim was processed based on one or more ICD-9 codes. The transition to ICD-10 is required by October 1, 2015, for health care providers, health plans, and clearinghouses. More information can be found at http://www.cms.gov/Medicare/Coding/ICD10/ProviderResources.html",
+    "Length": 280
+  },
+  {
+    "Remark": "N506",
+    "Description": "Alert: This is an estimate of the member’s liability based on the information available at the time the estimate was processed. Actual coverage and member liability amounts will be determined when the claim is processed. This is not a pre-authorization or a guarantee of payment.",
+    "Length": 279
+  },
+  {
+    "Remark": "M17",
+    "Description": "Alert: Payment approved as you did not know, and could not reasonably have been expected to know, that this would not normally have been covered for this patient. In the future, you will be liable for charges for the same service(s) under the same or similar conditions.",
+    "Length": 270
+  },
+  {
+    "Remark": "MA14",
+    "Description": "Alert: The patient is a member of an employer-sponsored prepaid health plan. Services from outside that health plan are not covered. However, as you were not previously notified of this, we are paying this time. In the future, we will not pay you for non-plan services.",
+    "Length": 269
+  },
+  {
+    "Remark": "M96",
+    "Description": "The technical component of a service furnished to an inpatient may only be billed by that inpatient facility. You must contact the inpatient facility for technical component reimbursement. If not already billed, you should bill us for the professional component only.",
+    "Length": 267
+  },
+  {
+    "Remark": "N138",
+    "Description": "Alert: In the event you disagree with the Dental Advisor's opinion and have additional information relative to the case, you may submit radiographs to the Dental Advisor Unit at the subscriber's dental insurance carrier for a second Independent Dental Advisor Review.",
+    "Length": 267
+  },
+  {
+    "Remark": "MA72",
+    "Description": "Alert: The patient overpaid you for these assigned services. You must issue the patient a refund within 30 days for the difference between his/her payment to you and the total of the amount shown as patient responsibility and as paid to the patient on this notice.",
+    "Length": 264
+  },
+  {
+    "Remark": "M105",
+    "Description": "Information supplied does not support a break in therapy. The medical information we have for this patient does not support the need for this item as billed. We have approved payment for this item at a reduced level, and a new capped rental period will not begin.",
+    "Length": 263
+  },
+  {
+    "Remark": "N508",
+    "Description": "Alert: This real time claim adjudication response represents the member responsibility to the provider for services reported. The member will receive an Explanation of Benefits electronically or in the mail. Contact the insurer if there are any questions.",
+    "Length": 255
+  },
+  {
+    "Remark": "MA77",
+    "Description": "Alert: The patient overpaid you. You must issue the patient a refund within 30 days for the difference between the patient’s payment less the total of our and other payer payments and the amount shown as patient responsibility on this notice.",
+    "Length": 242
+  },
+  {
+    "Remark": "N12",
+    "Description": "Policy provides coverage supplemental to Medicare. As the member does not appear to be enrolled in the applicable part of Medicare, the member is responsible for payment of the portion of the charge that would have been covered by Medicare.",
+    "Length": 240
+  },
+  {
+    "Remark": "N162",
+    "Description": "Alert: Although your claim was paid, you have billed for a test/specialty not included in your Laboratory Certification. Your failure to correct the laboratory certification information will result in a denial of payment in the near future.",
+    "Length": 240
+  },
+  {
+    "Remark": "N97",
+    "Description": "Patients with stress incontinence, urinary obstruction, and specific neurologic diseases (e.g., diabetes with peripheral nerve involvement) which are associated with secondary manifestations of the above three indications are excluded.",
+    "Length": 235
+  },
+  {
+    "Remark": "N25",
+    "Description": "This company has been contracted by your benefit plan to provide administrative claims payment services only. This company does not assume financial risk or obligation with respect to claims processed on behalf of your benefit plan.",
+    "Length": 232
+  },
+  {
+    "Remark": "MA68",
+    "Description": "Alert: We did not crossover this claim because the secondary insurance information on the claim was incomplete. Please supply complete information or use the PLANID of the insurer to assure correct and timely routing of the claim.",
+    "Length": 230
+  },
+  {
+    "Remark": "N574",
+    "Description": "Our records indicate the ordering/referring provider is of a type/specialty that cannot order or refer. Please verify that the claim ordering/referring provider information is accurate or contact the ordering/referring provider.",
+    "Length": 228
+  },
+  {
+    "Remark": "N604",
+    "Description": "In accordance with New York No-Fault Law, Regulation 68, this base fee was calculated according to the New York Workers' Compensation Board Schedule of Medical Fees, pursuant to Regulation 83 and / or Appendix 17-C of 11 NYCRR.",
+    "Length": 227
+  },
+  {
+    "Remark": "N105",
+    "Description": "This is a misdirected claim/service for an RRB beneficiary. Submit paper claims to the RRB carrier: Palmetto GBA, P.O. Box 10066, Augusta, GA 30999. Call 866-749-4301 for RRB EDI information for electronic claims processing.",
+    "Length": 224
+  },
+  {
+    "Remark": "M48",
+    "Description": "Payment for services furnished to hospital inpatients (other than professional services of physicians) can only be made to the hospital. You must request payment from the hospital rather than the patient for this service.",
+    "Length": 221
+  },
+  {
+    "Remark": "MA19",
+    "Description": "Alert: Information was not sent to the Medigap insurer due to incorrect/invalid information you submitted concerning that insurer. Please verify your information and submit your secondary claim directly to that insurer.",
+    "Length": 219
+  },
+  {
+    "Remark": "MA85",
+    "Description": "Our records indicate that a primary payer exists (other than ourselves); however, you did not complete or enter accurately the insurance plan/group/program name or identification number. Enter the PlanID when effective.",
+    "Length": 219
+  },
+  {
+    "Remark": "MA118",
+    "Description": "Alert: No Medicare payment issued for this claim for services or supplies furnished to a Medicare-eligible veteran through a facility of the Department of Veterans Affairs. Coinsurance and/or deductible are applicable.",
+    "Length": 218
+  },
+  {
+    "Remark": "M114",
+    "Description": "This service was processed in accordance with rules and guidelines under the DMEPOS Competitive Bidding Program or a Demonstration Project. For more information regarding these projects, contact your local contractor.",
+    "Length": 217
+  },
+  {
+    "Remark": "N1",
+    "Description": "Alert: You may appeal this decision in writing within the required time limits following receipt of this notice by following the instructions included in your contract, plan benefit documents or jurisdiction statutes.",
+    "Length": 217
+  },
+  {
+    "Remark": "N71",
+    "Description": "Your unassigned claim for a drug or biological, clinical diagnostic laboratory services or ambulance service was processed as an assigned claim. You are required by law to accept assignment for these types of claims.",
+    "Length": 216
+  },
+  {
+    "Remark": "N96",
+    "Description": "Patient must be refractory to conventional therapy (documented behavioral, pharmacologic and/or surgical corrective therapy) and be an appropriate surgical candidate such that implantation with anesthesia can occur.",
+    "Length": 215
+  },
+  {
+    "Remark": "N106",
+    "Description": "Payment for services furnished to Skilled Nursing Facility (SNF) inpatients (except for excluded services) can only be made to the SNF. You must request payment from the SNF rather than the patient for this service.",
+    "Length": 215
+  },
+  {
+    "Remark": "M38",
+    "Description": "Alert: The patient is liable for the charges for this service as they were informed in writing before the service was furnished that we would not pay for it and the patient agreed to be responsible for the charges.",
+    "Length": 214
+  },
+  {
+    "Remark": "MA59",
+    "Description": "Alert: The patient overpaid you for these services. You must issue the patient a refund within 30 days for the difference between his/her payment and the total amount shown as patient responsibility on this notice.",
+    "Length": 214
+  },
+  {
+    "Remark": "N176",
+    "Description": "Services provided aboard a ship are covered only when the ship is of United States registry and is in United States waters. In addition, a doctor licensed to practice in the United States must provide the service.",
+    "Length": 213
+  },
+  {
+    "Remark": "MA47",
+    "Description": "Our records show you have opted out of Medicare, agreeing with the patient not to bill Medicare for services/tests/supplies furnished. As result, we cannot pay this claim. The patient is responsible for payment.",
+    "Length": 211
+  },
+  {
+    "Remark": "M47",
+    "Description": "Missing/incomplete/invalid Payer Claim Control Number. Other terms exist for this element including, but not limited to, Internal Control Number (ICN), Claim Control Number (CCN), Document Control Number (DCN).",
+    "Length": 210
+  },
+  {
+    "Remark": "N29",
+    "Description": "Missing documentation/orders/notes/summary/report/chart. Notes: (Modified 2/28/03, 8/1/05, 3/1/2014) Related to N225, Explicit RARCs have been approved, this non-specific RARC will be deactivated in March 2016.",
+    "Length": 210
+  },
+  {
+    "Remark": "N550",
+    "Description": "Alert: You have not responded to requests to revalidate your provider/supplier enrollment information. Your failure to revalidate your enrollment information will result in a payment hold in the near future.",
+    "Length": 207
+  },
+  {
+    "Remark": "N492",
+    "Description": "Alert: A network provider may bill the member for this service if the member requested the service and agreed in writing, prior to receiving the service, to be financially responsible for the billed charge.",
+    "Length": 206
+  },
+  {
+    "Remark": "N566",
+    "Description": "Alert: This procedure code requires functional reporting. Future claims containing this procedure code must include an applicable non-payable code and appropriate modifiers for the claim to be processed.",
+    "Length": 203
+  },
+  {
+    "Remark": "N601",
+    "Description": "In accordance with Hawaii Administrative Rules, Title 16, Chapter 23 Motor Vehicle Insurance Law payment is recommended based on Medicare Resource Based Relative Value Scale System applicable to Hawaii.",
+    "Length": 202
+  },
+  {
+    "Remark": "N589",
+    "Description": "Coverage is excluded to any person injured as a result of operating a motor vehicle while in an intoxicated condition or while the ability to operate such a vehicle is impaired by the use of a drug.",
+    "Length": 198
+  },
+  {
+    "Remark": "M104",
+    "Description": "Information supplied supports a break in therapy. A new capped rental period will begin with delivery of the equipment. This is the maximum approved under the fee schedule for this item or service.",
+    "Length": 197
+  },
+  {
+    "Remark": "N89",
+    "Description": "Alert: Payment information for this claim has been forwarded to more than one other payer, but format limitations permit only one of the secondary payers to be identified in this remittance advice.",
+    "Length": 197
+  },
+  {
+    "Remark": "N218",
+    "Description": "You must furnish and service this item for as long as the patient continues to need it. We can pay for maintenance and/or servicing for the time period specified in the contract or coverage manual.",
+    "Length": 197
+  },
+  {
+    "Remark": "N606",
+    "Description": "The Oregon allowed amount for this procedure is based upon the Workers Compensation Fee Schedule (OAR 436-009). The allowed amount has been calculated in accordance with Section 4 of ORS 742.524.",
+    "Length": 195
+  },
+  {
+    "Remark": "MA130",
+    "Description": "Your claim contains incomplete and/or invalid information, and no appeal rights are afforded because the claim is unprocessable. Please submit a new claim with the complete/correct information.",
+    "Length": 193
+  },
+  {
+    "Remark": "N215",
+    "Description": "Alert: A payer providing supplemental or secondary coverage shall not require a claims determination for this service from a primary payer as a condition of making its own claims determination.",
+    "Length": 193
+  },
+  {
+    "Remark": "N698",
+    "Description": "Alert: This reversal is due to non-payment of the health insurance premiums (Health Insurance Exchange or other) by the end of the premium payment grace period, resulting in loss of coverage.",
+    "Length": 191
+  },
+  {
+    "Remark": "M138",
+    "Description": "Patient identified as a demonstration participant but the patient was not enrolled in the demonstration at the time services were rendered. Coverage is limited to demonstration participants.",
+    "Length": 190
+  },
+  {
+    "Remark": "MA80",
+    "Description": "Informational notice. No payment issued for this claim with this notice. Payment issued to the hospital by its intermediary for all services for this encounter under a demonstration project.",
+    "Length": 190
+  },
+  {
+    "Remark": "N187",
+    "Description": "Alert: You may request a review in writing within the required time limits following receipt of this notice by following the instructions included in your contract or plan benefit documents.",
+    "Length": 190
+  },
+  {
+    "Remark": "N347",
+    "Description": "Your claim for a referred or purchased service cannot be paid because payment has already been made for this same service to another provider by a payment contractor representing the payer.",
+    "Length": 189
+  },
+  {
+    "Remark": "N104",
+    "Description": "This claim/service is not payable under our claims jurisdiction area. You can identify the correct Medicare contractor to process this claim/service through the CMS website at www.cms.gov.",
+    "Length": 188
+  },
+  {
+    "Remark": "N183",
+    "Description": "Alert: This is a predetermination advisory message, when this service is submitted for payment additional documentation as specified in plan documents will be required to process benefits.",
+    "Length": 188
+  },
+  {
+    "Remark": "N561",
+    "Description": "The bundled claim originally submitted for this episode of care includes related readmissions. You may resubmit the original claim to receive a corrected payment based on this readmission.",
+    "Length": 188
+  },
+  {
+    "Remark": "N720",
+    "Description": "Alert: The patient overpaid you. You may need to issue the patient a refund for the difference between the patient’s payment and the amount shown as patient responsibility on this notice.",
+    "Length": 187
+  },
+  {
+    "Remark": "MA131",
+    "Description": "Physician already paid for services in conjunction with this demonstration claim. You must have the physician withdraw that claim and refund the payment before we can process your claim.",
+    "Length": 186
+  },
+  {
+    "Remark": "N373",
+    "Description": "It has been determined that another payer paid the services as primary when they were not the primary payer. Therefore, we are refunding to the payer that paid as primary on your behalf.",
+    "Length": 186
+  },
+  {
+    "Remark": "N6",
+    "Description": "Under FEHB law (U.S.C. 8904(b)), we cannot pay more for covered care than the amount Medicare would have allowed if the patient were enrolled in Medicare Part A and/or Medicare Part B.",
+    "Length": 184
+  },
+  {
+    "Remark": "N360",
+    "Description": "Alert: Coordination of benefits has not been calculated when estimating benefits for this pre-determination. Submit payment information from the primary payer with the secondary claim.",
+    "Length": 184
+  },
+  {
+    "Remark": "N565",
+    "Description": "Alert: This non-payable reporting code requires a modifier. Future claims containing this non-payable reporting code must include an appropriate modifier for the claim to be processed.",
+    "Length": 184
+  },
+  {
+    "Remark": "MA64",
+    "Description": "Our records indicate that we should be the third payer for this claim. We cannot process this claim until we have received payment information from the primary and secondary payers.",
+    "Length": 181
+  },
+  {
+    "Remark": "N119",
+    "Description": "This service is not paid if billed once every 28 days, and the patient has spent 5 or more consecutive days in any inpatient or Skilled /nursing Facility (SNF) within those 28 days.",
+    "Length": 181
+  },
+  {
+    "Remark": "MA02",
+    "Description": "Alert: If you do not agree with this determination, you have the right to appeal. You must file a written request for an appeal within 180 days of the date you receive this notice.",
+    "Length": 180
+  },
+  {
+    "Remark": "MA17",
+    "Description": "We are the primary payer and have paid at the primary rate. You must contact the patient's other insurer to refund any excess it may have paid due to its erroneous primary payment.",
+    "Length": 180
+  },
+  {
+    "Remark": "N608",
+    "Description": "The fee schedule amount allowed is calculated at 110% of the Medicare Fee Schedule for this region, specialty and type of service. This fee is calculated in compliance with Act 6.",
+    "Length": 179
+  },
+  {
+    "Remark": "M106",
+    "Description": "Information supplied does not support a break in therapy. A new capped rental period will not begin. This is the maximum approved under the fee schedule for this item or service.",
+    "Length": 178
+  },
+  {
+    "Remark": "MA95",
+    "Description": "A not otherwise classified or unlisted procedure code(s) was billed but a narrative description of the procedure was not entered on the claim. Refer to item 19 on the HCFA-1500.",
+    "Length": 177
+  },
+  {
+    "Remark": "N544",
+    "Description": "Alert: Although this was paid, you have billed with a referring/ordering provider that does not match our system record. Unless corrected this will not be paid in the future.",
+    "Length": 174
+  },
+  {
+    "Remark": "N121",
+    "Description": "Medicare Part B does not pay for items or services provided by this type of practitioner for beneficiaries in a Medicare Part A covered Skilled Nursing Facility (SNF) stay.",
+    "Length": 172
+  },
+  {
+    "Remark": "M65",
+    "Description": "One interpreting physician charge can be submitted per claim when a purchased diagnostic test is indicated. Please submit a separate claim for each interpreting physician.",
+    "Length": 171
+  },
+  {
+    "Remark": "M98",
+    "Description": "Begin to report the Universal Product Number on claims for items of this type. We will soon begin to deny payment for items of this type if billed without the correct UPN.",
+    "Length": 171
+  },
+  {
+    "Remark": "N366",
+    "Description": "Requested information not provided. The claim will be reopened if the information previously requested is submitted within one year after the date of this denial notice.",
+    "Length": 169
+  },
+  {
+    "Remark": "N505",
+    "Description": "Alert: This response includes only services that could be estimated in real time. No estimate will be provided for the services that could not be estimated in real time.",
+    "Length": 169
+  },
+  {
+    "Remark": "M100",
+    "Description": "We do not pay for an oral anti-emetic drug that is not administered for use immediately before, at, or within 48 hours of administration of a covered chemotherapy drug.",
+    "Length": 168
+  },
+  {
+    "Remark": "N523",
+    "Description": "The limitation on outlier payments defined by this payer for this service period has been met. The outlier payment otherwise applicable to this claim has not been paid.",
+    "Length": 168
+  },
+  {
+    "Remark": "MA04",
+    "Description": "Secondary payment cannot be considered without the identity of or payment information from the primary payer. The information was either not reported or was illegible.",
+    "Length": 167
+  },
+  {
+    "Remark": "N120",
+    "Description": "Payment is subject to home health prospective payment system partial episode payment adjustment. Patient was transferred/discharged/readmitted during payment episode.",
+    "Length": 166
+  },
+  {
+    "Remark": "N126",
+    "Description": "Social Security Records indicate that this individual has been deported. This payer does not cover items and services furnished to individuals who have been deported.",
+    "Length": 166
+  },
+  {
+    "Remark": "N367",
+    "Description": "Alert: The claim information has been forwarded to a Consumer Spending Account processor for review; for example, flexible spending account or health savings account.",
+    "Length": 166
+  },
+  {
+    "Remark": "M39",
+    "Description": "Alert: The patient is not liable for payment of this service as the advance notice of non-coverage you provided the patient did not comply with program requirements.",
+    "Length": 165
+  },
+  {
+    "Remark": "MA78",
+    "Description": "The patient overpaid you. You must issue the patient a refund within 30 days for the difference between our allowed amount total and the amount paid by the patient.",
+    "Length": 164
+  },
+  {
+    "Remark": "N515",
+    "Description": "Alert: Submit this claim to the patient's other insurer for potential payment of supplemental benefits. We did not forward the claim information. (use N387 instead)",
+    "Length": 164
+  },
+  {
+    "Remark": "N603",
+    "Description": "This fee is calculated according to the New Jersey medical fee schedules for Automobile Personal Injury Protection and Motor Bus Medical Expense Insurance Coverage.",
+    "Length": 164
+  },
+  {
+    "Remark": "M70",
+    "Description": "Alert: The NDC code submitted for this service was translated to a HCPCS code for processing, but please continue to submit the NDC on future claims for this item.",
+    "Length": 163
+  },
+  {
+    "Remark": "MA94",
+    "Description": "Did not enter the statement “Attending physician not hospice employee” on the claim form to certify that the rendering physician is not an employee of the hospice.",
+    "Length": 163
+  },
+  {
+    "Remark": "M120",
+    "Description": "Missing/incomplete/invalid provider identifier for the substituting physician who furnished the service(s) under a reciprocal billing or locum tenens arrangement.",
+    "Length": 162
+  },
+  {
+    "Remark": "MA16",
+    "Description": "The patient is covered by the Black Lung Program. Send this claim to the Department of Labor, Federal Black Lung Program, P.O. Box 828, Lanham-Seabrook MD 20703.",
+    "Length": 161
+  },
+  {
+    "Remark": "MA20",
+    "Description": "Skilled Nursing Facility (SNF) stay not covered when care is primarily related to the use of an urethral catheter for convenience or the control of incontinence.",
+    "Length": 161
+  },
+  {
+    "Remark": "MA110",
+    "Description": "Missing/incomplete/invalid information on whether the diagnostic test(s) were performed by an outside entity or if no purchased tests are included on the claim.",
+    "Length": 160
+  },
+  {
+    "Remark": "N99",
+    "Description": "Patient must be able to demonstrate adequate ability to record voiding diary data such that clinical results of the implant procedure can be properly evaluated.",
+    "Length": 160
+  },
+  {
+    "Remark": "M112",
+    "Description": "Reimbursement for this item is based on the single payment amount required under the DMEPOS Competitive Bidding Program for the area where the patient resides.",
+    "Length": 159
+  },
+  {
+    "Remark": "N107",
+    "Description": "Services furnished to Skilled Nursing Facility (SNF) inpatients must be billed on the inpatient claim. They cannot be billed separately as outpatient services.",
+    "Length": 159
+  },
+  {
+    "Remark": "N136",
+    "Description": "Alert: To obtain information on the process to file an appeal in Arizona, call the Department's Consumer Assistance Office at (602) 912-8444 or (800) 325-2548.",
+    "Length": 159
+  },
+  {
+    "Remark": "MA55",
+    "Description": "Not covered as patient received medical health care services, automatically revoking his/her election to receive religious non-medical health care services.",
+    "Length": 156
+  },
+  {
+    "Remark": "N8",
+    "Description": "Crossover claim denied by previous payer and complete claim data not forwarded. Resubmit this claim to this payer to provide adequate data for adjudication.",
+    "Length": 156
+  },
+  {
+    "Remark": "N511",
+    "Description": "Alert: Information on the availability of Consumer Spending Account funds to cover the member liability on this claim/service is not available at this time.",
+    "Length": 156
+  },
+  {
+    "Remark": "N559",
+    "Description": "This claim/service is not payable under our service area. The claim must be filed to the Payer/Plan in whose service area the Ordering Physician is located.",
+    "Length": 156
+  },
+  {
+    "Remark": "M14",
+    "Description": "No separate payment for an injection administered during an office visit, and no payment for a full office visit if the patient only received an injection.",
+    "Length": 155
+  },
+  {
+    "Remark": "M73",
+    "Description": "The HPSA/Physician Scarcity bonus can only be paid on the professional component of this service. Rebill as separate professional and technical components.",
+    "Length": 155
+  },
+  {
+    "Remark": "M109",
+    "Description": "We have provided you with a bundled payment for a teleconsultation. You must send 25 percent of the teleconsultation payment to the referring practitioner.",
+    "Length": 155
+  },
+  {
+    "Remark": "M5",
+    "Description": "Monthly rental payments can continue until the earlier of the 15th month from the first rental month, or the month when the equipment is no longer needed.",
+    "Length": 154
+  },
+  {
+    "Remark": "N132",
+    "Description": "Alert: Payments will cease for services rendered by this US Government debarred or excluded provider after the 30 day grace period as previously notified.",
+    "Length": 154
+  },
+  {
+    "Remark": "M36",
+    "Description": "This is the 11th rental month. We cannot pay for this until you indicate that the patient has been given the option of changing the rental to a purchase.",
+    "Length": 153
+  },
+  {
+    "Remark": "MA115",
+    "Description": "Missing/incomplete/invalid physical location (name and address, or PIN) where the service(s) were rendered in a Health Professional Shortage Area (HPSA).",
+    "Length": 153
+  },
+  {
+    "Remark": "N147",
+    "Description": "Long term care case mix or per diem rate cannot be determined because the patient ID number is missing, incomplete, or invalid on the assignment request.",
+    "Length": 153
+  },
+  {
+    "Remark": "MA73",
+    "Description": "Informational remittance associated with a Medicare demonstration. No payment issued under fee-for-service Medicare as patient has elected managed care.",
+    "Length": 152
+  },
+  {
+    "Remark": "N86",
+    "Description": "A failed trial of pelvic muscle exercise training is required in order for biofeedback training for the treatment of urinary incontinence to be covered.",
+    "Length": 152
+  },
+  {
+    "Remark": "M116",
+    "Description": "Processed under a demonstration project or program. Project or program is ending and additional services may not be paid under this project or program.",
+    "Length": 151
+  },
+  {
+    "Remark": "MA18",
+    "Description": "Alert: The claim information is also being forwarded to the patient's supplemental insurer. Send any questions regarding supplemental benefits to them.",
+    "Length": 151
+  },
+  {
+    "Remark": "MA12",
+    "Description": "You have not established that you have the right under the law to bill for services furnished by the person(s) that furnished this (these) service(s).",
+    "Length": 150
+  },
+  {
+    "Remark": "M113",
+    "Description": "Our records indicate that this patient began using this item/service prior to the current contract period for the DMEPOS Competitive Bidding Program.",
+    "Length": 149
+  },
+  {
+    "Remark": "N353",
+    "Description": "Alert: Benefits have been estimated, when the actual services have been rendered, additional payment will be considered based on the submitted claim.",
+    "Length": 149
+  },
+  {
+    "Remark": "N557",
+    "Description": "This claim/service is not payable under our service area. The claim must be filed to the Payer/Plan in whose service area the specimen was collected.",
+    "Length": 149
+  },
+  {
+    "Remark": "N558",
+    "Description": "This claim/service is not payable under our service area. The claim must be filed to the Payer/Plan in whose service area the equipment was received.",
+    "Length": 149
+  },
+  {
+    "Remark": "N563",
+    "Description": "Alert: Missing required provider/supplier issuance of advance patient notice of non-coverage. The patient is not liable for payment for this service.",
+    "Length": 149
+  },
+  {
+    "Remark": "MA49",
+    "Description": "Missing/incomplete/invalid six-digit provider identifier for home health agency or hospice for physician(s) performing care plan oversight services.",
+    "Length": 148
+  },
+  {
+    "Remark": "N597",
+    "Description": "Adjusted based on a medical/dental provider's apportionment of care between related injuries and other unrelated medical/dental conditions/injuries.",
+    "Length": 148
+  },
+  {
+    "Remark": "N102",
+    "Description": "This claim has been denied without reviewing the medical/dental record because the requested records were not received or were not received timely.",
+    "Length": 147
+  },
+  {
+    "Remark": "N469",
+    "Description": "Alert: Claim/Service(s) subject to appeal process, see section 935 of Medicare Prescription Drug, Improvement, and Modernization Act of 2003 (MMA).",
+    "Length": 147
+  },
+  {
+    "Remark": "M6",
+    "Description": "Alert: You must furnish and service this item for any period of medical need for the remainder of the reasonable useful lifetime of the equipment.",
+    "Length": 146
+  },
+  {
+    "Remark": "N73",
+    "Description": "A Skilled Nursing Facility is responsible for payment of outside providers who furnish these services/supplies under arrangement to its residents.",
+    "Length": 146
+  },
+  {
+    "Remark": "N174",
+    "Description": "This is not a covered service/procedure/ equipment/bed, however patient liability is limited to amounts shown in the adjustments under group 'PR'.",
+    "Length": 146
+  },
+  {
+    "Remark": "N220",
+    "Description": "Alert: See the payer's web site or contact the payer's Customer Service department to obtain forms and instructions for filing a provider dispute.",
+    "Length": 146
+  },
+  {
+    "Remark": "N562",
+    "Description": "The provider number of your incoming claim does not match the provider number on the processed Notice of Admission (NOA) for this bundled payment.",
+    "Length": 146
+  },
+  {
+    "Remark": "N387",
+    "Description": "Alert: Submit this claim to the patient's other insurer for potential payment of supplemental benefits. We did not forward the claim information.",
+    "Length": 145
+  },
+  {
+    "Remark": "MA08",
+    "Description": "Alert: Claim information was not forwarded because the supplemental coverage is not with a Medigap plan, or you do not participate in Medicare.",
+    "Length": 143
+  },
+  {
+    "Remark": "N10",
+    "Description": "Adjustment based on the findings of a review organization/professional consult/manual adjudication/medical advisor/dental advisor/peer review.",
+    "Length": 142
+  },
+  {
+    "Remark": "N409",
+    "Description": "This service is related to an accidental injury and is not covered unless provided within a specific time frame from the date of the accident.",
+    "Length": 142
+  },
+  {
+    "Remark": "N770",
+    "Description": "The adjustment request received from the provider has been processed. Your original claim has been adjusted based on the information received.",
+    "Length": 142
+  },
+  {
+    "Remark": "N670",
+    "Description": "This service code has been identified as the primary procedure code subject to the Medicare Multiple Procedure Payment Reduction (MPPR) rule.",
+    "Length": 141
+  },
+  {
+    "Remark": "M15",
+    "Description": "Separately billed services/tests have been bundled as they are considered components of the same procedure. Separate payment is not allowed.",
+    "Length": 140
+  },
+  {
+    "Remark": "M18",
+    "Description": "Certain services may be approved for home use. Neither a hospital nor a Skilled Nursing Facility (SNF) is considered to be a patient's home.",
+    "Length": 140
+  },
+  {
+    "Remark": "MA116",
+    "Description": "Did not complete the statement 'Homebound' on the claim to validate whether laboratory services were performed at home or in an institution.",
+    "Length": 140
+  },
+  {
+    "Remark": "MA76",
+    "Description": "Missing/incomplete/invalid provider identifier for home health agency or hospice when physician is performing care plan oversight services.",
+    "Length": 139
+  },
+  {
+    "Remark": "N111",
+    "Description": "No appeal right except duplicate claim/service issue. This service was included in a claim that has been previously billed and adjudicated.",
+    "Length": 139
+  },
+  {
+    "Remark": "N536",
+    "Description": "We are not changing the prior payer's determination of patient responsibility, which you may collect, as this service is not covered by us.",
+    "Length": 139
+  },
+  {
+    "Remark": "M101",
+    "Description": "Begin to report a G1-G5 modifier with this HCPCS. We will soon begin to deny payment for this service if billed without a G1-G5 modifier.",
+    "Length": 137
+  },
+  {
+    "Remark": "N231",
+    "Description": "Incomplete/invalid invoice or statement certifying the actual cost of the lens, less discounts, and/or the type of intraocular lens used.",
+    "Length": 137
+  },
+  {
+    "Remark": "MA13",
+    "Description": "Alert: You may be subject to penalties if you bill the patient for amounts not reported with the PR (patient responsibility) group code.",
+    "Length": 136
+  },
+  {
+    "Remark": "MA82",
+    "Description": "Missing/incomplete/invalid provider/supplier billing number/identifier or billing name, address, city, state, zip code, or phone number.",
+    "Length": 136
+  },
+  {
+    "Remark": "N44",
+    "Description": "Payer’s share of regulatory surcharges, assessments, allowances or health care-related taxes paid directly to the regulatory authority.",
+    "Length": 135
+  },
+  {
+    "Remark": "N93",
+    "Description": "A separate claim must be submitted for each place of service. Services furnished at multiple sites may not be billed in the same claim.",
+    "Length": 135
+  },
+  {
+    "Remark": "N767",
+    "Description": "The Medicaid state requires provider to be enrolled in the member’s Medicaid state program prior to any claim benefits being processed.",
+    "Length": 135
+  },
+  {
+    "Remark": "M97",
+    "Description": "Not paid to practitioner when provided to patient in this place of service. Payment included in the reimbursement issued the facility.",
+    "Length": 134
+  },
+  {
+    "Remark": "N614",
+    "Description": "Alert: Additional information is included in the 835 Healthcare Policy Identification Segment (loop 2110 Service Payment Information).",
+    "Length": 134
+  },
+  {
+    "Remark": "N358",
+    "Description": "Alert: This decision may be reviewed if additional documentation as described in the contract or plan benefit documents is submitted.",
+    "Length": 133
+  },
+  {
+    "Remark": "N420",
+    "Description": "Claim payment was the result of a payer's retroactive adjustment due to a Coordination of Benefits or Third Party Liability Recovery.",
+    "Length": 133
+  },
+  {
+    "Remark": "N734",
+    "Description": "The patient is eligible for these medical services only when unable to work or perform normal activities due to an illness or injury.",
+    "Length": 133
+  },
+  {
+    "Remark": "N134",
+    "Description": "Alert: This represents your scheduled payment for this service. If treatment has been discontinued, please contact Customer Service.",
+    "Length": 132
+  },
+  {
+    "Remark": "N535",
+    "Description": "Payment is adjusted when procedure is performed in this place of service based on the submitted procedure code and place of service.",
+    "Length": 132
+  },
+  {
+    "Remark": "M8",
+    "Description": "We do not accept blood gas tests results when the test was conducted by a medical supplier or taken while the patient is on oxygen.",
+    "Length": 131
+  },
+  {
+    "Remark": "N350",
+    "Description": "Missing/incomplete/invalid description of service for a Not Otherwise Classified (NOC) code or for an Unlisted/By Report procedure.",
+    "Length": 131
+  },
+  {
+    "Remark": "N573",
+    "Description": "Alert: You have been overpaid and must refund the overpayment. The refund will be requested separately by another payer/contractor.",
+    "Length": 131
+  },
+  {
+    "Remark": "MA101",
+    "Description": "A Skilled Nursing Facility (SNF) is responsible for payment of outside providers who furnish these services/supplies to residents.",
+    "Length": 130
+  },
+  {
+    "Remark": "MA09",
+    "Description": "Alert: Claim submitted as unassigned but processed as assigned in accordance with our current assignment/participation agreement.",
+    "Length": 129
+  },
+  {
+    "Remark": "N186",
+    "Description": "Non-Availability Statement (NAS) required for this service. Contact the nearest Military Treatment Facility (MTF) for assistance.",
+    "Length": 129
+  },
+  {
+    "Remark": "N740",
+    "Description": "The member's Consumer Spending Account does not contain sufficient funds to cover the member's liability for this claim/service.",
+    "Length": 128
+  },
+  {
+    "Remark": "N23",
+    "Description": "Alert: Patient liability may be affected due to coordination of benefits with other carriers and/or maximum benefit provisions.",
+    "Length": 127
+  },
+  {
+    "Remark": "N538",
+    "Description": "A facility is responsible for payment to outside providers who furnish these services/supplies/drugs to its patients/residents.",
+    "Length": 127
+  },
+  {
+    "Remark": "N575",
+    "Description": "Mismatch between the submitted ordering/referring provider name and the ordering/referring provider name stored in our records.",
+    "Length": 127
+  },
+  {
+    "Remark": "N605",
+    "Description": "This fee was calculated based upon New York All Patients Refined Diagnosis Related Groups (APR-DRG), pursuant to Regulation 68.",
+    "Length": 127
+  },
+  {
+    "Remark": "N735",
+    "Description": "Adjustment without review of medical/dental record because the requested records were not received or were not received timely.",
+    "Length": 127
+  },
+  {
+    "Remark": "M130",
+    "Description": "Missing invoice or statement certifying the actual cost of the lens, less discounts, and/or the type of intraocular lens used.",
+    "Length": 126
+  },
+  {
+    "Remark": "MA15",
+    "Description": "Alert: Your claim has been separated to expedite handling. You will receive a separate notice for the other services reported.",
+    "Length": 126
+  },
+  {
+    "Remark": "N155",
+    "Description": "Alert: Our records do not indicate that other insurance is on file. Please submit other insurance information for our records.",
+    "Length": 126
+  },
+  {
+    "Remark": "N179",
+    "Description": "Additional information has been requested from the member. The charges will be reconsidered upon receipt of that information.",
+    "Length": 125
+  },
+  {
+    "Remark": "M9",
+    "Description": "Alert: This is the tenth rental month. You must offer the patient the choice of changing the rental to a purchase agreement.",
+    "Length": 124
+  },
+  {
+    "Remark": "MA96",
+    "Description": "Claim rejected. Coded as a Medicare Managed Care Demonstration but patient is not enrolled in a Medicare managed care plan.",
+    "Length": 123
+  },
+  {
+    "Remark": "N127",
+    "Description": "This is a misdirected claim/service for a United Mine Workers of America (UMWA) beneficiary. Please submit claims to them.",
+    "Length": 122
+  },
+  {
+    "Remark": "N201",
+    "Description": "A mental health facility is responsible for payment of outside providers who furnish these services/supplies to residents.",
+    "Length": 122
+  },
+  {
+    "Remark": "N82",
+    "Description": "Provider must accept insurance payment as payment in full when a third party payer contract specifies full reimbursement.",
+    "Length": 121
+  },
+  {
+    "Remark": "N560",
+    "Description": "The pilot program requires an interim or final claim within 60 days of the Notice of Admission. A claim was not received.",
+    "Length": 121
+  },
+  {
+    "Remark": "N632",
+    "Description": "According to the Official Medical Fee Schedule this service has a relative value of zero and therefore no payment is due.",
+    "Length": 121
+  },
+  {
+    "Remark": "N702",
+    "Description": "Decision based on review of previously adjudicated claims or for claims in process for the same/similar type of services.",
+    "Length": 121
+  },
+  {
+    "Remark": "N728",
+    "Description": "A workers' compensation insurer has reported having ongoing responsibility for medical services (ORM) for this diagnosis.",
+    "Length": 121
+  },
+  {
+    "Remark": "N216",
+    "Description": "We do not offer coverage for this type of service or the patient is not enrolled in this portion of our benefit package.",
+    "Length": 120
+  },
+  {
+    "Remark": "N512",
+    "Description": "Alert: This is the initial remit of a non-NCPDP claim originally submitted real-time without change to the adjudication.",
+    "Length": 120
+  },
+  {
+    "Remark": "N774",
+    "Description": "Alert: Refer to your Third Party Processor Agreement for specific information on fees associated with this payment type.",
+    "Length": 120
+  },
+  {
+    "Remark": "M7",
+    "Description": "No rental payments after the item is purchased, or after the total of issued rental payments equals the purchase price.",
+    "Length": 119
+  },
+  {
+    "Remark": "M140",
+    "Description": "Service not covered until after the patient’s 50th birthday, i.e., no coverage prior to the day after the 50th birthday",
+    "Length": 119
+  },
+  {
+    "Remark": "N357",
+    "Description": "Time frame requirements between this service/procedure/supply and a related service/procedure/supply have not been met.",
+    "Length": 119
+  },
+  {
+    "Remark": "N513",
+    "Description": "Alert: This is the initial remit of a non-NCPDP claim originally submitted real-time with a change to the adjudication.",
+    "Length": 119
+  },
+  {
+    "Remark": "MA98",
+    "Description": "Claim Rejected. Does not contain the correct Medicare Managed Care Demonstration contract number for this beneficiary.",
+    "Length": 118
+  },
+  {
+    "Remark": "N444",
+    "Description": "Alert: This facility has not filed the Election for High Cost Outlier form with the Division of Workers' Compensation.",
+    "Length": 118
+  },
+  {
+    "Remark": "N545",
+    "Description": "Payment reduced based on status as an unsuccessful eprescriber per the Electronic Prescribing (eRx) Incentive Program.",
+    "Length": 118
+  },
+  {
+    "Remark": "N590",
+    "Description": "Missing independent medical exam detailing the cause of injuries sustained and medical necessity of services rendered.",
+    "Length": 118
+  },
+  {
+    "Remark": "M55",
+    "Description": "We do not pay for self-administered anti-emetic drugs that are not administered with a covered oral anti-cancer drug.",
+    "Length": 117
+  },
+  {
+    "Remark": "N673",
+    "Description": "Reimbursement has been calculated based on an outpatient per diem or an outpatient factor and/or fee schedule amount.",
+    "Length": 117
+  },
+  {
+    "Remark": "N177",
+    "Description": "Alert: We did not send this claim to patient’s other insurer. They have indicated no additional payment can be made.",
+    "Length": 116
+  },
+  {
+    "Remark": "N572",
+    "Description": "This procedure is not payable unless appropriate non-payable reporting codes and associated modifiers are submitted.",
+    "Length": 116
+  },
+  {
+    "Remark": "N704",
+    "Description": "Alert: You may not appeal this decision but can resubmit this claim/service with corrected information if warranted.",
+    "Length": 116
+  },
+  {
+    "Remark": "M93",
+    "Description": "Information supplied supports a break in therapy. A new capped rental period began with delivery of this equipment.",
+    "Length": 115
+  },
+  {
+    "Remark": "M125",
+    "Description": "Missing/incomplete/invalid information on the period of time for which the service/supply/equipment will be needed.",
+    "Length": 115
+  },
+  {
+    "Remark": "MA51",
+    "Description": "Missing/incomplete/invalid CLIA certification number for laboratory services billed by physician office laboratory.",
+    "Length": 115
+  },
+  {
+    "Remark": "MA102",
+    "Description": "Missing/incomplete/invalid name or provider identifier for the rendering/referring/ ordering/ supervising provider.",
+    "Length": 115
+  },
+  {
+    "Remark": "N348",
+    "Description": "You chose that this service/supply/drug would be rendered/supplied and billed by a different practitioner/supplier.",
+    "Length": 115
+  },
+  {
+    "Remark": "N696",
+    "Description": "Alert: This reversal is due to a Coordination of Benefits or Third Party Liability Recovery retroactive adjustment.",
+    "Length": 115
+  },
+  {
+    "Remark": "M16",
+    "Description": "Alert: Please see our web site, mailings, or bulletins for more details concerning this policy/procedure/decision.",
+    "Length": 114
+  },
+  {
+    "Remark": "N65",
+    "Description": "Procedure code or procedure rate count cannot be determined, or was not on file, for the date of service/provider.",
+    "Length": 114
+  },
+  {
+    "Remark": "N695",
+    "Description": "Alert: This reversal is due to incorrect patient financial responsibility information on the initial adjudication.",
+    "Length": 114
+  },
+  {
+    "Remark": "MA97",
+    "Description": "Missing/incomplete/invalid Medicare Managed Care Demonstration contract number or clinical trial registry number.",
+    "Length": 113
+  },
+  {
+    "Remark": "N592",
+    "Description": "Adjusted because this is not the initial prescription or exceeds the amount allowed for the initial prescription.",
+    "Length": 113
+  },
+  {
+    "Remark": "M110",
+    "Description": "Missing/incomplete/invalid provider identifier for the provider from whom you purchased interpretation services.",
+    "Length": 112
+  },
+  {
+    "Remark": "MA104",
+    "Description": "Missing/incomplete/invalid date the patient was last seen or the provider identifier of the attending physician.",
+    "Length": 112
+  },
+  {
+    "Remark": "M133",
+    "Description": "Claim did not identify who performed the purchased diagnostic test or the amount you were charged for the test.",
+    "Length": 111
+  },
+  {
+    "Remark": "N2",
+    "Description": "This allowance has been made in accordance with the most appropriate course of treatment provision of the plan.",
+    "Length": 111
+  },
+  {
+    "Remark": "N156",
+    "Description": "Alert: The patient is responsible for the difference between the approved treatment and the elective treatment.",
+    "Length": 111
+  },
+  {
+    "Remark": "N381",
+    "Description": "Alert: Consult our contractual agreement for restrictions/billing/payment information related to these charges.",
+    "Length": 111
+  },
+  {
+    "Remark": "MA10",
+    "Description": "Alert: The patient's payment was in excess of the amount owed. You must refund the overpayment to the patient.",
+    "Length": 110
+  },
+  {
+    "Remark": "N160",
+    "Description": "The patient must choose an option before a payment can be made for this procedure/ equipment/ supply/ service.",
+    "Length": 110
+  },
+  {
+    "Remark": "N168",
+    "Description": "The patient must choose an option before a payment can be made for this procedure/ equipment/ supply/ service.",
+    "Length": 110
+  },
+  {
+    "Remark": "M12",
+    "Description": "Diagnostic tests performed by a physician must indicate whether purchased services are included on the claim.",
+    "Length": 109
+  },
+  {
+    "Remark": "M68",
+    "Description": "Missing/incomplete/invalid attending, ordering, rendering, supervising or referring physician identification.",
+    "Length": 109
+  },
+  {
+    "Remark": "MA111",
+    "Description": "Missing/incomplete/invalid purchase price of the test(s) and/or the performing laboratory's name and address.",
+    "Length": 109
+  },
+  {
+    "Remark": "N422",
+    "Description": "Claim payment was the result of a payer's retroactive adjustment due to a payer's contract incentive program.",
+    "Length": 109
+  },
+  {
+    "Remark": "N725",
+    "Description": "A liability insurer has reported having ongoing responsibility for medical services (ORM) for this diagnosis.",
+    "Length": 109
+  },
+  {
+    "Remark": "M28",
+    "Description": "This does not qualify for payment under Part B when Part A coverage is exhausted or not otherwise available.",
+    "Length": 108
+  },
+  {
+    "Remark": "MA57",
+    "Description": "Patient submitted written request to revoke his/her election for religious non-medical health care services.",
+    "Length": 108
+  },
+  {
+    "Remark": "N568",
+    "Description": "Alert: Initial payment based on the Notice of Admission (NOA) under the Bundled Payment Model IV initiative.",
+    "Length": 108
+  },
+  {
+    "Remark": "N727",
+    "Description": "A no-fault insurer has reported having ongoing responsibility for medical services (ORM) for this diagnosis.",
+    "Length": 108
+  },
+  {
+    "Remark": "N123",
+    "Description": "Alert: This is a split service and represents a portion of the units from the originally submitted service.",
+    "Length": 107
+  },
+  {
+    "Remark": "N363",
+    "Description": "Alert: in the near future we are implementing new policies/procedures that would affect this determination.",
+    "Length": 107
+  },
+  {
+    "Remark": "M80",
+    "Description": "Not covered when performed during the same session/date as a previously processed service for the patient.",
+    "Length": 106
+  },
+  {
+    "Remark": "MA74",
+    "Description": "Alert: This payment replaces an earlier payment for this claim that was either lost, damaged or returned.",
+    "Length": 105
+  },
+  {
+    "Remark": "N141",
+    "Description": "The patient was not residing in a long-term care facility during all or part of the service dates billed.",
+    "Length": 105
+  },
+  {
+    "Remark": "N230",
+    "Description": "Incomplete/invalid indication of whether the patient owns the equipment that requires the part or supply.",
+    "Length": 105
+  },
+  {
+    "Remark": "N369",
+    "Description": "Alert: Although this claim has been processed, it is deficient according to state legislation/regulation.",
+    "Length": 105
+  },
+  {
+    "Remark": "N22",
+    "Description": "Alert: This procedure code was added/changed because it more accurately describes the services rendered.",
+    "Length": 104
+  },
+  {
+    "Remark": "N628",
+    "Description": "Out-patient follow up visits on the same date of service as a scheduled test or treatment is disallowed.",
+    "Length": 104
+  },
+  {
+    "Remark": "N643",
+    "Description": "The services billed are considered Not Covered or Non-Covered (NC) in the applicable state fee schedule.",
+    "Length": 104
+  },
+  {
+    "Remark": "MA123",
+    "Description": "Your center was not selected to participate in this study, therefore, we cannot pay for these services.",
+    "Length": 103
+  },
+  {
+    "Remark": "N421",
+    "Description": "Claim payment was the result of a payer's retroactive adjustment due to a review organization decision.",
+    "Length": 103
+  },
+  {
+    "Remark": "N533",
+    "Description": "Services performed in an Indian Health Services facility under a self-insured tribal Group Health Plan.",
+    "Length": 103
+  },
+  {
+    "Remark": "N612",
+    "Description": "Medical provider not authorized/certified to provide treatment to injured workers in this jurisdiction.",
+    "Length": 103
+  },
+  {
+    "Remark": "N759",
+    "Description": "Payment adjusted based on the National Electrical Manufacturers Association (NEMA) Standard XR-29-2013.",
+    "Length": 103
+  },
+  {
+    "Remark": "M43",
+    "Description": "Payment for this service previously issued to you or another provider by another carrier/intermediary.",
+    "Length": 102
+  },
+  {
+    "Remark": "M111",
+    "Description": "We do not pay for chiropractic manipulative treatment when the patient refuses to have an x-ray taken.",
+    "Length": 102
+  },
+  {
+    "Remark": "N72",
+    "Description": "PPS (Prospective Payment System) code changed by medical reviewers. Not supported by clinical records.",
+    "Length": 102
+  },
+  {
+    "Remark": "N448",
+    "Description": "This drug/service/supply is not included in the fee schedule or contracted/legislated fee arrangement.",
+    "Length": 102
+  },
+  {
+    "Remark": "N521",
+    "Description": "Mismatch between the submitted provider information and the provider information stored in our system.",
+    "Length": 102
+  },
+  {
+    "Remark": "M11",
+    "Description": "DME, orthotics and prosthetics must be billed to the DME carrier who services the patient's zip code.",
+    "Length": 101
+  },
+  {
+    "Remark": "N406",
+    "Description": "This service is only covered when the recipient's insurer(s) do not provide coverage for the service.",
+    "Length": 101
+  },
+  {
+    "Remark": "N722",
+    "Description": "Patient must use Workers' Compensation Set-Aside (WCSA) funds to pay for the medical service or item.",
+    "Length": 101
+  },
+  {
+    "Remark": "M69",
+    "Description": "Paid at the regular rate as you did not submit documentation to justify the modified procedure code.",
+    "Length": 100
+  },
+  {
+    "Remark": "M94",
+    "Description": "Information supplied does not support a break in therapy. A new capped rental period will not begin.",
+    "Length": 100
+  },
+  {
+    "Remark": "M108",
+    "Description": "Missing/incomplete/invalid provider identifier for the provider who interpreted the diagnostic test.",
+    "Length": 100
+  },
+  {
+    "Remark": "N133",
+    "Description": "Alert: Services for predetermination and services requesting payment are being processed separately.",
+    "Length": 100
+  },
+  {
+    "Remark": "N151",
+    "Description": "Telephone contact services will not be paid until the face-to-face contact requirement has been met.",
+    "Length": 100
+  },
+  {
+    "Remark": "N546",
+    "Description": "Payment represents a previous reduction based on the Electronic Prescribing (eRx) Incentive Program.",
+    "Length": 100
+  },
+  {
+    "Remark": "N583",
+    "Description": "Patient was not an occupant of our insured vehicle and therefore, is not an eligible injured person.",
+    "Length": 100
+  },
+  {
+    "Remark": "N656",
+    "Description": "An interest payment is being made because benefits are being paid outside the statutory requirement.",
+    "Length": 100
+  },
+  {
+    "Remark": "N172",
+    "Description": "The patient is not liable for the denied/adjusted charge(s) for receiving any updated service/item.",
+    "Length": 99
+  },
+  {
+    "Remark": "N204",
+    "Description": "Services under review for possible pre-existing condition. Send medical records for prior 12 months",
+    "Length": 99
+  },
+  {
+    "Remark": "N666",
+    "Description": "Only one evaluation and management code at this service level is covered during the course of care.",
+    "Length": 99
+  },
+  {
+    "Remark": "M115",
+    "Description": "This item is denied when provided to this patient by a non-contract or non-demonstration supplier.",
+    "Length": 98
+  },
+  {
+    "Remark": "M136",
+    "Description": "Missing/incomplete/invalid indication that the service was supervised or evaluated by a physician.",
+    "Length": 98
+  },
+  {
+    "Remark": "MA45",
+    "Description": "Alert: As previously advised, a portion or all of your payment is being held in a special account.",
+    "Length": 98
+  },
+  {
+    "Remark": "N7",
+    "Description": "Alert: Processing of this claim/service has included consideration under Major Medical provisions.",
+    "Length": 98
+  },
+  {
+    "Remark": "N376",
+    "Description": "Subscriber/patient is assigned to active military duty, therefore primary coverage may be TRICARE.",
+    "Length": 98
+  },
+  {
+    "Remark": "N419",
+    "Description": "Claim payment was the result of a payer's retroactive adjustment due to a retroactive rate change.",
+    "Length": 98
+  },
+  {
+    "Remark": "N480",
+    "Description": "Incomplete/invalid Explanation of Benefits (Coordination of Benefits or Medicare Secondary Payer).",
+    "Length": 98
+  },
+  {
+    "Remark": "N747",
+    "Description": "This is a misdirected claim/service. Submit the claim to the payer/plan where the patient resides.",
+    "Length": 98
+  },
+  {
+    "Remark": "N56",
+    "Description": "Procedure code billed is not correct/valid for the services billed or the date of service billed.",
+    "Length": 97
+  },
+  {
+    "Remark": "N375",
+    "Description": "Missing/incomplete/invalid questionnaire/information required to determine dependent eligibility.",
+    "Length": 97
+  },
+  {
+    "Remark": "N405",
+    "Description": "This service is only covered when the donor's insurer(s) do not provide coverage for the service.",
+    "Length": 97
+  },
+  {
+    "Remark": "N74",
+    "Description": "Resubmit with multiple claims, each claim covering services provided in only one calendar month.",
+    "Length": 96
+  },
+  {
+    "Remark": "N374",
+    "Description": "Primary Medicare Part A insurance has been exhausted and a Part B Remittance Advice is required.",
+    "Length": 96
+  },
+  {
+    "Remark": "N763",
+    "Description": "The demonstration code is not appropriate for this claim; resubmit without a demonstration code.",
+    "Length": 96
+  },
+  {
+    "Remark": "N159",
+    "Description": "Payment denied/reduced because mileage is not covered when the patient is not in the ambulance.",
+    "Length": 95
+  },
+  {
+    "Remark": "N166",
+    "Description": "Payment denied/reduced because mileage is not covered when the patient is not in the ambulance.",
+    "Length": 95
+  },
+  {
+    "Remark": "N352",
+    "Description": "Alert: There are no scheduled payments for this service. Submit a claim for each patient visit.",
+    "Length": 95
+  },
+  {
+    "Remark": "N423",
+    "Description": "Claim payment was the result of a payer's retroactive adjustment due to a non standard program.",
+    "Length": 95
+  },
+  {
+    "Remark": "N600",
+    "Description": "Adjusted based on the applicable fee schedule for the region in which the service was rendered.",
+    "Length": 95
+  },
+  {
+    "Remark": "N754",
+    "Description": "Missing/incomplete/invalid Referring Provider or Other Source Qualifier on the 1500 Claim Form.",
+    "Length": 95
+  },
+  {
+    "Remark": "M124",
+    "Description": "Missing indication of whether the patient owns the equipment that requires the part or supply.",
+    "Length": 94
+  },
+  {
+    "Remark": "MA133",
+    "Description": "Claim overlaps inpatient stay. Rebill only those services rendered outside the inpatient stay.",
+    "Length": 94
+  },
+  {
+    "Remark": "N14",
+    "Description": "Payment based on a contractual amount or agreement, fee schedule, or maximum allowable amount.",
+    "Length": 94
+  },
+  {
+    "Remark": "N130",
+    "Description": "Consult plan benefit documents/guidelines for information about restrictions for this service.",
+    "Length": 94
+  },
+  {
+    "Remark": "N343",
+    "Description": "Missing/incomplete/invalid Transcutaneous Electrical Nerve Stimulator (TENS) trial start date.",
+    "Length": 94
+  },
+  {
+    "Remark": "N384",
+    "Description": "Records indicate that the referenced body part/tooth has been removed in a previous procedure.",
+    "Length": 94
+  },
+  {
+    "Remark": "N514",
+    "Description": "Consult plan benefit documents/guidelines for information about restrictions for this service.",
+    "Length": 94
+  },
+  {
+    "Remark": "N639",
+    "Description": "Reimbursement has been made according to the inpatient rehabilitation facilities fee schedule.",
+    "Length": 94
+  },
+  {
+    "Remark": "N651",
+    "Description": "No Personal Injury Protection/Medical Payments Coverage on the policy at the time of the loss.",
+    "Length": 94
+  },
+  {
+    "Remark": "M86",
+    "Description": "Service denied because payment already made for same/similar procedure within set time frame.",
+    "Length": 93
+  },
+  {
+    "Remark": "MA24",
+    "Description": "Christian Science Sanitarium/ Skilled Nursing Facility (SNF) bill in the same benefit period.",
+    "Length": 93
+  },
+  {
+    "Remark": "N189",
+    "Description": "Alert: This service has been paid as a one-time exception to the plan's benefit restrictions.",
+    "Length": 93
+  },
+  {
+    "Remark": "N594",
+    "Description": "Records reflect the injured party did not complete an Application for Benefits for this loss.",
+    "Length": 93
+  },
+  {
+    "Remark": "N617",
+    "Description": "This enrollee is in the second or third month of the advance premium tax credit grace period.",
+    "Length": 93
+  },
+  {
+    "Remark": "N631",
+    "Description": "Medical Fee Schedule does not list this code. An allowance was made for a comparable service.",
+    "Length": 93
+  },
+  {
+    "Remark": "MA50",
+    "Description": "Missing/incomplete/invalid Investigational Device Exemption number or Clinical Trial number.",
+    "Length": 92
+  },
+  {
+    "Remark": "N59",
+    "Description": "Alert: Please refer to your provider manual for additional program and provider information.",
+    "Length": 92
+  },
+  {
+    "Remark": "N344",
+    "Description": "Missing/incomplete/invalid Transcutaneous Electrical Nerve Stimulator (TENS) trial end date.",
+    "Length": 92
+  },
+  {
+    "Remark": "N364",
+    "Description": "Alert: According to our agreement, you must waive the deductible and/or coinsurance amounts.",
+    "Length": 92
+  },
+  {
+    "Remark": "N435",
+    "Description": "Exceeds number/frequency approved /allowed within time period without support documentation.",
+    "Length": 92
+  },
+  {
+    "Remark": "N539",
+    "Description": "Alert: We processed appeals/waiver requests on your behalf and that request has been denied.",
+    "Length": 92
+  },
+  {
+    "Remark": "N541",
+    "Description": "Mismatch between the submitted insurance type code and the information stored in our system.",
+    "Length": 92
+  },
+  {
+    "Remark": "N623",
+    "Description": "Not covered when deemed unscientific/unproven/outmoded/experimental/excessive/inappropriate.",
+    "Length": 92
+  },
+  {
+    "Remark": "M91",
+    "Description": "Lab procedures with different CLIA certification numbers must be billed on separate claims.",
+    "Length": 91
+  },
+  {
+    "Remark": "MA88",
+    "Description": "Missing/incomplete/invalid insured's address and/or telephone number for the primary payer.",
+    "Length": 91
+  },
+  {
+    "Remark": "N83",
+    "Description": "No appeal rights. Adjudicative decision based on the provisions of a demonstration project.",
+    "Length": 91
+  },
+  {
+    "Remark": "N180",
+    "Description": "This item or service does not meet the criteria for the category under which it was billed.",
+    "Length": 91
+  },
+  {
+    "Remark": "N224",
+    "Description": "Incomplete/invalid documentation of benefit to the patient during initial treatment period.",
+    "Length": 91
+  },
+  {
+    "Remark": "N436",
+    "Description": "The injury claim has not been accepted and a mandatory medical reimbursement has been made.",
+    "Length": 91
+  },
+  {
+    "Remark": "N553",
+    "Description": "Payment adjusted based on a Low Income Subsidy (LIS) retroactive coverage or status change.",
+    "Length": 91
+  },
+  {
+    "Remark": "N564",
+    "Description": "Patient did not meet the inclusion criteria for the demonstration project or pilot program.",
+    "Length": 91
+  },
+  {
+    "Remark": "N595",
+    "Description": "Records reflect the injured party did not complete an Assignment of Benefits for this loss.",
+    "Length": 91
+  },
+  {
+    "Remark": "N697",
+    "Description": "Alert: This reversal is due to a payer's retroactive contract incentive program adjustment.",
+    "Length": 91
+  },
+  {
+    "Remark": "MA86",
+    "Description": "Missing/incomplete/invalid group or policy number of the insured for the primary coverage.",
+    "Length": 90
+  },
+  {
+    "Remark": "N525",
+    "Description": "These services are not covered when performed within the global period of another service.",
+    "Length": 90
+  },
+  {
+    "Remark": "N616",
+    "Description": "Alert: This enrollee is in the first month of the advance premium tax credit grace period.",
+    "Length": 90
+  },
+  {
+    "Remark": "N699",
+    "Description": "Payment adjusted based on the Physician Quality Reporting System (PQRS) Incentive Program.",
+    "Length": 90
+  },
+  {
+    "Remark": "N193",
+    "Description": "Alert: Specific federal/state/local program may cover this service through another payer.",
+    "Length": 89
+  },
+  {
+    "Remark": "N551",
+    "Description": "Payment adjusted based on the Ambulatory Surgical Center (ASC) Quality Reporting Program.",
+    "Length": 89
+  },
+  {
+    "Remark": "N596",
+    "Description": "Records reflect the injured party did not complete a Medical Authorization for this loss.",
+    "Length": 89
+  },
+  {
+    "Remark": "M144",
+    "Description": "Pre-/post-operative care payment is included in the allowance for the surgery/procedure.",
+    "Length": 88
+  },
+  {
+    "Remark": "MA25",
+    "Description": "A patient may not elect to change a hospice provider more than once in a benefit period.",
+    "Length": 88
+  },
+  {
+    "Remark": "N48",
+    "Description": "Claim information does not agree with information received from other insurance carrier.",
+    "Length": 88
+  },
+  {
+    "Remark": "N52",
+    "Description": "Patient not enrolled in the billing provider's managed care plan on the date of service.",
+    "Length": 88
+  },
+  {
+    "Remark": "N94",
+    "Description": "Claim/Service denied because a more specific taxonomy code is required for adjudication.",
+    "Length": 88
+  },
+  {
+    "Remark": "N143",
+    "Description": "The patient was not in a hospice program during all or part of the service dates billed.",
+    "Length": 88
+  },
+  {
+    "Remark": "N609",
+    "Description": "80% of the provider's billed amount is being recommended for payment according to Act 6.",
+    "Length": 88
+  },
+  {
+    "Remark": "N618",
+    "Description": "Alert: This claim will automatically be reprocessed if the enrollee pays their premiums.",
+    "Length": 88
+  },
+  {
+    "Remark": "N723",
+    "Description": "Patient must use Liability set-aside (LSA) funds to pay for the medical service or item.",
+    "Length": 88
+  },
+  {
+    "Remark": "N724",
+    "Description": "Patient must use No-Fault set-aside (NFSA) funds to pay for the medical service or item.",
+    "Length": 88
+  },
+  {
+    "Remark": "M4",
+    "Description": "Alert: This is the last monthly installment payment for this durable medical equipment.",
+    "Length": 87
+  },
+  {
+    "Remark": "M21",
+    "Description": "Missing/incomplete/invalid place of residence for this service/item provided in a home.",
+    "Length": 87
+  },
+  {
+    "Remark": "MA89",
+    "Description": "Missing/incomplete/invalid patient's relationship to the insured for the primary payer.",
+    "Length": 87
+  },
+  {
+    "Remark": "N16",
+    "Description": "Family/member Out-of-Pocket maximum has been met. Payment based on a higher percentage.",
+    "Length": 87
+  },
+  {
+    "Remark": "N36",
+    "Description": "Claim must meet primary payer’s processing requirements before we can consider payment.",
+    "Length": 87
+  },
+  {
+    "Remark": "N479",
+    "Description": "Missing Explanation of Benefits (Coordination of Benefits or Medicare Secondary Payer).",
+    "Length": 87
+  },
+  {
+    "Remark": "M10",
+    "Description": "Equipment purchases are limited to the first or the tenth month of medical necessity.",
+    "Length": 85
+  },
+  {
+    "Remark": "M61",
+    "Description": "We cannot pay for this as the approval period for the FDA clinical trial has expired.",
+    "Length": 85
+  },
+  {
+    "Remark": "M75",
+    "Description": "Multiple automated multichannel tests performed on the same day combined for payment.",
+    "Length": 85
+  },
+  {
+    "Remark": "M88",
+    "Description": "We cannot pay for laboratory tests unless billed by the laboratory that did the work.",
+    "Length": 85
+  },
+  {
+    "Remark": "M107",
+    "Description": "Payment reduced as 90-day rolling average hematocrit for ESRD patient exceeded 36.5%.",
+    "Length": 85
+  },
+  {
+    "Remark": "MA134",
+    "Description": "Missing/incomplete/invalid provider number of the facility where the patient resides.",
+    "Length": 85
+  },
+  {
+    "Remark": "N131",
+    "Description": "Total payments under multiple contracts cannot exceed the allowance for this service.",
+    "Length": 85
+  },
+  {
+    "Remark": "N135",
+    "Description": "Record fees are the patient's responsibility and limited to the specified co-payment.",
+    "Length": 85
+  },
+  {
+    "Remark": "N584",
+    "Description": "Not covered based on the insured's noncompliance with policy or statutory conditions.",
+    "Length": 85
+  },
+  {
+    "Remark": "N591",
+    "Description": "Payment based on an Independent Medical Examination (IME) or Utilization Review (UR).",
+    "Length": 85
+  },
+  {
+    "Remark": "N703",
+    "Description": "This service is incompatible with previously adjudicated claims or claims in process.",
+    "Length": 85
+  },
+  {
+    "Remark": "MA46",
+    "Description": "Alert: The new information was considered but additional payment will not be issued.",
+    "Length": 84
+  },
+  {
+    "Remark": "MA53",
+    "Description": "Missing/incomplete/invalid Competitive Bidding Demonstration Project identification.",
+    "Length": 84
+  },
+  {
+    "Remark": "N171",
+    "Description": "Payment for repair or replacement is not covered or has exceeded the purchase price.",
+    "Length": 84
+  },
+  {
+    "Remark": "N213",
+    "Description": "Missing/incomplete/invalid facility/discrete unit DRG/DRG exempt status information.",
+    "Length": 84
+  },
+  {
+    "Remark": "N447",
+    "Description": "Payment is based on a generic equivalent as required documentation was not provided.",
+    "Length": 84
+  },
+  {
+    "Remark": "N527",
+    "Description": "We processed this claim as the primary payer prior to receiving the recovery demand.",
+    "Length": 84
+  },
+  {
+    "Remark": "N534",
+    "Description": "This is an individual policy, the employer does not participate in plan sponsorship.",
+    "Length": 84
+  },
+  {
+    "Remark": "N637",
+    "Description": "Consultations are not allowed once treatment has been rendered by the same provider.",
+    "Length": 84
+  },
+  {
+    "Remark": "M1",
+    "Description": "X-ray not taken within the past 12 months or near enough to the start of treatment.",
+    "Length": 83
+  },
+  {
+    "Remark": "MA61",
+    "Description": "Missing/incomplete/invalid social security number or health insurance claim number.",
+    "Length": 83
+  },
+  {
+    "Remark": "N55",
+    "Description": "Procedures for billing with group/referring/performing providers were not followed.",
+    "Length": 83
+  },
+  {
+    "Remark": "N661",
+    "Description": "Documentation does not support that the services rendered were medically necessary.",
+    "Length": 83
+  },
+  {
+    "Remark": "N21",
+    "Description": "Alert: Your line item has been separated into multiple lines to expedite handling.",
+    "Length": 82
+  },
+  {
+    "Remark": "N78",
+    "Description": "The necessary components of the child and teen checkup (EPSDT) were not completed.",
+    "Length": 82
+  },
+  {
+    "Remark": "N181",
+    "Description": "Additional information is required from another provider involved in this service.",
+    "Length": 82
+  },
+  {
+    "Remark": "N365",
+    "Description": "This procedure code is not payable. It is for reporting/information purposes only.",
+    "Length": 82
+  },
+  {
+    "Remark": "N593",
+    "Description": "Not covered based on failure to attend a scheduled Independent Medical Exam (IME).",
+    "Length": 82
+  },
+  {
+    "Remark": "N626",
+    "Description": "New or established patient E/M codes are not payable with chiropractic care codes.",
+    "Length": 82
+  },
+  {
+    "Remark": "N686",
+    "Description": "Missing/incomplete/Invalid questionnaire needed to complete payment determination.",
+    "Length": 82
+  },
+  {
+    "Remark": "N694",
+    "Description": "Alert: This reversal is due to a resubmission/change to the claim by the provider.",
+    "Length": 82
+  },
+  {
+    "Remark": "M121",
+    "Description": "We pay for this service only when performed with a covered cryosurgical ablation.",
+    "Length": 81
+  },
+  {
+    "Remark": "MA48",
+    "Description": "Missing/incomplete/invalid name or address of responsible party or primary payer.",
+    "Length": 81
+  },
+  {
+    "Remark": "MA54",
+    "Description": "Physician certification or election consent for hospice care not received timely.",
+    "Length": 81
+  },
+  {
+    "Remark": "N69",
+    "Description": "Alert: PPS (Prospective Payment System) code changed by claims processing system.",
+    "Length": 81
+  },
+  {
+    "Remark": "N424",
+    "Description": "Patient does not reside in the geographic area required for this type of payment.",
+    "Length": 81
+  },
+  {
+    "Remark": "N427",
+    "Description": "Payment for eyeglasses or contact lenses can be made only after cataract surgery.",
+    "Length": 81
+  },
+  {
+    "Remark": "N518",
+    "Description": "No separate payment for accessories when furnished for use with oxygen equipment.",
+    "Length": 81
+  },
+  {
+    "Remark": "N576",
+    "Description": "Services not related to the specific incident/claim/accident/loss being reported.",
+    "Length": 81
+  },
+  {
+    "Remark": "N621",
+    "Description": "Charges for Jurisdiction required forms, reports, or chart notes are not payable.",
+    "Length": 81
+  },
+  {
+    "Remark": "M42",
+    "Description": "The medical necessity form must be personally signed by the attending physician.",
+    "Length": 80
+  },
+  {
+    "Remark": "M134",
+    "Description": "Performed by a facility/supplier in which the provider has a financial interest.",
+    "Length": 80
+  },
+  {
+    "Remark": "MA34",
+    "Description": "Missing/incomplete/invalid number of coinsurance days during the billing period.",
+    "Length": 80
+  },
+  {
+    "Remark": "N161",
+    "Description": "This drug/service/supply is covered only when the associated service is covered.",
+    "Length": 80
+  },
+  {
+    "Remark": "N169",
+    "Description": "This drug/service/supply is covered only when the associated service is covered.",
+    "Length": 80
+  },
+  {
+    "Remark": "N214",
+    "Description": "Missing/incomplete/invalid history of the related initial surgical procedure(s).",
+    "Length": 80
+  },
+  {
+    "Remark": "N223",
+    "Description": "Missing documentation of benefit to the patient during initial treatment period.",
+    "Length": 80
+  },
+  {
+    "Remark": "N385",
+    "Description": "Notification of admission was not timely according to published plan procedures.",
+    "Length": 80
+  },
+  {
+    "Remark": "N620",
+    "Description": "Alert: This procedure code is for quality reporting/informational purposes only.",
+    "Length": 80
+  },
+  {
+    "Remark": "N676",
+    "Description": "Service does not qualify for payment under the Outpatient Facility Fee Schedule.",
+    "Length": 80
+  },
+  {
+    "Remark": "N700",
+    "Description": "Payment adjusted based on the Electronic Health Records (EHR) Incentive Program.",
+    "Length": 80
+  },
+  {
+    "Remark": "N771",
+    "Description": "Alert: Under Federal law you cannot charge more than the limiting charge amount.",
+    "Length": 80
+  },
+  {
+    "Remark": "M33",
+    "Description": "Missing/incomplete/invalid UPIN for the ordering/referring/performing provider.",
+    "Length": 79
+  },
+  {
+    "Remark": "M58",
+    "Description": "Missing/incomplete/invalid claim information. Resubmit claim after corrections.",
+    "Length": 79
+  },
+  {
+    "Remark": "N24",
+    "Description": "Missing/incomplete/invalid Electronic Funds Transfer (EFT) banking information.",
+    "Length": 79
+  },
+  {
+    "Remark": "N349",
+    "Description": "The administration method and drug must be reported to adjudicate this service.",
+    "Length": 79
+  },
+  {
+    "Remark": "N537",
+    "Description": "We have examined claims history and no records of the services have been found.",
+    "Length": 79
+  },
+  {
+    "Remark": "M41",
+    "Description": "We do not pay for this as the patient has no legal obligation to pay for this.",
+    "Length": 78
+  },
+  {
+    "Remark": "M95",
+    "Description": "Services subjected to Home Health Initiative medical review/cost report audit.",
+    "Length": 78
+  },
+  {
+    "Remark": "N206",
+    "Description": "The supporting documentation does not match the information sent on the claim.",
+    "Length": 78
+  },
+  {
+    "Remark": "N450",
+    "Description": "Covered only when performed by the primary treating physician or the designee.",
+    "Length": 78
+  },
+  {
+    "Remark": "N650",
+    "Description": "This policy was not in effect for this date of loss. No coverage is available.",
+    "Length": 78
+  },
+  {
+    "Remark": "M92",
+    "Description": "Services subjected to review under the Home Health Medical Review Initiative.",
+    "Length": 77
+  },
+  {
+    "Remark": "N142",
+    "Description": "The original claim was denied. Resubmit a new claim, not a replacement claim.",
+    "Length": 77
+  },
+  {
+    "Remark": "N154",
+    "Description": "Alert: This payment was delayed for correction of provider's mailing address.",
+    "Length": 77
+  },
+  {
+    "Remark": "N199",
+    "Description": "Additional payment/recoupment approved based on payer-initiated review/audit.",
+    "Length": 77
+  },
+  {
+    "Remark": "N275",
+    "Description": "Missing/incomplete/invalid other payer purchased service provider identifier.",
+    "Length": 77
+  },
+  {
+    "Remark": "N692",
+    "Description": "Alert: This reversal is due to an incorrect rate on the initial adjudication.",
+    "Length": 77
+  },
+  {
+    "Remark": "MA07",
+    "Description": "Alert: The claim information has also been forwarded to Medicaid for review.",
+    "Length": 76
+  },
+  {
+    "Remark": "MA32",
+    "Description": "Missing/incomplete/invalid number of covered days during the billing period.",
+    "Length": 76
+  },
+  {
+    "Remark": "MA114",
+    "Description": "Missing/incomplete/invalid information on where the services were furnished.",
+    "Length": 76
+  },
+  {
+    "Remark": "MA125",
+    "Description": "Per legislation governing this program, payment constitutes payment in full.",
+    "Length": 76
+  },
+  {
+    "Remark": "N113",
+    "Description": "Only one initial visit is covered per physician, group practice or provider.",
+    "Length": 76
+  },
+  {
+    "Remark": "N226",
+    "Description": "Incomplete/invalid American Diabetes Association Certificate of Recognition.",
+    "Length": 76
+  },
+  {
+    "Remark": "N278",
+    "Description": "Missing/incomplete/invalid other payer service facility provider identifier.",
+    "Length": 76
+  },
+  {
+    "Remark": "N400",
+    "Description": "Alert: Electronically enabled providers should submit claims electronically.",
+    "Length": 76
+  },
+  {
+    "Remark": "N682",
+    "Description": "Missing/Incomplete/Invalid history of prior periodontal therapy/maintenance.",
+    "Length": 76
+  },
+  {
+    "Remark": "M119",
+    "Description": "Missing/incomplete/invalid/ deactivated/withdrawn National Drug Code (NDC).",
+    "Length": 75
+  },
+  {
+    "Remark": "M123",
+    "Description": "Missing/incomplete/invalid name, strength, or dosage of the drug furnished.",
+    "Length": 75
+  },
+  {
+    "Remark": "MA26",
+    "Description": "Alert: Our records indicate that you were previously informed of this rule.",
+    "Length": 75
+  },
+  {
+    "Remark": "MA31",
+    "Description": "Missing/incomplete/invalid beginning and ending dates of the period billed.",
+    "Length": 75
+  },
+  {
+    "Remark": "MA129",
+    "Description": "This provider was not certified for this procedure on this date of service.",
+    "Length": 75
+  },
+  {
+    "Remark": "N437",
+    "Description": "Alert: If the injury claim is accepted, these charges will be reconsidered.",
+    "Length": 75
+  },
+  {
+    "Remark": "N693",
+    "Description": "Alert: This reversal is due to a cancellation of the claim by the provider.",
+    "Length": 75
+  },
+  {
+    "Remark": "M74",
+    "Description": "This service does not qualify for a HPSA/Physician Scarcity bonus payment.",
+    "Length": 74
+  },
+  {
+    "Remark": "M84",
+    "Description": "Medical code sets used must be the codes in effect at the time of service.",
+    "Length": 74
+  },
+  {
+    "Remark": "MA75",
+    "Description": "Missing/incomplete/invalid patient or authorized representative signature.",
+    "Length": 74
+  },
+  {
+    "Remark": "MA90",
+    "Description": "Missing/incomplete/invalid employment status code for the primary insured.",
+    "Length": 74
+  },
+  {
+    "Remark": "N182",
+    "Description": "This claim/service must be billed according to the schedule for this plan.",
+    "Length": 74
+  },
+  {
+    "Remark": "N259",
+    "Description": "Missing/incomplete/invalid billing provider/supplier secondary identifier.",
+    "Length": 74
+  },
+  {
+    "Remark": "N662",
+    "Description": "Alert: Consideration of payment will be made upon receipt of a final bill.",
+    "Length": 74
+  },
+  {
+    "Remark": "MA27",
+    "Description": "Missing/incomplete/invalid entitlement number or name shown on the claim.",
+    "Length": 73
+  },
+  {
+    "Remark": "N54",
+    "Description": "Claim information is inconsistent with pre-certified/authorized services.",
+    "Length": 73
+  },
+  {
+    "Remark": "N145",
+    "Description": "Missing/incomplete/invalid provider identifier for this place of service.",
+    "Length": 73
+  },
+  {
+    "Remark": "N173",
+    "Description": "No qualifying hospital stay dates were provided for this episode of care.",
+    "Length": 73
+  },
+  {
+    "Remark": "N194",
+    "Description": "Technical component not paid if provider does not own the equipment used.",
+    "Length": 73
+  },
+  {
+    "Remark": "N196",
+    "Description": "Alert: Patient eligible to apply for other coverage which may be primary.",
+    "Length": 73
+  },
+  {
+    "Remark": "N260",
+    "Description": "Missing/incomplete/invalid billing provider/supplier contact information.",
+    "Length": 73
+  },
+  {
+    "Remark": "N356",
+    "Description": "Not covered when performed with, or subsequent to, a non-covered service.",
+    "Length": 73
+  },
+  {
+    "Remark": "N397",
+    "Description": "Benefits are not available for incomplete service(s)/undelivered item(s).",
+    "Length": 73
+  },
+  {
+    "Remark": "N522",
+    "Description": "Duplicate of a claim processed, or to be processed, as a crossover claim.",
+    "Length": 73
+  },
+  {
+    "Remark": "N635",
+    "Description": "The Allowance is calculated based on the anesthesia base units plus time.",
+    "Length": 73
+  },
+  {
+    "Remark": "N646",
+    "Description": "Reimbursement has been adjusted based on the guidelines for an assistant.",
+    "Length": 73
+  },
+  {
+    "Remark": "N684",
+    "Description": "Payment denied as this is a specialty claim submitted as a general claim.",
+    "Length": 73
+  },
+  {
+    "Remark": "M35",
+    "Description": "Missing/incomplete/invalid pre-operative photos or visual field results.",
+    "Length": 72
+  },
+  {
+    "Remark": "M40",
+    "Description": "Claim must be assigned and must be filed by the practitioner's employer.",
+    "Length": 72
+  },
+  {
+    "Remark": "M83",
+    "Description": "Service is not covered unless the patient is classified as at high risk.",
+    "Length": 72
+  },
+  {
+    "Remark": "M102",
+    "Description": "Service not performed on equipment approved by the FDA for this purpose.",
+    "Length": 72
+  },
+  {
+    "Remark": "N60",
+    "Description": "A valid NDC is required for payment of drug claims effective October 02.",
+    "Length": 72
+  },
+  {
+    "Remark": "N257",
+    "Description": "Missing/incomplete/invalid billing provider/supplier primary identifier.",
+    "Length": 72
+  },
+  {
+    "Remark": "N588",
+    "Description": "The patient has instructed that medical claims/bills are not to be paid.",
+    "Length": 72
+  },
+  {
+    "Remark": "N688",
+    "Description": "Alert: This reversal is due to a medical or utilization review decision.",
+    "Length": 72
+  },
+  {
+    "Remark": "N721",
+    "Description": "This service is only covered when performed as part of a clinical trial.",
+    "Length": 72
+  },
+  {
+    "Remark": "MA05",
+    "Description": "Incorrect admission date patient status or type of bill entry on claim.",
+    "Length": 71
+  },
+  {
+    "Remark": "N188",
+    "Description": "The approved level of care does not match the procedure code submitted.",
+    "Length": 71
+  },
+  {
+    "Remark": "N433",
+    "Description": "Resubmit this claim using only your National Provider Identifier (NPI).",
+    "Length": 71
+  },
+  {
+    "Remark": "N674",
+    "Description": "Not covered unless a pre-requisite procedure/service has been provided.",
+    "Length": 71
+  },
+  {
+    "Remark": "N743",
+    "Description": "Adjusted because the services may be related to an employment accident.",
+    "Length": 71
+  },
+  {
+    "Remark": "M128",
+    "Description": "Missing/incomplete/invalid date of the patient’s last physician visit.",
+    "Length": 70
+  },
+  {
+    "Remark": "M129",
+    "Description": "Missing/incomplete/invalid indicator of x-ray availability for review.",
+    "Length": 70
+  },
+  {
+    "Remark": "MA119",
+    "Description": "Provider level adjustment for late claim filing applies to this claim.",
+    "Length": 70
+  },
+  {
+    "Remark": "N62",
+    "Description": "Dates of service span multiple rate periods. Resubmit separate claims.",
+    "Length": 70
+  },
+  {
+    "Remark": "N128",
+    "Description": "This amount represents the prior to coverage portion of the allowance.",
+    "Length": 70
+  },
+  {
+    "Remark": "N362",
+    "Description": "The number of Days or Units of Service exceeds our acceptable maximum.",
+    "Length": 70
+  },
+  {
+    "Remark": "N368",
+    "Description": "You must appeal the determination of the previously adjudicated claim.",
+    "Length": 70
+  },
+  {
+    "Remark": "N372",
+    "Description": "Only reasonable and necessary maintenance/service charges are covered.",
+    "Length": 70
+  },
+  {
+    "Remark": "N638",
+    "Description": "Reimbursement has been made according to the home health fee schedule.",
+    "Length": 70
+  },
+  {
+    "Remark": "N644",
+    "Description": "Reimbursement has been made according to the bilateral procedure rule.",
+    "Length": 70
+  },
+  {
+    "Remark": "N760",
+    "Description": "This facility is not authorized to receive payment for the service(s).",
+    "Length": 70
+  },
+  {
+    "Remark": "N761",
+    "Description": "This provider is not authorized to receive payment for the service(s).",
+    "Length": 70
+  },
+  {
+    "Remark": "M126",
+    "Description": "Missing/incomplete/invalid individual lab codes included in the test.",
+    "Length": 69
+  },
+  {
+    "Remark": "MA33",
+    "Description": "Missing/incomplete/invalid noncovered days during the billing period.",
+    "Length": 69
+  },
+  {
+    "Remark": "MA105",
+    "Description": "Missing/incomplete/invalid provider number for this place of service.",
+    "Length": 69
+  },
+  {
+    "Remark": "MA107",
+    "Description": "Paper claim contains more than three separate data items in field 19.",
+    "Length": 69
+  },
+  {
+    "Remark": "N197",
+    "Description": "The subscriber must update insurance information directly with payer.",
+    "Length": 69
+  },
+  {
+    "Remark": "N272",
+    "Description": "Missing/incomplete/invalid other payer attending provider identifier.",
+    "Length": 69
+  },
+  {
+    "Remark": "N273",
+    "Description": "Missing/incomplete/invalid other payer operating provider identifier.",
+    "Length": 69
+  },
+  {
+    "Remark": "N276",
+    "Description": "Missing/incomplete/invalid other payer referring provider identifier.",
+    "Length": 69
+  },
+  {
+    "Remark": "N277",
+    "Description": "Missing/incomplete/invalid other payer rendering provider identifier.",
+    "Length": 69
+  },
+  {
+    "Remark": "N298",
+    "Description": "Missing/incomplete/invalid supervising provider secondary identifier.",
+    "Length": 69
+  },
+  {
+    "Remark": "N361",
+    "Description": "Payment adjusted based on multiple diagnostic imaging procedure rules",
+    "Length": 69
+  },
+  {
+    "Remark": "N470",
+    "Description": "This payment will complete the mandatory medical reimbursement limit.",
+    "Length": 69
+  },
+  {
+    "Remark": "N498",
+    "Description": "Incomplete/invalid Medical Permanent Impairment or Disability Report.",
+    "Length": 69
+  },
+  {
+    "Remark": "N748",
+    "Description": "Adjusted because the related hospital charges have not been received.",
+    "Length": 69
+  },
+  {
+    "Remark": "M85",
+    "Description": "Subjected to review of physician evaluation and management services.",
+    "Length": 68
+  },
+  {
+    "Remark": "N9",
+    "Description": "Adjustment represents the estimated amount a previous payer may pay.",
+    "Length": 68
+  },
+  {
+    "Remark": "N51",
+    "Description": "Electronic interchange agreement not on file for provider/submitter.",
+    "Length": 68
+  },
+  {
+    "Remark": "N163",
+    "Description": "Medical record does not support code billed per the code definition.",
+    "Length": 68
+  },
+  {
+    "Remark": "N571",
+    "Description": "Alert: Payment will be issued quarterly by another payer/contractor.",
+    "Length": 68
+  },
+  {
+    "Remark": "N585",
+    "Description": "Benefits are no longer available based on a final injury settlement.",
+    "Length": 68
+  },
+  {
+    "Remark": "N752",
+    "Description": "Missing/incomplete/invalid HIPPS Treatment Authorization Code (TAC).",
+    "Length": 68
+  },
+  {
+    "Remark": "N765",
+    "Description": "This payer does not cover co-insurance assessed by a previous payer.",
+    "Length": 68
+  },
+  {
+    "Remark": "MA29",
+    "Description": "Missing/incomplete/invalid provider name, city, state, or zip code.",
+    "Length": 67
+  },
+  {
+    "Remark": "MA126",
+    "Description": "Pancreas transplant not covered unless kidney transplant performed.",
+    "Length": 67
+  },
+  {
+    "Remark": "N79",
+    "Description": "Service billed is not compatible with patient location information.",
+    "Length": 67
+  },
+  {
+    "Remark": "N158",
+    "Description": "Transportation in a vehicle other than an ambulance is not covered.",
+    "Length": 67
+  },
+  {
+    "Remark": "N165",
+    "Description": "Transportation in a vehicle other than an ambulance is not covered.",
+    "Length": 67
+  },
+  {
+    "Remark": "N191",
+    "Description": "The provider must update insurance information directly with payer.",
+    "Length": 67
+  },
+  {
+    "Remark": "N225",
+    "Description": "Incomplete/invalid documentation/orders/notes/summary/report/chart.",
+    "Length": 67
+  },
+  {
+    "Remark": "N254",
+    "Description": "Missing/incomplete/invalid attending provider secondary identifier.",
+    "Length": 67
+  },
+  {
+    "Remark": "N263",
+    "Description": "Missing/incomplete/invalid operating provider secondary identifier.",
+    "Length": 67
+  },
+  {
+    "Remark": "N287",
+    "Description": "Missing/incomplete/invalid referring provider secondary identifier.",
+    "Length": 67
+  },
+  {
+    "Remark": "N291",
+    "Description": "Missing/incomplete/invalid rendering provider secondary identifier.",
+    "Length": 67
+  },
+  {
+    "Remark": "N297",
+    "Description": "Missing/incomplete/invalid supervising provider primary identifier.",
+    "Length": 67
+  },
+  {
+    "Remark": "N408",
+    "Description": "This payer does not cover deductibles assessed by a previous payer.",
+    "Length": 67
+  },
+  {
+    "Remark": "N629",
+    "Description": "Reviews/documentation/notes/summaries/reports/charts not requested.",
+    "Length": 67
+  },
+  {
+    "Remark": "N654",
+    "Description": "Adjusted based on achievement of maximum medical improvement (MMI).",
+    "Length": 67
+  },
+  {
+    "Remark": "N657",
+    "Description": "This should be billed with the appropriate code for these services.",
+    "Length": 67
+  },
+  {
+    "Remark": "N762",
+    "Description": "This facility is not certified for Tomosynthesis (3-D) mammography.",
+    "Length": 67
+  },
+  {
+    "Remark": "M13",
+    "Description": "Only one initial visit is covered per specialty per medical group.",
+    "Length": 66
+  },
+  {
+    "Remark": "M99",
+    "Description": "Missing/incomplete/invalid Universal Product Number/Serial Number.",
+    "Length": 66
+  },
+  {
+    "Remark": "M137",
+    "Description": "Part B coinsurance under a demonstration project or pilot program.",
+    "Length": 66
+  },
+  {
+    "Remark": "MA71",
+    "Description": "Missing/incomplete/invalid provider representative signature date.",
+    "Length": 66
+  },
+  {
+    "Remark": "MA109",
+    "Description": "Claim processed in accordance with ambulatory surgical guidelines.",
+    "Length": 66
+  },
+  {
+    "Remark": "N202",
+    "Description": "Alert: Additional information/explanation will be sent separately.",
+    "Length": 66
+  },
+  {
+    "Remark": "N246",
+    "Description": "State regulated patient payment limitations apply to this service.",
+    "Length": 66
+  },
+  {
+    "Remark": "N250",
+    "Description": "Missing/incomplete/invalid assistant surgeon secondary identifier.",
+    "Length": 66
+  },
+  {
+    "Remark": "N267",
+    "Description": "Missing/incomplete/invalid ordering provider secondary identifier.",
+    "Length": 66
+  },
+  {
+    "Remark": "N351",
+    "Description": "Service date outside of the approved treatment plan service dates.",
+    "Length": 66
+  },
+  {
+    "Remark": "N371",
+    "Description": "Alert: title of this equipment must be transferred to the patient.",
+    "Length": 66
+  },
+  {
+    "Remark": "N532",
+    "Description": "Not qualified for recovery based on disability and working status.",
+    "Length": 66
+  },
+  {
+    "Remark": "N547",
+    "Description": "A refund request (Frequency Type Code 8) was processed previously.",
+    "Length": 66
+  },
+  {
+    "Remark": "N549",
+    "Description": "Alert: Patient's calendar year out-of-pocket maximum has been met.",
+    "Length": 66
+  },
+  {
+    "Remark": "N730",
+    "Description": "Incomplete/invalid patient medical/dental record for this service.",
+    "Length": 66
+  },
+  {
+    "Remark": "N732",
+    "Description": "Services performed at an unlicensed facility are not reimbursable.",
+    "Length": 66
+  },
+  {
+    "Remark": "N751",
+    "Description": "Adjusted because the drug is covered under a Medicare Part D plan.",
+    "Length": 66
+  },
+  {
+    "Remark": "N766",
+    "Description": "This payer does not cover co-payment assessed by a previous payer.",
+    "Length": 66
+  },
+  {
+    "Remark": "M3",
+    "Description": "Equipment is the same or similar to equipment already being used.",
+    "Length": 65
+  },
+  {
+    "Remark": "M142",
+    "Description": "Missing American Diabetes Association Certificate of Recognition.",
+    "Length": 65
+  },
+  {
+    "Remark": "N20",
+    "Description": "Service not payable with other service rendered on the same date.",
+    "Length": 65
+  },
+  {
+    "Remark": "N32",
+    "Description": "Claim must be submitted by the provider who rendered the service.",
+    "Length": 65
+  },
+  {
+    "Remark": "N100",
+    "Description": "PPS (Prospect Payment System) code corrected during adjudication.",
+    "Length": 65
+  },
+  {
+    "Remark": "N170",
+    "Description": "A new/revised/renewed certificate of medical necessity is needed.",
+    "Length": 65
+  },
+  {
+    "Remark": "N253",
+    "Description": "Missing/incomplete/invalid attending provider primary identifier.",
+    "Length": 65
+  },
+  {
+    "Remark": "N262",
+    "Description": "Missing/incomplete/invalid operating provider primary identifier.",
+    "Length": 65
+  },
+  {
+    "Remark": "N268",
+    "Description": "Missing/incomplete/invalid ordering provider contact information.",
+    "Length": 65
+  },
+  {
+    "Remark": "N274",
+    "Description": "Missing/incomplete/invalid other payer other provider identifier.",
+    "Length": 65
+  },
+  {
+    "Remark": "N283",
+    "Description": "Missing/incomplete/invalid purchased service provider identifier.",
+    "Length": 65
+  },
+  {
+    "Remark": "N286",
+    "Description": "Missing/incomplete/invalid referring provider primary identifier.",
+    "Length": 65
+  },
+  {
+    "Remark": "N290",
+    "Description": "Missing/incomplete/invalid rendering provider primary identifier.",
+    "Length": 65
+  },
+  {
+    "Remark": "N295",
+    "Description": "Missing/incomplete/invalid service facility secondary identifier.",
+    "Length": 65
+  },
+  {
+    "Remark": "N744",
+    "Description": "Adjusted because the services may be related to an auto accident.",
+    "Length": 65
+  },
+  {
+    "Remark": "M139",
+    "Description": "Denied services exceed the coverage limit for the demonstration.",
+    "Length": 64
+  },
+  {
+    "Remark": "MA87",
+    "Description": "Missing/incomplete/invalid insured's name for the primary payer.",
+    "Length": 64
+  },
+  {
+    "Remark": "MA91",
+    "Description": "Alert: This determination is the result of the appeal you filed.",
+    "Length": 64
+  },
+  {
+    "Remark": "N95",
+    "Description": "This provider type/provider specialty may not bill this service.",
+    "Length": 64
+  },
+  {
+    "Remark": "N118",
+    "Description": "This service is not paid if billed more than once every 28 days.",
+    "Length": 64
+  },
+  {
+    "Remark": "N209",
+    "Description": "Missing/incomplete/invalid taxpayer identification number (TIN).",
+    "Length": 64
+  },
+  {
+    "Remark": "N249",
+    "Description": "Missing/incomplete/invalid assistant surgeon primary identifier.",
+    "Length": 64
+  },
+  {
+    "Remark": "N265",
+    "Description": "Missing/incomplete/invalid ordering provider primary identifier.",
+    "Length": 64
+  },
+  {
+    "Remark": "N282",
+    "Description": "Missing/incomplete/invalid pay-to provider secondary identifier.",
+    "Length": 64
+  },
+  {
+    "Remark": "N370",
+    "Description": "Billing exceeds the rental months covered/approved by the payer.",
+    "Length": 64
+  },
+  {
+    "Remark": "N380",
+    "Description": "The original claim has been processed, submit a corrected claim.",
+    "Length": 64
+  },
+  {
+    "Remark": "N440",
+    "Description": "Incomplete/invalid anesthesia physical status report/indicators.",
+    "Length": 64
+  },
+  {
+    "Remark": "N528",
+    "Description": "Patient is entitled to benefits for Institutional Services only.",
+    "Length": 64
+  },
+  {
+    "Remark": "N772",
+    "Description": "Alert: Rebill urgent/emergent and ancillary services separately.",
+    "Length": 64
+  },
+  {
+    "Remark": "MA83",
+    "Description": "Did not indicate whether we are the primary or secondary payer.",
+    "Length": 63
+  },
+  {
+    "Remark": "MA100",
+    "Description": "Missing/incomplete/invalid date of current illness or symptoms.",
+    "Length": 63
+  },
+  {
+    "Remark": "N198",
+    "Description": "Rendering provider must be affiliated with the pay-to provider.",
+    "Length": 63
+  },
+  {
+    "Remark": "N271",
+    "Description": "Missing/incomplete/invalid other provider secondary identifier.",
+    "Length": 63
+  },
+  {
+    "Remark": "N293",
+    "Description": "Missing/incomplete/invalid service facility primary identifier.",
+    "Length": 63
+  },
+  {
+    "Remark": "N319",
+    "Description": "Missing/incomplete/invalid hearing or vision prescription date.",
+    "Length": 63
+  },
+  {
+    "Remark": "N407",
+    "Description": "You are not an approved submitter for this transmission format.",
+    "Length": 63
+  },
+  {
+    "Remark": "N418",
+    "Description": "Misrouted claim. See the payer's claim submission instructions.",
+    "Length": 63
+  },
+  {
+    "Remark": "N529",
+    "Description": "Patient is entitled to benefits for Professional Services only.",
+    "Length": 63
+  },
+  {
+    "Remark": "N641",
+    "Description": "Reimbursement has been based on the number of body areas rated.",
+    "Length": 63
+  },
+  {
+    "Remark": "N642",
+    "Description": "Adjusted when billed as individual tests instead of as a panel.",
+    "Length": 63
+  },
+  {
+    "Remark": "N680",
+    "Description": "Missing/Incomplete/Invalid date of previous dental extractions.",
+    "Length": 63
+  },
+  {
+    "Remark": "N13",
+    "Description": "Payment based on professional/technical component modifier(s).",
+    "Length": 62
+  },
+  {
+    "Remark": "N112",
+    "Description": "This claim is excluded from your electronic remittance advice.",
+    "Length": 62
+  },
+  {
+    "Remark": "N280",
+    "Description": "Missing/incomplete/invalid pay-to provider primary identifier.",
+    "Length": 62
+  },
+  {
+    "Remark": "N379",
+    "Description": "Claim level information does not match line level information.",
+    "Length": 62
+  },
+  {
+    "Remark": "N516",
+    "Description": "Records indicate a mismatch between the submitted NPI and EIN.",
+    "Length": 62
+  },
+  {
+    "Remark": "N531",
+    "Description": "Not qualified for recovery based on direct payment of premium.",
+    "Length": 62
+  },
+  {
+    "Remark": "N580",
+    "Description": "Determination based on the provisions of the insurance policy.",
+    "Length": 62
+  },
+  {
+    "Remark": "N624",
+    "Description": "The associated Workers' Compensation claim has been withdrawn.",
+    "Length": 62
+  },
+  {
+    "Remark": "N625",
+    "Description": "Missing/Incomplete/Invalid Workers' Compensation Claim Number.",
+    "Length": 62
+  },
+  {
+    "Remark": "N679",
+    "Description": "Incomplete/Invalid post-operative images/visual field results.",
+    "Length": 62
+  },
+  {
+    "Remark": "M81",
+    "Description": "You are required to code to the highest level of specificity.",
+    "Length": 61
+  },
+  {
+    "Remark": "MA70",
+    "Description": "Missing/incomplete/invalid provider representative signature.",
+    "Length": 61
+  },
+  {
+    "Remark": "N244",
+    "Description": "Incomplete/Invalid pre-operative images/visual field results.",
+    "Length": 61
+  },
+  {
+    "Remark": "N258",
+    "Description": "Missing/incomplete/invalid billing provider/supplier address.",
+    "Length": 61
+  },
+  {
+    "Remark": "N270",
+    "Description": "Missing/incomplete/invalid other provider primary identifier.",
+    "Length": 61
+  },
+  {
+    "Remark": "N310",
+    "Description": "Missing/incomplete/invalid assumed or relinquished care date.",
+    "Length": 61
+  },
+  {
+    "Remark": "N311",
+    "Description": "Missing/incomplete/invalid authorized to return to work date.",
+    "Length": 61
+  },
+  {
+    "Remark": "N472",
+    "Description": "Payment for this service has been issued to another provider.",
+    "Length": 61
+  },
+  {
+    "Remark": "N552",
+    "Description": "Payment adjusted to reverse a previous withhold/bonus amount.",
+    "Length": 61
+  },
+  {
+    "Remark": "N640",
+    "Description": "Exceeds number/frequency approved/allowed within time period.",
+    "Length": 61
+  },
+  {
+    "Remark": "N717",
+    "Description": "Incomplete/Invalid documentation of face-to-face examination.",
+    "Length": 61
+  },
+  {
+    "Remark": "M143",
+    "Description": "The provider must update license information with the payer.",
+    "Length": 60
+  },
+  {
+    "Remark": "MA44",
+    "Description": "Alert: No appeal rights. Adjudicative decision based on law.",
+    "Length": 60
+  },
+  {
+    "Remark": "MA58",
+    "Description": "Missing/incomplete/invalid release of information indicator.",
+    "Length": 60
+  },
+  {
+    "Remark": "N294",
+    "Description": "Missing/incomplete/invalid service facility primary address.",
+    "Length": 60
+  },
+  {
+    "Remark": "N320",
+    "Description": "Missing/incomplete/invalid Home Health Certification Period.",
+    "Length": 60
+  },
+  {
+    "Remark": "N653",
+    "Description": "The date of injury does not match the reported date of loss.",
+    "Length": 60
+  },
+  {
+    "Remark": "MA06",
+    "Description": "Missing/incomplete/invalid beginning and/or ending date(s).",
+    "Length": 59
+  },
+  {
+    "Remark": "MA35",
+    "Description": "Missing/incomplete/invalid number of lifetime reserve days.",
+    "Length": 59
+  },
+  {
+    "Remark": "MA60",
+    "Description": "Missing/incomplete/invalid patient relationship to insured.",
+    "Length": 59
+  },
+  {
+    "Remark": "N31",
+    "Description": "Missing/incomplete/invalid prescribing provider identifier.",
+    "Length": 59
+  },
+  {
+    "Remark": "N33",
+    "Description": "No record of health check prior to initiation of treatment.",
+    "Length": 59
+  },
+  {
+    "Remark": "N81",
+    "Description": "Procedure billed is not compatible with tooth surface code.",
+    "Length": 59
+  },
+  {
+    "Remark": "N237",
+    "Description": "Incomplete/invalid patient medical record for this service.",
+    "Length": 59
+  },
+  {
+    "Remark": "N339",
+    "Description": "Missing/incomplete/invalid similar illness or symptom date.",
+    "Length": 59
+  },
+  {
+    "Remark": "N446",
+    "Description": "Incomplete/invalid document for actual cost or paid amount.",
+    "Length": 59
+  },
+  {
+    "Remark": "N530",
+    "Description": "Not Qualified for Recovery based on enrollment information.",
+    "Length": 59
+  },
+  {
+    "Remark": "N634",
+    "Description": "The allowance is calculated based on anesthesia time units.",
+    "Length": 59
+  },
+  {
+    "Remark": "N636",
+    "Description": "Adjusted because this is reimbursable only once per injury.",
+    "Length": 59
+  },
+  {
+    "Remark": "N685",
+    "Description": "Missing/Incomplete/Invalid Prosthesis, Crown or Inlay Code.",
+    "Length": 59
+  },
+  {
+    "Remark": "N687",
+    "Description": "Alert: This reversal is due to a retroactive disenrollment.",
+    "Length": 59
+  },
+  {
+    "Remark": "N690",
+    "Description": "Alert: This reversal is due to a provider submitted appeal.",
+    "Length": 59
+  },
+  {
+    "Remark": "N701",
+    "Description": "Payment adjusted based on the Value-based Payment Modifier.",
+    "Length": 59
+  },
+  {
+    "Remark": "M77",
+    "Description": "Missing/incomplete/invalid/inappropriate place of service.",
+    "Length": 58
+  },
+  {
+    "Remark": "N4",
+    "Description": "Missing/Incomplete/Invalid prior Insurance Carrier(s) EOB.",
+    "Length": 58
+  },
+  {
+    "Remark": "N39",
+    "Description": "Procedure code is not compatible with tooth number/letter.",
+    "Length": 58
+  },
+  {
+    "Remark": "N80",
+    "Description": "Missing/incomplete/invalid prenatal screening information.",
+    "Length": 58
+  },
+  {
+    "Remark": "N256",
+    "Description": "Missing/incomplete/invalid billing provider/supplier name.",
+    "Length": 58
+  },
+  {
+    "Remark": "N434",
+    "Description": "Missing/Incomplete/Invalid Present on Admission indicator.",
+    "Length": 58
+  },
+  {
+    "Remark": "N488",
+    "Description": "Incomplete/invalid Prosthetics or Orthotics Certification.",
+    "Length": 58
+  },
+  {
+    "Remark": "N497",
+    "Description": "Missing Medical Permanent Impairment or Disability Report.",
+    "Length": 58
+  },
+  {
+    "Remark": "N611",
+    "Description": "Claim in litigation. Contact insurer for more information.",
+    "Length": 58
+  },
+  {
+    "Remark": "N658",
+    "Description": "The billed service(s) are not considered medical expenses.",
+    "Length": 58
+  },
+  {
+    "Remark": "N675",
+    "Description": "Additional information is required from the injured party.",
+    "Length": 58
+  },
+  {
+    "Remark": "N691",
+    "Description": "Alert: This reversal is due to a patient submitted appeal.",
+    "Length": 58
+  },
+  {
+    "Remark": "M63",
+    "Description": "We do not pay for more than one of these on the same day.",
+    "Length": 57
+  },
+  {
+    "Remark": "MA108",
+    "Description": "Paper claim contains more than one data item in field 23.",
+    "Length": 57
+  },
+  {
+    "Remark": "N148",
+    "Description": "Missing/incomplete/invalid date of last menstrual period.",
+    "Length": 57
+  },
+  {
+    "Remark": "N152",
+    "Description": "Missing/incomplete/invalid replacement claim information.",
+    "Length": 57
+  },
+  {
+    "Remark": "N222",
+    "Description": "Incomplete/invalid Admitting History and Physical report.",
+    "Length": 57
+  },
+  {
+    "Remark": "N234",
+    "Description": "Incomplete/invalid oxygen certification/re-certification.",
+    "Length": 57
+  },
+  {
+    "Remark": "N239",
+    "Description": "Incomplete/invalid physician financial relationship form.",
+    "Length": 57
+  },
+  {
+    "Remark": "N245",
+    "Description": "Incomplete/invalid plan information for other insurance .",
+    "Length": 57
+  },
+  {
+    "Remark": "N318",
+    "Description": "Missing/incomplete/invalid discharge or end of care date.",
+    "Length": 57
+  },
+  {
+    "Remark": "N332",
+    "Description": "Missing/incomplete/invalid prior hospital discharge date.",
+    "Length": 57
+  },
+  {
+    "Remark": "N524",
+    "Description": "Based on policy this payment constitutes payment in full.",
+    "Length": 57
+  },
+  {
+    "Remark": "N683",
+    "Description": "Missing/Incomplete/Invalid prior treatment documentation.",
+    "Length": 57
+  },
+  {
+    "Remark": "N689",
+    "Description": "Alert: This reversal is due to a retroactive rate change.",
+    "Length": 57
+  },
+  {
+    "Remark": "N719",
+    "Description": "Penalty applied based on plan requirements not being met.",
+    "Length": 57
+  },
+  {
+    "Remark": "N757",
+    "Description": "Adjusted based on the Federal Indian Fees schedule (MLR).",
+    "Length": 57
+  },
+  {
+    "Remark": "M62",
+    "Description": "Missing/incomplete/invalid treatment authorization code.",
+    "Length": 56
+  },
+  {
+    "Remark": "M87",
+    "Description": "Claim/service(s) subjected to CFO-CAP prepayment review.",
+    "Length": 56
+  },
+  {
+    "Remark": "N109",
+    "Description": "Alert: This claim/service was chosen for complex review.",
+    "Length": 56
+  },
+  {
+    "Remark": "N184",
+    "Description": "Rebill technical and professional components separately.",
+    "Length": 56
+  },
+  {
+    "Remark": "N307",
+    "Description": "Missing/incomplete/invalid adjudication or payment date.",
+    "Length": 56
+  },
+  {
+    "Remark": "N346",
+    "Description": "Missing/incomplete/invalid oral cavity designation code.",
+    "Length": 56
+  },
+  {
+    "Remark": "N443",
+    "Description": "Missing/incomplete/invalid total time or begin/end time.",
+    "Length": 56
+  },
+  {
+    "Remark": "N491",
+    "Description": "Missing/Incomplete/Invalid Exclusionary Rider Condition.",
+    "Length": 56
+  },
+  {
+    "Remark": "N665",
+    "Description": "Services by an unlicensed provider are not reimbursable.",
+    "Length": 56
+  },
+  {
+    "Remark": "MA81",
+    "Description": "Missing/incomplete/invalid provider/supplier signature.",
+    "Length": 55
+  },
+  {
+    "Remark": "N90",
+    "Description": "Covered only when performed by the attending physician.",
+    "Length": 55
+  },
+  {
+    "Remark": "N92",
+    "Description": "This facility is not certified for digital mammography.",
+    "Length": 55
+  },
+  {
+    "Remark": "N117",
+    "Description": "This service is paid only once in a patient’s lifetime.",
+    "Length": 55
+  },
+  {
+    "Remark": "N157",
+    "Description": "Transportation to/from this destination is not covered.",
+    "Length": 55
+  },
+  {
+    "Remark": "N164",
+    "Description": "Transportation to/from this destination is not covered.",
+    "Length": 55
+  },
+  {
+    "Remark": "N217",
+    "Description": "We pay only one site of service per provider per claim.",
+    "Length": 55
+  },
+  {
+    "Remark": "N251",
+    "Description": "Missing/incomplete/invalid attending provider taxonomy.",
+    "Length": 55
+  },
+  {
+    "Remark": "N284",
+    "Description": "Missing/incomplete/invalid referring provider taxonomy.",
+    "Length": 55
+  },
+  {
+    "Remark": "N288",
+    "Description": "Missing/incomplete/invalid rendering provider taxonomy.",
+    "Length": 55
+  },
+  {
+    "Remark": "N313",
+    "Description": "Missing/incomplete/invalid certification revision date.",
+    "Length": 55
+  },
+  {
+    "Remark": "N328",
+    "Description": "Missing/incomplete/invalid Oxygen Saturation Test date.",
+    "Length": 55
+  },
+  {
+    "Remark": "N468",
+    "Description": "Incomplete/invalid Report of Tests and Analysis Report.",
+    "Length": 55
+  },
+  {
+    "Remark": "N548",
+    "Description": "Alert: Patient's calendar year deductible has been met.",
+    "Length": 55
+  },
+  {
+    "Remark": "N729",
+    "Description": "Missing patient medical/dental record for this service.",
+    "Length": 55
+  },
+  {
+    "Remark": "M49",
+    "Description": "Missing/incomplete/invalid value code(s) or amount(s).",
+    "Length": 54
+  },
+  {
+    "Remark": "MA112",
+    "Description": "Missing/incomplete/invalid group practice information.",
+    "Length": 54
+  },
+  {
+    "Remark": "N77",
+    "Description": "Missing/incomplete/invalid designated provider number.",
+    "Length": 54
+  },
+  {
+    "Remark": "N247",
+    "Description": "Missing/incomplete/invalid assistant surgeon taxonomy.",
+    "Length": 54
+  },
+  {
+    "Remark": "N540",
+    "Description": "Payment adjusted based on the interrupted stay policy.",
+    "Length": 54
+  },
+  {
+    "Remark": "N569",
+    "Description": "Not covered when performed for the reported diagnosis.",
+    "Length": 54
+  },
+  {
+    "Remark": "M2",
+    "Description": "Not paid separately when the patient is an inpatient.",
+    "Length": 53
+  },
+  {
+    "Remark": "M52",
+    "Description": "Missing/incomplete/invalid “from” date(s) of service.",
+    "Length": 53
+  },
+  {
+    "Remark": "M71",
+    "Description": "Total payment reduced due to overlap of tests billed.",
+    "Length": 53
+  },
+  {
+    "Remark": "MA120",
+    "Description": "Missing/incomplete/invalid CLIA certification number.",
+    "Length": 53
+  },
+  {
+    "Remark": "N75",
+    "Description": "Missing/incomplete/invalid tooth surface information.",
+    "Length": 53
+  },
+  {
+    "Remark": "N192",
+    "Description": "Patient is a Medicaid/Qualified Medicare Beneficiary.",
+    "Length": 53
+  },
+  {
+    "Remark": "N200",
+    "Description": "The professional component must be billed separately.",
+    "Length": 53
+  },
+  {
+    "Remark": "N255",
+    "Description": "Missing/incomplete/invalid billing provider taxonomy.",
+    "Length": 53
+  },
+  {
+    "Remark": "N266",
+    "Description": "Missing/incomplete/invalid ordering provider address.",
+    "Length": 53
+  },
+  {
+    "Remark": "N296",
+    "Description": "Missing/incomplete/invalid supervising provider name.",
+    "Length": 53
+  },
+  {
+    "Remark": "N411",
+    "Description": "This service is allowed one time in a 6-month period.",
+    "Length": 53
+  },
+  {
+    "Remark": "N412",
+    "Description": "This service is allowed 2 times in a 12-month period.",
+    "Length": 53
+  },
+  {
+    "Remark": "N414",
+    "Description": "This service is allowed 4 times in a 12-month period.",
+    "Length": 53
+  },
+  {
+    "Remark": "N415",
+    "Description": "This service is allowed 1 time in an 18-month period.",
+    "Length": 53
+  },
+  {
+    "Remark": "N430",
+    "Description": "Procedure code is inconsistent with the units billed.",
+    "Length": 53
+  },
+  {
+    "Remark": "N439",
+    "Description": "Missing anesthesia physical status report/indicators.",
+    "Length": 53
+  },
+  {
+    "Remark": "N520",
+    "Description": "Alert: Payment made from a Consumer Spending Account.",
+    "Length": 53
+  },
+  {
+    "Remark": "N554",
+    "Description": "Missing/Incomplete/Invalid Family Planning Indicator.",
+    "Length": 53
+  },
+  {
+    "Remark": "N582",
+    "Description": "Benefits suspended pending the patient's cooperation.",
+    "Length": 53
+  },
+  {
+    "Remark": "N610",
+    "Description": "Alert: Payment based on an appropriate level of care.",
+    "Length": 53
+  },
+  {
+    "Remark": "N733",
+    "Description": "Regulatory surcharges are paid directly to the state.",
+    "Length": 53
+  },
+  {
+    "Remark": "N753",
+    "Description": "Missing/incomplete/invalid Attachment Control Number.",
+    "Length": 53
+  },
+  {
+    "Remark": "N756",
+    "Description": "Missing/incomplete/invalid point of drop-off address.",
+    "Length": 53
+  },
+  {
+    "Remark": "M22",
+    "Description": "Missing/incomplete/invalid number of miles traveled.",
+    "Length": 52
+  },
+  {
+    "Remark": "M24",
+    "Description": "Missing/incomplete/invalid number of doses per vial.",
+    "Length": 52
+  },
+  {
+    "Remark": "M53",
+    "Description": "Missing/incomplete/invalid days or units of service.",
+    "Length": 52
+  },
+  {
+    "Remark": "M82",
+    "Description": "Service is not covered when patient is under age 50.",
+    "Length": 52
+  },
+  {
+    "Remark": "MA66",
+    "Description": "Missing/incomplete/invalid principal procedure code.",
+    "Length": 52
+  },
+  {
+    "Remark": "N5",
+    "Description": "EOB received from previous payer. Claim not on file.",
+    "Length": 52
+  },
+  {
+    "Remark": "N49",
+    "Description": "Court ordered coverage information needs validation.",
+    "Length": 52
+  },
+  {
+    "Remark": "N53",
+    "Description": "Missing/incomplete/invalid point of pick-up address.",
+    "Length": 52
+  },
+  {
+    "Remark": "N58",
+    "Description": "Missing/incomplete/invalid patient liability amount.",
+    "Length": 52
+  },
+  {
+    "Remark": "N84",
+    "Description": "Alert: Further installment payments are forthcoming.",
+    "Length": 52
+  },
+  {
+    "Remark": "N110",
+    "Description": "This facility is not certified for film mammography.",
+    "Length": 52
+  },
+  {
+    "Remark": "N144",
+    "Description": "The rate changed during the dates of service billed.",
+    "Length": 52
+  },
+  {
+    "Remark": "N212",
+    "Description": "Charges processed under a Point of Service benefit .",
+    "Length": 52
+  },
+  {
+    "Remark": "N227",
+    "Description": "Incomplete/invalid Certificate of Medical Necessity.",
+    "Length": 52
+  },
+  {
+    "Remark": "N238",
+    "Description": "Incomplete/invalid physician certified plan of care.",
+    "Length": 52
+  },
+  {
+    "Remark": "N303",
+    "Description": "Missing/incomplete/invalid principal procedure date.",
+    "Length": 52
+  },
+  {
+    "Remark": "N306",
+    "Description": "Missing/incomplete/invalid acute manifestation date.",
+    "Length": 52
+  },
+  {
+    "Remark": "N308",
+    "Description": "Missing/incomplete/invalid appliance placement date.",
+    "Length": 52
+  },
+  {
+    "Remark": "N327",
+    "Description": "Missing/incomplete/invalid other insured birth date.",
+    "Length": 52
+  },
+  {
+    "Remark": "N337",
+    "Description": "Missing/incomplete/invalid secondary diagnosis date.",
+    "Length": 52
+  },
+  {
+    "Remark": "N428",
+    "Description": "Not covered when performed in this place of service.",
+    "Length": 52
+  },
+  {
+    "Remark": "N517",
+    "Description": "Resubmit a new claim with the requested information.",
+    "Length": 52
+  },
+  {
+    "Remark": "M46",
+    "Description": "Missing/incomplete/invalid occurrence span code(s).",
+    "Length": 51
+  },
+  {
+    "Remark": "M59",
+    "Description": "Missing/incomplete/invalid “to” date(s) of service.",
+    "Length": 51
+  },
+  {
+    "Remark": "M67",
+    "Description": "Missing/incomplete/invalid other procedure code(s).",
+    "Length": 51
+  },
+  {
+    "Remark": "N243",
+    "Description": "Incomplete/invalid/not approved screening document.",
+    "Length": 51
+  },
+  {
+    "Remark": "N252",
+    "Description": "Missing/incomplete/invalid attending provider name.",
+    "Length": 51
+  },
+  {
+    "Remark": "N261",
+    "Description": "Missing/incomplete/invalid operating provider name.",
+    "Length": 51
+  },
+  {
+    "Remark": "N281",
+    "Description": "Missing/incomplete/invalid pay-to provider address.",
+    "Length": 51
+  },
+  {
+    "Remark": "N285",
+    "Description": "Missing/incomplete/invalid referring provider name.",
+    "Length": 51
+  },
+  {
+    "Remark": "N289",
+    "Description": "Missing/incomplete/invalid rendering provider name.",
+    "Length": 51
+  },
+  {
+    "Remark": "N300",
+    "Description": "Missing/incomplete/invalid occurrence span date(s).",
+    "Length": 51
+  },
+  {
+    "Remark": "N302",
+    "Description": "Missing/incomplete/invalid other procedure date(s).",
+    "Length": 51
+  },
+  {
+    "Remark": "N322",
+    "Description": "Missing/incomplete/invalid last certification date.",
+    "Length": 51
+  },
+  {
+    "Remark": "N678",
+    "Description": "Missing post-operative images/visual field results.",
+    "Length": 51
+  },
+  {
+    "Remark": "N758",
+    "Description": "Adjusted based on the prior authorization decision.",
+    "Length": 51
+  },
+  {
+    "Remark": "M76",
+    "Description": "Missing/incomplete/invalid diagnosis or condition.",
+    "Length": 50
+  },
+  {
+    "Remark": "M117",
+    "Description": "Not covered unless submitted via electronic claim.",
+    "Length": 50
+  },
+  {
+    "Remark": "MA122",
+    "Description": "Missing/incomplete/invalid initial treatment date.",
+    "Length": 50
+  },
+  {
+    "Remark": "N167",
+    "Description": "Charges exceed the post-transplant coverage limit.",
+    "Length": 50
+  },
+  {
+    "Remark": "N178",
+    "Description": "Missing pre-operative images/visual field results.",
+    "Length": 50
+  },
+  {
+    "Remark": "N195",
+    "Description": "The technical component must be billed separately.",
+    "Length": 50
+  },
+  {
+    "Remark": "N248",
+    "Description": "Missing/incomplete/invalid assistant surgeon name.",
+    "Length": 50
+  },
+  {
+    "Remark": "N264",
+    "Description": "Missing/incomplete/invalid ordering provider name.",
+    "Length": 50
+  },
+  {
+    "Remark": "N413",
+    "Description": "This service is allowed 2 times in a benefit year.",
+    "Length": 50
+  },
+  {
+    "Remark": "N416",
+    "Description": "This service is allowed 1 time in a 3-year period.",
+    "Length": 50
+  },
+  {
+    "Remark": "N417",
+    "Description": "This service is allowed 1 time in a 5-year period.",
+    "Length": 50
+  },
+  {
+    "Remark": "N449",
+    "Description": "Payment based on a comparable drug/service/supply.",
+    "Length": 50
+  },
+  {
+    "Remark": "N486",
+    "Description": "Incomplete/invalid Physical Therapy Certification.",
+    "Length": 50
+  },
+  {
+    "Remark": "N526",
+    "Description": "Not qualified for recovery based on employer size.",
+    "Length": 50
+  },
+  {
+    "Remark": "N607",
+    "Description": "Service provided for non-compensable condition(s).",
+    "Length": 50
+  },
+  {
+    "Remark": "N671",
+    "Description": "Payment based on a jurisdiction cost-charge ratio.",
+    "Length": 50
+  },
+  {
+    "Remark": "N718",
+    "Description": "Missing documentation of face-to-face examination.",
+    "Length": 50
+  },
+  {
+    "Remark": "N764",
+    "Description": "Missing/incomplete/invalid Hematocrit (HCT) value.",
+    "Length": 50
+  },
+  {
+    "Remark": "MA23",
+    "Description": "Demand bill approved as result of medical review.",
+    "Length": 49
+  },
+  {
+    "Remark": "N15",
+    "Description": "Services for a newborn must be billed separately.",
+    "Length": 49
+  },
+  {
+    "Remark": "N50",
+    "Description": "Missing/incomplete/invalid discharge information.",
+    "Length": 49
+  },
+  {
+    "Remark": "N149",
+    "Description": "Rebill all applicable services on a single claim.",
+    "Length": 49
+  },
+  {
+    "Remark": "N203",
+    "Description": "Missing/incomplete/invalid anesthesia time/units.",
+    "Length": 49
+  },
+  {
+    "Remark": "N219",
+    "Description": "Payment based on previous payer's allowed amount.",
+    "Length": 49
+  },
+  {
+    "Remark": "N292",
+    "Description": "Missing/incomplete/invalid service facility name.",
+    "Length": 49
+  },
+  {
+    "Remark": "N321",
+    "Description": "Missing/incomplete/invalid last admission period.",
+    "Length": 49
+  },
+  {
+    "Remark": "N340",
+    "Description": "Missing/incomplete/invalid subscriber birth date.",
+    "Length": 49
+  },
+  {
+    "Remark": "N378",
+    "Description": "Missing/incomplete/invalid prescription quantity.",
+    "Length": 49
+  },
+  {
+    "Remark": "N441",
+    "Description": "This missed/cancelled appointment is not covered.",
+    "Length": 49
+  },
+  {
+    "Remark": "N466",
+    "Description": "Incomplete/invalid Physical Therapy Notes/Report.",
+    "Length": 49
+  },
+  {
+    "Remark": "N494",
+    "Description": "Incomplete/invalid Doctor First Report of Injury.",
+    "Length": 49
+  },
+  {
+    "Remark": "N581",
+    "Description": "Investigation of coverage eligibility is pending.",
+    "Length": 49
+  },
+  {
+    "Remark": "N622",
+    "Description": "Not covered based on the date of injury/accident.",
+    "Length": 49
+  },
+  {
+    "Remark": "N633",
+    "Description": "Additional anesthesia time units are not allowed.",
+    "Length": 49
+  },
+  {
+    "Remark": "N660",
+    "Description": "Sales tax has been included in the reimbursement.",
+    "Length": 49
+  },
+  {
+    "Remark": "N672",
+    "Description": "Alert: Amount applied to Health Insurance Offset.",
+    "Length": 49
+  },
+  {
+    "Remark": "N773",
+    "Description": "Drug supplied not obtained from specialty vendor.",
+    "Length": 49
+  },
+  {
+    "Remark": "M90",
+    "Description": "Not covered more than once in a 12 month period.",
+    "Length": 48
+  },
+  {
+    "Remark": "M118",
+    "Description": "Letter to follow containing further information.",
+    "Length": 48
+  },
+  {
+    "Remark": "M122",
+    "Description": "Missing/incomplete/invalid level of subluxation.",
+    "Length": 48
+  },
+  {
+    "Remark": "M127",
+    "Description": "Missing patient medical record for this service.",
+    "Length": 48
+  },
+  {
+    "Remark": "MA21",
+    "Description": "SSA records indicate mismatch with name and sex.",
+    "Length": 48
+  },
+  {
+    "Remark": "N241",
+    "Description": "Incomplete/invalid review organization approval.",
+    "Length": 48
+  },
+  {
+    "Remark": "N279",
+    "Description": "Missing/incomplete/invalid pay-to provider name.",
+    "Length": 48
+  },
+  {
+    "Remark": "N315",
+    "Description": "Missing/incomplete/invalid disability from date.",
+    "Length": 48
+  },
+  {
+    "Remark": "N324",
+    "Description": "Missing/incomplete/invalid last seen/visit date.",
+    "Length": 48
+  },
+  {
+    "Remark": "N331",
+    "Description": "Missing/incomplete/invalid physician order date.",
+    "Length": 48
+  },
+  {
+    "Remark": "N333",
+    "Description": "Missing/incomplete/invalid prior placement date.",
+    "Length": 48
+  },
+  {
+    "Remark": "N390",
+    "Description": "This service/report cannot be billed separately.",
+    "Length": 48
+  },
+  {
+    "Remark": "N392",
+    "Description": "Incomplete/invalid emergency department records.",
+    "Length": 48
+  },
+  {
+    "Remark": "N445",
+    "Description": "Missing document for actual cost or paid amount.",
+    "Length": 48
+  },
+  {
+    "Remark": "N586",
+    "Description": "The injured party does not qualify for benefits.",
+    "Length": 48
+  },
+  {
+    "Remark": "N602",
+    "Description": "Adjusted based on the Redbook maximum allowance.",
+    "Length": 48
+  },
+  {
+    "Remark": "N647",
+    "Description": "Adjusted based on diagnosis-related group (DRG).",
+    "Length": 48
+  },
+  {
+    "Remark": "M57",
+    "Description": "Missing/incomplete/invalid provider identifier.",
+    "Length": 47
+  },
+  {
+    "Remark": "MA63",
+    "Description": "Missing/incomplete/invalid principal diagnosis.",
+    "Length": 47
+  },
+  {
+    "Remark": "MA65",
+    "Description": "Missing/incomplete/invalid admitting diagnosis.",
+    "Length": 47
+  },
+  {
+    "Remark": "MA99",
+    "Description": "Missing/incomplete/invalid Medigap information.",
+    "Length": 47
+  },
+  {
+    "Remark": "MA128",
+    "Description": "Missing/incomplete/invalid FDA approval number.",
+    "Length": 47
+  },
+  {
+    "Remark": "N19",
+    "Description": "Procedure code incidental to primary procedure.",
+    "Length": 47
+  },
+  {
+    "Remark": "N37",
+    "Description": "Missing/incomplete/invalid tooth number/letter.",
+    "Length": 47
+  },
+  {
+    "Remark": "N87",
+    "Description": "Home use of biofeedback therapy is not covered.",
+    "Length": 47
+  },
+  {
+    "Remark": "N108",
+    "Description": "Missing/incomplete/invalid upgrade information.",
+    "Length": 47
+  },
+  {
+    "Remark": "N153",
+    "Description": "Missing/incomplete/invalid room and board rate.",
+    "Length": 47
+  },
+  {
+    "Remark": "N235",
+    "Description": "Incomplete/invalid pacemaker registration form.",
+    "Length": 47
+  },
+  {
+    "Remark": "N269",
+    "Description": "Missing/incomplete/invalid other provider name.",
+    "Length": 47
+  },
+  {
+    "Remark": "N342",
+    "Description": "Missing/incomplete/invalid test performed date.",
+    "Length": 47
+  },
+  {
+    "Remark": "N377",
+    "Description": "Payment based on a processed replacement claim.",
+    "Length": 47
+  },
+  {
+    "Remark": "N388",
+    "Description": "Missing/incomplete/invalid prescription number.",
+    "Length": 47
+  },
+  {
+    "Remark": "N487",
+    "Description": "Missing Prosthetics or Orthotics Certification.",
+    "Length": 47
+  },
+  {
+    "Remark": "N496",
+    "Description": "Incomplete/invalid Supplemental Medical Report.",
+    "Length": 47
+  },
+  {
+    "Remark": "N619",
+    "Description": "Coverage terminated for non-payment of premium.",
+    "Length": 47
+  },
+  {
+    "Remark": "N630",
+    "Description": "Referral not authorized by attending physician.",
+    "Length": 47
+  },
+  {
+    "Remark": "N652",
+    "Description": "The date of service is before the date of loss.",
+    "Length": 47
+  },
+  {
+    "Remark": "M19",
+    "Description": "Missing oxygen certification/re-certification.",
+    "Length": 46
+  },
+  {
+    "Remark": "M45",
+    "Description": "Missing/incomplete/invalid occurrence code(s).",
+    "Length": 46
+  },
+  {
+    "Remark": "M131",
+    "Description": "Missing physician financial relationship form.",
+    "Length": 46
+  },
+  {
+    "Remark": "MA117",
+    "Description": "This claim has been assessed a $1.00 user fee.",
+    "Length": 46
+  },
+  {
+    "Remark": "N35",
+    "Description": "Program integrity/utilization review decision.",
+    "Length": 46
+  },
+  {
+    "Remark": "N221",
+    "Description": "Missing Admitting History and Physical report.",
+    "Length": 46
+  },
+  {
+    "Remark": "N242",
+    "Description": "Incomplete/invalid radiology film(s)/image(s).",
+    "Length": 46
+  },
+  {
+    "Remark": "N299",
+    "Description": "Missing/incomplete/invalid occurrence date(s).",
+    "Length": 46
+  },
+  {
+    "Remark": "N312",
+    "Description": "Missing/incomplete/invalid begin therapy date.",
+    "Length": 46
+  },
+  {
+    "Remark": "N316",
+    "Description": "Missing/incomplete/invalid disability to date.",
+    "Length": 46
+  },
+  {
+    "Remark": "N329",
+    "Description": "Missing/incomplete/invalid patient birth date.",
+    "Length": 46
+  },
+  {
+    "Remark": "N330",
+    "Description": "Missing/incomplete/invalid patient death date.",
+    "Length": 46
+  },
+  {
+    "Remark": "N334",
+    "Description": "Missing/incomplete/invalid re-evaluation date.",
+    "Length": 46
+  },
+  {
+    "Remark": "N382",
+    "Description": "Missing/incomplete/invalid patient identifier.",
+    "Length": 46
+  },
+  {
+    "Remark": "N570",
+    "Description": "Missing/incomplete/invalid credentialing data.",
+    "Length": 46
+  },
+  {
+    "Remark": "N627",
+    "Description": "Service not payable per managed care contract.",
+    "Length": 46
+  },
+  {
+    "Remark": "N655",
+    "Description": "Payment based on provider's geographic region.",
+    "Length": 46
+  },
+  {
+    "Remark": "M37",
+    "Description": "Not covered when the patient is under age 35.",
+    "Length": 45
+  },
+  {
+    "Remark": "M51",
+    "Description": "Missing/incomplete/invalid procedure code(s).",
+    "Length": 45
+  },
+  {
+    "Remark": "M72",
+    "Description": "Did not enter full 8-digit date (MM/DD/CCYY).",
+    "Length": 45
+  },
+  {
+    "Remark": "M135",
+    "Description": "Missing/incomplete/invalid plan of treatment.",
+    "Length": 45
+  },
+  {
+    "Remark": "MA37",
+    "Description": "Missing/incomplete/invalid patient's address.",
+    "Length": 45
+  },
+  {
+    "Remark": "MA92",
+    "Description": "Missing plan information for other insurance.",
+    "Length": 45
+  },
+  {
+    "Remark": "N18",
+    "Description": "Payment based on the Medicare allowed amount.",
+    "Length": 45
+  },
+  {
+    "Remark": "N34",
+    "Description": "Incorrect claim form/format for this service.",
+    "Length": 45
+  },
+  {
+    "Remark": "N85",
+    "Description": "Alert: This is the final installment payment.",
+    "Length": 45
+  },
+  {
+    "Remark": "N301",
+    "Description": "Missing/incomplete/invalid procedure date(s).",
+    "Length": 45
+  },
+  {
+    "Remark": "N323",
+    "Description": "Missing/incomplete/invalid last contact date.",
+    "Length": 45
+  },
+  {
+    "Remark": "N507",
+    "Description": "Plan distance requirements have not been met.",
+    "Length": 45
+  },
+  {
+    "Remark": "N768",
+    "Description": "Incomplete/invalid initial evaluation report.",
+    "Length": 45
+  },
+  {
+    "Remark": "M56",
+    "Description": "Missing/incomplete/invalid payer identifier.",
+    "Length": 44
+  },
+  {
+    "Remark": "MA42",
+    "Description": "Missing/incomplete/invalid admission source.",
+    "Length": 44
+  },
+  {
+    "Remark": "N27",
+    "Description": "Missing/incomplete/invalid treatment number.",
+    "Length": 44
+  },
+  {
+    "Remark": "N38",
+    "Description": "Missing/incomplete/invalid place of service.",
+    "Length": 44
+  },
+  {
+    "Remark": "N47",
+    "Description": "Claim conflicts with another inpatient stay.",
+    "Length": 44
+  },
+  {
+    "Remark": "N57",
+    "Description": "Missing/incomplete/invalid prescribing date.",
+    "Length": 44
+  },
+  {
+    "Remark": "N64",
+    "Description": "The “from” and “to” dates must be different.",
+    "Length": 44
+  },
+  {
+    "Remark": "N76",
+    "Description": "Missing/incomplete/invalid number of riders.",
+    "Length": 44
+  },
+  {
+    "Remark": "N325",
+    "Description": "Missing/incomplete/invalid last worked date.",
+    "Length": 44
+  },
+  {
+    "Remark": "N336",
+    "Description": "Missing/incomplete/invalid replacement date.",
+    "Length": 44
+  },
+  {
+    "Remark": "N410",
+    "Description": "Not covered unless the prescription changes.",
+    "Length": 44
+  },
+  {
+    "Remark": "N432",
+    "Description": "Alert: Adjustment based on a Recovery Audit.",
+    "Length": 44
+  },
+  {
+    "Remark": "N438",
+    "Description": "This jurisdiction only accepts paper claims.",
+    "Length": 44
+  },
+  {
+    "Remark": "N452",
+    "Description": "Incomplete/invalid Admission Summary Report.",
+    "Length": 44
+  },
+  {
+    "Remark": "N669",
+    "Description": "Adjusted based on the Medicare fee schedule.",
+    "Length": 44
+  },
+  {
+    "Remark": "N681",
+    "Description": "Missing/Incomplete/Invalid full arch series.",
+    "Length": 44
+  },
+  {
+    "Remark": "N731",
+    "Description": "Incomplete/Invalid mental health assessment.",
+    "Length": 44
+  },
+  {
+    "Remark": "M50",
+    "Description": "Missing/incomplete/invalid revenue code(s).",
+    "Length": 43
+  },
+  {
+    "Remark": "M64",
+    "Description": "Missing/incomplete/invalid other diagnosis.",
+    "Length": 43
+  },
+  {
+    "Remark": "MA62",
+    "Description": "Alert: This is a telephone review decision.",
+    "Length": 43
+  },
+  {
+    "Remark": "N91",
+    "Description": "Services not included in the appeal review.",
+    "Length": 43
+  },
+  {
+    "Remark": "N232",
+    "Description": "Incomplete/invalid itemized bill/statement.",
+    "Length": 43
+  },
+  {
+    "Remark": "N309",
+    "Description": "Missing/incomplete/invalid assessment date.",
+    "Length": 43
+  },
+  {
+    "Remark": "N326",
+    "Description": "Missing/incomplete/invalid last x-ray date.",
+    "Length": 43
+  },
+  {
+    "Remark": "N442",
+    "Description": "Payment based on an alternate fee schedule.",
+    "Length": 43
+  },
+  {
+    "Remark": "N471",
+    "Description": "Missing/incomplete/invalid HIPPS Rate Code.",
+    "Length": 43
+  },
+  {
+    "Remark": "N476",
+    "Description": "Incomplete/invalid completed referral form.",
+    "Length": 43
+  },
+  {
+    "Remark": "M34",
+    "Description": "Claim lacks the CLIA certification number.",
+    "Length": 42
+  },
+  {
+    "Remark": "M44",
+    "Description": "Missing/incomplete/invalid condition code.",
+    "Length": 42
+  },
+  {
+    "Remark": "M78",
+    "Description": "Missing/incomplete/invalid HCPCS modifier.",
+    "Length": 42
+  },
+  {
+    "Remark": "MA40",
+    "Description": "Missing/incomplete/invalid admission date.",
+    "Length": 42
+  },
+  {
+    "Remark": "MA41",
+    "Description": "Missing/incomplete/invalid admission type.",
+    "Length": 42
+  },
+  {
+    "Remark": "MA43",
+    "Description": "Missing/incomplete/invalid patient status.",
+    "Length": 42
+  },
+  {
+    "Remark": "N11",
+    "Description": "Denial reversed because of medical review.",
+    "Length": 42
+  },
+  {
+    "Remark": "N46",
+    "Description": "Missing/incomplete/invalid admission hour.",
+    "Length": 42
+  },
+  {
+    "Remark": "N185",
+    "Description": "Alert: Do not resubmit this claim/service.",
+    "Length": 42
+  },
+  {
+    "Remark": "N304",
+    "Description": "Missing/incomplete/invalid dispensed date.",
+    "Length": 42
+  },
+  {
+    "Remark": "N314",
+    "Description": "Missing/incomplete/invalid diagnosis date.",
+    "Length": 42
+  },
+  {
+    "Remark": "N317",
+    "Description": "Missing/incomplete/invalid discharge hour.",
+    "Length": 42
+  },
+  {
+    "Remark": "N345",
+    "Description": "Date range not valid with units submitted.",
+    "Length": 42
+  },
+  {
+    "Remark": "N404",
+    "Description": "Incomplete/invalid facility certification.",
+    "Length": 42
+  },
+  {
+    "Remark": "N464",
+    "Description": "Incomplete/invalid support data for claim.",
+    "Length": 42
+  },
+  {
+    "Remark": "N577",
+    "Description": "Personal Injury Protection (PIP) Coverage.",
+    "Length": 42
+  },
+  {
+    "Remark": "M54",
+    "Description": "Missing/incomplete/invalid total charges.",
+    "Length": 41
+  },
+  {
+    "Remark": "M60",
+    "Description": "Missing Certificate of Medical Necessity.",
+    "Length": 41
+  },
+  {
+    "Remark": "M141",
+    "Description": "Missing physician certified plan of care.",
+    "Length": 41
+  },
+  {
+    "Remark": "MA93",
+    "Description": "Non-PIP (Periodic Interim Payment) claim.",
+    "Length": 41
+  },
+  {
+    "Remark": "MA132",
+    "Description": "Adjustment to the pre-demonstration rate.",
+    "Length": 41
+  },
+  {
+    "Remark": "N66",
+    "Description": "Missing/incomplete/invalid documentation.",
+    "Length": 41
+  },
+  {
+    "Remark": "N70",
+    "Description": "Consolidated billing and payment applies.",
+    "Length": 41
+  },
+  {
+    "Remark": "N233",
+    "Description": "Incomplete/invalid operative note/report.",
+    "Length": 41
+  },
+  {
+    "Remark": "N305",
+    "Description": "Missing/incomplete/invalid accident date.",
+    "Length": 41
+  },
+  {
+    "Remark": "N335",
+    "Description": "Missing/incomplete/invalid referral date.",
+    "Length": 41
+  },
+  {
+    "Remark": "N394",
+    "Description": "Incomplete/invalid progress notes/report.",
+    "Length": 41
+  },
+  {
+    "Remark": "N399",
+    "Description": "Incomplete/invalid elective consent form.",
+    "Length": 41
+  },
+  {
+    "Remark": "N567",
+    "Description": "Not covered when considered preventative.",
+    "Length": 41
+  },
+  {
+    "Remark": "N677",
+    "Description": "Alert: Films/Images will not be returned.",
+    "Length": 41
+  },
+  {
+    "Remark": "N755",
+    "Description": "Missing/incomplete/invalid ICD Indicator.",
+    "Length": 41
+  },
+  {
+    "Remark": "M89",
+    "Description": "Not covered more than once under age 40.",
+    "Length": 40
+  },
+  {
+    "Remark": "MA30",
+    "Description": "Missing/incomplete/invalid type of bill.",
+    "Length": 40
+  },
+  {
+    "Remark": "MA36",
+    "Description": "Missing/incomplete/invalid patient name.",
+    "Length": 40
+  },
+  {
+    "Remark": "N28",
+    "Description": "Consent form requirements not fulfilled.",
+    "Length": 40
+  },
+  {
+    "Remark": "N63",
+    "Description": "Rebill services on separate claim lines.",
+    "Length": 40
+  },
+  {
+    "Remark": "N150",
+    "Description": "Missing/incomplete/invalid model number.",
+    "Length": 40
+  },
+  {
+    "Remark": "N211",
+    "Description": "Alert: You may not appeal this decision.",
+    "Length": 40
+  },
+  {
+    "Remark": "N338",
+    "Description": "Missing/incomplete/invalid shipped date.",
+    "Length": 40
+  },
+  {
+    "Remark": "N341",
+    "Description": "Missing/incomplete/invalid surgery date.",
+    "Length": 40
+  },
+  {
+    "Remark": "N389",
+    "Description": "Duplicate prescription number submitted.",
+    "Length": 40
+  },
+  {
+    "Remark": "N402",
+    "Description": "Incomplete/invalid periodontal charting.",
+    "Length": 40
+  },
+  {
+    "Remark": "N500",
+    "Description": "Incomplete/invalid Medical Legal Report.",
+    "Length": 40
+  },
+  {
+    "Remark": "N122",
+    "Description": "Add-on code cannot be billed by itself.",
+    "Length": 39
+  },
+  {
+    "Remark": "N454",
+    "Description": "Incomplete/invalid Consultation Report.",
+    "Length": 39
+  },
+  {
+    "Remark": "N485",
+    "Description": "Missing Physical Therapy Certification.",
+    "Length": 39
+  },
+  {
+    "Remark": "N519",
+    "Description": "Invalid combination of HCPCS modifiers.",
+    "Length": 39
+  },
+  {
+    "Remark": "N543",
+    "Description": "Incomplete/invalid income verification.",
+    "Length": 39
+  },
+  {
+    "Remark": "N598",
+    "Description": "Health care policy coverage is primary.",
+    "Length": 39
+  },
+  {
+    "Remark": "MA22",
+    "Description": "Payment of less than $1.00 suppressed.",
+    "Length": 38
+  },
+  {
+    "Remark": "MA38",
+    "Description": "Missing/incomplete/invalid birth date.",
+    "Length": 38
+  },
+  {
+    "Remark": "MA121",
+    "Description": "Missing/incomplete/invalid x-ray date.",
+    "Length": 38
+  },
+  {
+    "Remark": "N129",
+    "Description": "Not eligible due to the patient's age.",
+    "Length": 38
+  },
+  {
+    "Remark": "N229",
+    "Description": "Incomplete/invalid contract indicator.",
+    "Length": 38
+  },
+  {
+    "Remark": "N465",
+    "Description": "Missing Physical Therapy Notes/Report.",
+    "Length": 38
+  },
+  {
+    "Remark": "N484",
+    "Description": "Incomplete/invalid Periodontal Charts.",
+    "Length": 38
+  },
+  {
+    "Remark": "N493",
+    "Description": "Missing Doctor First Report of Injury.",
+    "Length": 38
+  },
+  {
+    "Remark": "N504",
+    "Description": "Incomplete/invalid Work Status Report.",
+    "Length": 38
+  },
+  {
+    "Remark": "N736",
+    "Description": "Incomplete/invalid Sleep Study Report.",
+    "Length": 38
+  },
+  {
+    "Remark": "MA106",
+    "Description": "PIP (Periodic Interim Payment) claim.",
+    "Length": 37
+  },
+  {
+    "Remark": "N175",
+    "Description": "Missing review organization approval.",
+    "Length": 37
+  },
+  {
+    "Remark": "N391",
+    "Description": "Missing emergency department records.",
+    "Length": 37
+  },
+  {
+    "Remark": "N396",
+    "Description": "Incomplete/invalid laboratory report.",
+    "Length": 37
+  },
+  {
+    "Remark": "N458",
+    "Description": "Incomplete/invalid Diagnostic Report.",
+    "Length": 37
+  },
+  {
+    "Remark": "N460",
+    "Description": "Incomplete/invalid Discharge Summary.",
+    "Length": 37
+  },
+  {
+    "Remark": "N502",
+    "Description": "Incomplete/invalid Vocational Report.",
+    "Length": 37
+  },
+  {
+    "Remark": "N664",
+    "Description": "Adjusted based on a legal settlement.",
+    "Length": 37
+  },
+  {
+    "Remark": "N726",
+    "Description": "A conditional payment is not allowed.",
+    "Length": 37
+  },
+  {
+    "Remark": "N738",
+    "Description": "Incomplete/invalid Vein Study Report.",
+    "Length": 37
+  },
+  {
+    "Remark": "M132",
+    "Description": "Missing pacemaker registration form.",
+    "Length": 36
+  },
+  {
+    "Remark": "N30",
+    "Description": "Patient ineligible for this service.",
+    "Length": 36
+  },
+  {
+    "Remark": "N208",
+    "Description": "Missing/incomplete/invalid DRG code.",
+    "Length": 36
+  },
+  {
+    "Remark": "N210",
+    "Description": "Alert: You may appeal this decision.",
+    "Length": 36
+  },
+  {
+    "Remark": "N236",
+    "Description": "Incomplete/invalid pathology report.",
+    "Length": 36
+  },
+  {
+    "Remark": "N240",
+    "Description": "Incomplete/invalid radiology report.",
+    "Length": 36
+  },
+  {
+    "Remark": "N429",
+    "Description": "Not covered when considered routine.",
+    "Length": 36
+  },
+  {
+    "Remark": "N495",
+    "Description": "Missing Supplemental Medical Report.",
+    "Length": 36
+  },
+  {
+    "Remark": "N578",
+    "Description": "Coverages do not apply to this loss.",
+    "Length": 36
+  },
+  {
+    "Remark": "N587",
+    "Description": "Policy benefits have been exhausted.",
+    "Length": 36
+  },
+  {
+    "Remark": "N746",
+    "Description": "Incomplete/invalid Ambulance Report.",
+    "Length": 36
+  },
+  {
+    "Remark": "N750",
+    "Description": "Incomplete/invalid Blood Gas Report.",
+    "Length": 36
+  },
+  {
+    "Remark": "MA67",
+    "Description": "Alert: Correction to a prior claim.",
+    "Length": 35
+  },
+  {
+    "Remark": "MA69",
+    "Description": "Missing/incomplete/invalid remarks.",
+    "Length": 35
+  },
+  {
+    "Remark": "N40",
+    "Description": "Missing radiology film(s)/image(s).",
+    "Length": 35
+  },
+  {
+    "Remark": "N45",
+    "Description": "Payment based on authorized amount.",
+    "Length": 35
+  },
+  {
+    "Remark": "N61",
+    "Description": "Rebill services on separate claims.",
+    "Length": 35
+  },
+  {
+    "Remark": "N205",
+    "Description": "Information provided was illegible.",
+    "Length": 35
+  },
+  {
+    "Remark": "N426",
+    "Description": "No coverage when self-administered.",
+    "Length": 35
+  },
+  {
+    "Remark": "N456",
+    "Description": "Incomplete/invalid Physician Order.",
+    "Length": 35
+  },
+  {
+    "Remark": "N556",
+    "Description": "Incomplete/invalid medication list.",
+    "Length": 35
+  },
+  {
+    "Remark": "N659",
+    "Description": "This item is exempt from sales tax.",
+    "Length": 35
+  },
+  {
+    "Remark": "N663",
+    "Description": "Adjusted based on an agreed amount.",
+    "Length": 35
+  },
+  {
+    "Remark": "M79",
+    "Description": "Missing/incomplete/invalid charge.",
+    "Length": 34
+  },
+  {
+    "Remark": "MA39",
+    "Description": "Missing/incomplete/invalid gender.",
+    "Length": 34
+  },
+  {
+    "Remark": "N207",
+    "Description": "Missing/incomplete/invalid weight.",
+    "Length": 34
+  },
+  {
+    "Remark": "N359",
+    "Description": "Missing/incomplete/invalid height.",
+    "Length": 34
+  },
+  {
+    "Remark": "N467",
+    "Description": "Missing Tests and Analysis Report.",
+    "Length": 34
+  },
+  {
+    "Remark": "M20",
+    "Description": "Missing/incomplete/invalid HCPCS.",
+    "Length": 33
+  },
+  {
+    "Remark": "MA79",
+    "Description": "Billed in excess of interim rate.",
+    "Length": 33
+  },
+  {
+    "Remark": "N42",
+    "Description": "Missing mental health assessment.",
+    "Length": 33
+  },
+  {
+    "Remark": "N383",
+    "Description": "Not covered when deemed cosmetic.",
+    "Length": 33
+  },
+  {
+    "Remark": "N451",
+    "Description": "Missing Admission Summary Report.",
+    "Length": 33
+  },
+  {
+    "Remark": "N462",
+    "Description": "Incomplete/invalid Nursing Notes.",
+    "Length": 33
+  },
+  {
+    "Remark": "N474",
+    "Description": "Incomplete/invalid certification.",
+    "Length": 33
+  },
+  {
+    "Remark": "N478",
+    "Description": "Incomplete/invalid Dental Models.",
+    "Length": 33
+  },
+  {
+    "Remark": "N490",
+    "Description": "Incomplete/invalid referral form.",
+    "Length": 33
+  },
+  {
+    "Remark": "N705",
+    "Description": "Incomplete/invalid documentation.",
+    "Length": 33
+  },
+  {
+    "Remark": "MA52",
+    "Description": "Missing/incomplete/invalid date.",
+    "Length": 32
+  },
+  {
+    "Remark": "N26",
+    "Description": "Missing itemized bill/statement.",
+    "Length": 32
+  },
+  {
+    "Remark": "N43",
+    "Description": "Bed hold or leave days exceeded.",
+    "Length": 32
+  },
+  {
+    "Remark": "N228",
+    "Description": "Incomplete/invalid consent form.",
+    "Length": 32
+  },
+  {
+    "Remark": "N425",
+    "Description": "Statutorily excluded service(s).",
+    "Length": 32
+  },
+  {
+    "Remark": "N431",
+    "Description": "Not covered with this procedure.",
+    "Length": 32
+  },
+  {
+    "Remark": "N475",
+    "Description": "Missing completed referral form.",
+    "Length": 32
+  },
+  {
+    "Remark": "N579",
+    "Description": "Medical Payments Coverage (MPC).",
+    "Length": 32
+  },
+  {
+    "Remark": "N668",
+    "Description": "Incomplete/invalid prescription.",
+    "Length": 32
+  },
+  {
+    "Remark": "N769",
+    "Description": "A lateral diagnosis is required.",
+    "Length": 32
+  },
+  {
+    "Remark": "N403",
+    "Description": "Missing facility certification.",
+    "Length": 31
+  },
+  {
+    "Remark": "N463",
+    "Description": "Missing support data for claim.",
+    "Length": 31
+  },
+  {
+    "Remark": "N741",
+    "Description": "This is a site neutral payment.",
+    "Length": 31
+  },
+  {
+    "Remark": "M29",
+    "Description": "Missing operative note/report.",
+    "Length": 30
+  },
+  {
+    "Remark": "N393",
+    "Description": "Missing progress notes/report.",
+    "Length": 30
+  },
+  {
+    "Remark": "N398",
+    "Description": "Missing elective consent form.",
+    "Length": 30
+  },
+  {
+    "Remark": "N41",
+    "Description": "Authorization request denied.",
+    "Length": 29
+  },
+  {
+    "Remark": "N401",
+    "Description": "Missing periodontal charting.",
+    "Length": 29
+  },
+  {
+    "Remark": "N499",
+    "Description": "Missing Medical Legal Report.",
+    "Length": 29
+  },
+  {
+    "Remark": "N453",
+    "Description": "Missing Consultation Report.",
+    "Length": 28
+  },
+  {
+    "Remark": "N542",
+    "Description": "Missing income verification.",
+    "Length": 28
+  },
+  {
+    "Remark": "N648",
+    "Description": "Adjusted based on Stop Loss.",
+    "Length": 28
+  },
+  {
+    "Remark": "N146",
+    "Description": "Missing screening document.",
+    "Length": 27
+  },
+  {
+    "Remark": "N190",
+    "Description": "Missing contract indicator.",
+    "Length": 27
+  },
+  {
+    "Remark": "N354",
+    "Description": "Incomplete/invalid invoice.",
+    "Length": 27
+  },
+  {
+    "Remark": "N483",
+    "Description": "Missing Periodontal Charts.",
+    "Length": 27
+  },
+  {
+    "Remark": "N503",
+    "Description": "Missing Work Status Report.",
+    "Length": 27
+  },
+  {
+    "Remark": "N711",
+    "Description": "Incomplete/invalid summary.",
+    "Length": 27
+  },
+  {
+    "Remark": "N737",
+    "Description": "Missing Sleep Study Report.",
+    "Length": 27
+  },
+  {
+    "Remark": "N395",
+    "Description": "Missing laboratory report.",
+    "Length": 26
+  },
+  {
+    "Remark": "N457",
+    "Description": "Missing Diagnostic Report.",
+    "Length": 26
+  },
+  {
+    "Remark": "N459",
+    "Description": "Missing Discharge Summary.",
+    "Length": 26
+  },
+  {
+    "Remark": "N482",
+    "Description": "Incomplete/invalid Models.",
+    "Length": 26
+  },
+  {
+    "Remark": "N501",
+    "Description": "Missing Vocational Report.",
+    "Length": 26
+  },
+  {
+    "Remark": "N707",
+    "Description": "Incomplete/invalid orders.",
+    "Length": 26
+  },
+  {
+    "Remark": "N713",
+    "Description": "Incomplete/invalid report.",
+    "Length": 26
+  },
+  {
+    "Remark": "N739",
+    "Description": "Missing Vein Study Report.",
+    "Length": 26
+  },
+  {
+    "Remark": "M30",
+    "Description": "Missing pathology report.",
+    "Length": 25
+  },
+  {
+    "Remark": "M31",
+    "Description": "Missing radiology report.",
+    "Length": 25
+  },
+  {
+    "Remark": "N17",
+    "Description": "Per admission deductible.",
+    "Length": 25
+  },
+  {
+    "Remark": "N649",
+    "Description": "Payment based on invoice.",
+    "Length": 25
+  },
+  {
+    "Remark": "N709",
+    "Description": "Incomplete/invalid notes.",
+    "Length": 25
+  },
+  {
+    "Remark": "N715",
+    "Description": "Incomplete/invalid chart.",
+    "Length": 25
+  },
+  {
+    "Remark": "N745",
+    "Description": "Missing Ambulance Report.",
+    "Length": 25
+  },
+  {
+    "Remark": "N749",
+    "Description": "Missing Blood Gas Report.",
+    "Length": 25
+  },
+  {
+    "Remark": "MA127",
+    "Description": "Reserved for future use.",
+    "Length": 24
+  },
+  {
+    "Remark": "N455",
+    "Description": "Missing Physician Order.",
+    "Length": 24
+  },
+  {
+    "Remark": "N555",
+    "Description": "Missing medication list.",
+    "Length": 24
+  },
+  {
+    "Remark": "MA124",
+    "Description": "Processed for IME only.",
+    "Length": 23
+  },
+  {
+    "Remark": "N461",
+    "Description": "Missing Nursing Notes.",
+    "Length": 22
+  },
+  {
+    "Remark": "N473",
+    "Description": "Missing certification.",
+    "Length": 22
+  },
+  {
+    "Remark": "N477",
+    "Description": "Missing Dental Models.",
+    "Length": 22
+  },
+  {
+    "Remark": "N489",
+    "Description": "Missing referral form.",
+    "Length": 22
+  },
+  {
+    "Remark": "N706",
+    "Description": "Missing documentation.",
+    "Length": 22
+  },
+  {
+    "Remark": "N3",
+    "Description": "Missing consent form.",
+    "Length": 21
+  },
+  {
+    "Remark": "N667",
+    "Description": "Missing prescription.",
+    "Length": 21
+  },
+  {
+    "Remark": "MA103",
+    "Description": "Hemophilia Add On.",
+    "Length": 18
+  },
+  {
+    "Remark": "N645",
+    "Description": "Mark-up allowance.",
+    "Length": 18
+  },
+  {
+    "Remark": "M23",
+    "Description": "Missing invoice.",
+    "Length": 16
+  },
+  {
+    "Remark": "N712",
+    "Description": "Missing summary.",
+    "Length": 16
+  },
+  {
+    "Remark": "N481",
+    "Description": "Missing Models.",
+    "Length": 15
+  },
+  {
+    "Remark": "N708",
+    "Description": "Missing orders.",
+    "Length": 15
+  },
+  {
+    "Remark": "N714",
+    "Description": "Missing report.",
+    "Length": 15
+  },
+  {
+    "Remark": "N710",
+    "Description": "Missing notes.",
+    "Length": 14
+  },
+  {
+    "Remark": "N716",
+    "Description": "Missing chart.",
+    "Length": 14
+  }
+]
