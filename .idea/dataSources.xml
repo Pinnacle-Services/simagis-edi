@@ -7,5 +7,17 @@
       <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
       <jdbc-url>jdbc:sqlserver://localhost\MSSQLSERVER:1433;databaseName=XReg</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="claims_db@localhost" uuid="b2e04b9e-efde-42e7-9756-171452c5d2ef">
+      <driver-ref>sqlserver.ms</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://localhost\MSSQLSERVER:1433;databaseName=claims_db</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="webapp_db@localhost" uuid="16a7096e-d970-43be-abe5-2b8d32c8d570">
+      <driver-ref>sqlserver.ms</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://localhost\MSSQLSERVER:1433;databaseName=webapp_db</jdbc-url>
+    </data-source>
   </component>
 </project>
