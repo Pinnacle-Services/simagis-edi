@@ -50,7 +50,7 @@ class ClaimServlet : HttpServlet() {
             else -> collection.find(Document("acn", id))
         }
 
-        val html = ClaimsToHtml().apply {
+        val html = Claims835ToHtml().apply {
             documents.forEach { document ->
                 if (!append(document)) return@apply
             }

@@ -1,0 +1,7 @@
+[
+  {"id": "1", "caption": "Processed as Primary"},
+  {"id": "2", "caption": "Processed as Secondary"},
+  {"id": "3", "caption": "Processed as Tertiary"},
+  {"id": "4", "caption": "Denied"},
+  {"id": "22", "caption": "Reversal of Previous Payment"}
+]

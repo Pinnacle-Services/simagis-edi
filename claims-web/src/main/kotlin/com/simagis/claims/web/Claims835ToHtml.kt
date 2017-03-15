@@ -11,7 +11,7 @@ import javax.json.JsonString
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/14/2017.
  */
-class ClaimsToHtml(val maxCount: Int = 100) {
+class Claims835ToHtml(val maxCount: Int = 100) {
     private var count = 0
     private var indent = 0
     private val html = StringBuilder()
@@ -20,8 +20,8 @@ class ClaimsToHtml(val maxCount: Int = 100) {
 
     private fun formatValue(key: String, value: Any?): String = when {
         key == "cpt" && value is String -> value + " " + cptCodes.optString(value)
-        key == "adjGrp" && value is String -> value + " " + adjustmentGroupCodes.optString(value)
-        key == "adjReason" && value is String -> value + " " + adjustmentCodes.optString(value)
+        key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value)
+        key == "adjReason" && value is String -> value + " " + adjReasonCodes.optString(value)
         value is Date -> dateFormat.format(value)
         else -> value.asHTML
     }
@@ -41,7 +41,7 @@ class ClaimsToHtml(val maxCount: Int = 100) {
 
         private val keys: Keys by lazy {
             val order = mutableListOf<String>()
-            val map = loadAsMap("keyNames.json", {
+            val map = loadAsMap("claim835.keyNames.json", {
                 val key = it.getString("key")
                 order+= key
                 key to it.getString("name")
@@ -50,17 +50,17 @@ class ClaimsToHtml(val maxCount: Int = 100) {
         }
 
         private val cptCodes: Map<String, String> by lazy {
-            loadAsMap("cptCodes.json", {
+            loadAsMap("claim835-cpt-codes.json", {
                 it.getString("cpt_code") to it.getString("short_description")
             })
         }
-        private val adjustmentGroupCodes: Map<String, String> by lazy {
-            loadAsMap("adjustmentGroupCodes.json", {
+        private val adjGrpCodes: Map<String, String> by lazy {
+            loadAsMap("claim835-adjGrp-codes.json", {
                 it.getString("id") to it.getString("caption")
             })
         }
-        private val adjustmentCodes: Map<String, String> by lazy {
-            loadAsMap("adjustmentCodes.json", { json ->
+        private val adjReasonCodes: Map<String, String> by lazy {
+            loadAsMap("claim835-adjReason-codes.json", { json ->
                 val reason = json.getString("Reason")
                 val description = json["Description"]
                 if (reason is String && description is JsonString)
@@ -69,7 +69,7 @@ class ClaimsToHtml(val maxCount: Int = 100) {
         }
 
         private fun loadAsMap(name: String, map: (JsonObject) -> Pair<String, String>?): Map<String, String> = mutableMapOf<String, String>().apply {
-            ClaimsToHtml::class.java.getResourceAsStream(name).use { Json.createReader(it).readArray() }.forEach {
+            Claims835ToHtml::class.java.getResourceAsStream(name).use { Json.createReader(it).readArray() }.forEach {
                 if (it is JsonObject) {
                     map(it)?.let { this += it }
                 }
