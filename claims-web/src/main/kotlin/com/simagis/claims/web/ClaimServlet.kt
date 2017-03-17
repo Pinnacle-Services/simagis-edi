@@ -24,7 +24,7 @@ class ClaimServlet : HttpServlet() {
         response.status = HTTP_NOT_FOUND
     }
 
-    private val mongoHost = System.getProperty("claims.mongo.host", "localhost")
+    private val mongoHost = System.getProperty("claims.mongo.host", "127.0.0.1")
     private val mongoDB = System.getProperty("claims.mongo.db", "claims")
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
@@ -40,6 +40,8 @@ class ClaimServlet : HttpServlet() {
         val db = mongoClient.getDatabase(mongoDB)
         val collection = db.getCollection(collectionName)
 
+        val paging = Paging.of(request.parameterMap)
+
         val documents: FindIterable<Document> = when {
             id.contains("-R-") -> collection.find(Document("_id", id))
             id.startsWith("{") -> collection.find(Document.parse(id))
@@ -54,12 +56,16 @@ class ClaimServlet : HttpServlet() {
                             4 -> limit((json[i] as JsonNumber).intValue())
                         }
                     }
+                    if (paging.isPageable) {
+                        skip(paging.ps * paging.pn)
+                        limit(paging.ps)
+                    }
                 }
             }
             else -> collection.find(Document("acn", id))
         }
 
-        val html = Claims835ToHtml().apply {
+        val html = Claims835ToHtml(paging = paging, root = request.servletPath + request.pathInfo).apply {
             documents.forEach { document ->
                 if (!append(document)) return@apply
             }

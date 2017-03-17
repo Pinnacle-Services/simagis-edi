@@ -7,13 +7,16 @@
             return document.getElementById(id).value;
         }
 
-        function buildLink() {
+        function buildLink(pageable) {
             var href = "/claim/" + toText("claim") + "/"
                 + "[" + toText("find") + ","
                 + toText("projection") + ","
                 + toText("sort") + ","
                 + toText("skip") + ","
                 + toText("limit") + "]";
+            if (pageable) {
+                href += "?ps=" + toText("ps")
+            }
             document.getElementById("link").innerHTML = "<a target='_blank' href='" + href + "'>" + href + "</a>"
         }
     </script>
@@ -44,8 +47,13 @@
         <td><label for="limit">limit</label></td>
         <td width="80%"><input id="limit" type="number" value="100"><br></td>
     </tr>
+    <tr>
+        <td><label for="ps">page size</label></td>
+        <td width="80%"><input id="ps" type="number" value="20"><br></td>
+    </tr>
 </table>
-<button onclick="buildLink()">build</button>
+<button onclick="buildLink(false)">build</button>
+<button onclick="buildLink(true)">build pageable</button>
 <br>
 <div id="link"></div>
 </body>

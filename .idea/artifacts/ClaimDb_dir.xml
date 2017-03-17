@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact name="ClaimDb:dir">
+    <output-path>$PROJECT_DIR$/out/artifacts/ClaimDb_dir</output-path>
+    <root id="root">
+      <element id="directory" name="lib">
+        <element id="artifact" artifact-name="ClaimDb:lib" />
+      </element>
+      <element id="directory" name="apps">
+        <element id="dir-copy" path="$PROJECT_DIR$/claims-web/apps" />
+      </element>
+    </root>
+  </artifact>
+</component>

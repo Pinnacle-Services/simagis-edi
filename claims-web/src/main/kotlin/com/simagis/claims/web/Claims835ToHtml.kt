@@ -11,7 +11,7 @@ import javax.json.JsonString
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/14/2017.
  */
-class Claims835ToHtml(val maxCount: Int = 100) {
+class Claims835ToHtml(val maxCount: Int = 100, val paging: Paging = Paging(0, 0), val root: String) {
     private var count = 0
     private var indent = 0
     private val html = StringBuilder()
@@ -178,13 +178,19 @@ class Claims835ToHtml(val maxCount: Int = 100) {
     }
 
     private fun addPageFooter() {
-        if (count != 1) {
-            if (count == maxCount) {
-                addIndentedText("found $count claims (or more)")
-            } else {
-                addIndentedText("found $count claims")
+        if (paging.isPageable) {
+            if (paging.pn > 0) addLink("$root?ps=${paging.ps}&pn=${paging.pn - 1}", "<-- Back".esc)
+            if (count == paging.ps) addLink("$root?ps=${paging.ps}&pn=${paging.pn + 1}", "Next -->".esc)
+        } else {
+            if (count != 1) {
+                if (count == maxCount) {
+                    addIndentedText("found $count claims (or more)")
+                } else {
+                    addIndentedText("found $count claims")
+                }
             }
         }
+
         html.append("</body>")
     }
 
@@ -193,6 +199,10 @@ class Claims835ToHtml(val maxCount: Int = 100) {
 
     private fun addIndentedText(html: String) {
         this.html.append("<div style='text-indent: ${indent}em;'>$html</div>\n")
+    }
+
+    private fun addLink(href: String, html: String) {
+        this.html.append("<a href='$href'>$html</a>\n")
     }
 
     private val String.esc get() = this.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
