@@ -43,7 +43,6 @@ class ClaimServlet : HttpServlet() {
         val paging = Paging.of(request.parameterMap)
 
         val documents: FindIterable<Document> = when {
-            id.contains("-R-") -> collection.find(Document("_id", id))
             id.startsWith("{") -> collection.find(Document.parse(id))
             id.startsWith("[") -> Json.createReader(id.reader()).readArray().let { json ->
                 fun JsonObject.toDocument(): Document = Document.parse((this).toString())
@@ -62,6 +61,7 @@ class ClaimServlet : HttpServlet() {
                     }
                 }
             }
+            id.contains("-R-") -> collection.find(Document("_id", id))
             else -> collection.find(Document("acn", id))
         }
 
