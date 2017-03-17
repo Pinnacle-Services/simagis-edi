@@ -11,9 +11,7 @@
             var href = "/claim/" + toText("claim") + "/"
                 + "[" + toText("find") + ","
                 + toText("projection") + ","
-                + toText("sort") + ","
-                + toText("skip") + ","
-                + toText("limit") + "]";
+                + toText("sort") + "]";
             if (pageable) {
                 href += "?ps=" + toText("ps")
             }
@@ -24,7 +22,7 @@
 <body>
 <table width="50%">
     <tr>
-        <td><label for="claim">claim</label></td>
+        <td><label for="claim">EDI Document Type</label></td>
         <td width="80%"><input id="claim" type="text" value="835"><br></td>
     </tr>
     <tr>
@@ -40,20 +38,11 @@
         <td width="80%"><input style="width: 100%" id="sort" type="text" value="{}"><br></td>
     </tr>
     <tr>
-        <td><label for="skip">skip</label></td>
-        <td width="80%"><input id="skip" type="number" value="0"><br></td>
-    </tr>
-    <tr>
-        <td><label for="limit">limit</label></td>
-        <td width="80%"><input id="limit" type="number" value="100"><br></td>
-    </tr>
-    <tr>
         <td><label for="ps">page size</label></td>
         <td width="80%"><input id="ps" type="number" value="20"><br></td>
     </tr>
 </table>
-<button onclick="buildLink(false)">build</button>
-<button onclick="buildLink(true)">build pageable</button>
+<button onclick="buildLink(true)">Build URL</button>
 <br>
 <div id="link"></div>
 </body>
