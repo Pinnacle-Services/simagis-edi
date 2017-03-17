@@ -8,10 +8,8 @@
         }
 
         function buildLink(pageable) {
-            var href = "/claim/" + toText("claim") + "/"
-                + "[" + toText("find") + ","
-                + toText("projection") + ","
-                + toText("sort") + "]";
+            var json =  "[" + toText("find") + "," + toText("projection") + "," + toText("sort") + "]";
+            var href = "/claim/" + toText("claim") + "/" + encodeURIComponent(json);
             if (pageable) {
                 href += "?ps=" + toText("ps")
             }
