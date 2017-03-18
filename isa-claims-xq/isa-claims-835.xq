@@ -20,8 +20,8 @@ declare option output:method "json";
     let $ref := $clp/segment[@Id = "CLP"]/element[@Id = "CLP07"]/text()
     let $loc := $clp/segment[@Id = "CLP"]/element[@Id = "CLP08"]/text()
     let $freq := $clp/segment[@Id = "CLP"]/element[@Id = "CLP09"]/text()
-    let $ask_amt := $clp/segment[@Id = "CLP"]/element[@Id = "CLP03"]/text()
-    let $pay_amt := $clp/segment[@Id = "CLP"]/element[@Id = "CLP04"]/text()
+    let $ask_amt := number($clp/segment[@Id = "CLP"]/element[@Id = "CLP03"])
+    let $pay_amt := number($clp/segment[@Id = "CLP"]/element[@Id = "CLP04"])
     let $pr := $clp/segment[@Id = "CLP"]/element[@Id = "CLP05"]/text()
     let $filing := $clp/segment[@Id = "CLP"]/element[@Id = "CLP06"]/text()
     return
@@ -53,6 +53,7 @@ declare option output:method "json";
             <clmAsk-F>{$ask_amt}</clmAsk-F>,
             <clmPay-F>{$pay_amt}</clmPay-F>,
             <pr-F>{$pr}</pr-F>,
+            <clmPayTotal-F>{sum($pay_amt, $pr)}</clmPayTotal-F>,
             
             (:Claim Remarks:)            
             <remarks type='array'>{
@@ -79,7 +80,6 @@ declare option output:method "json";
                 return
                     <_ type='object'>{
                         <cptId >{concat($cpt_id,$cpt_mod)}</cptId>,
-                        <cptFullId >{concat($acn_id, $cpt_id, $cpt_mod)}</cptFullId>,
                         <cpt >{$cpt_id}</cpt>,
                         <cptMod1>{$cpt_mod}</cptMod1>,
                         <mod2>{$cpt_mod2}</mod2>,
