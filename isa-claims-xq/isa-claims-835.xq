@@ -28,6 +28,16 @@ declare option output:method "json";
         <_ type='object'> {
             <id>{concat($acn_id, "-R-", $ref)}</id>,
             <acn>{$acn_id}</acn>,
+            
+            (:billing system:)
+            if (matches($acn_id, "^\D{3}\d{9}"))
+            then <sys>{"V"}</sys>
+            else if (matches($acn_id,"^\d{9}-\d{4}\D"))
+            then <sys>{"X"}</sys>
+            else if (matches($acn_id,"^GN\d{5}"))
+            then <sys>{"Q"}</sys>
+            else <sys>{"U"}</sys>,
+            
             <ref>{$ref}</ref>,
             <status>{$status}</status>,
             <procDate-DT8>{$date_tr}</procDate-DT8>,
