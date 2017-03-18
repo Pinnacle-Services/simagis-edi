@@ -91,6 +91,7 @@ let $svc_dt:= $svc/segment[@Id="DTP" and *:element[@Id="DTP01" and .=472]]/eleme
     <cpt >{$cpt}</cpt>,
     <cptMod1>{$mod}</cptMod1>,
     <cptId >{concat($cpt,$mod)}</cptId>,
+    <cptFullId >{concat($acn_id,$cpt,$mod)}</cptFullId>,
     <cptDsc>{$cpt_descr}</cptDsc>,
     <qty-I>{$qty}</qty-I>,
     <cptAsk-F>{$cpt_ask}</cptAsk-F>
