@@ -80,6 +80,7 @@ declare option output:method "json";
                 return
                     <_ type='object'>{
                         <cptId >{concat($cpt_id,$cpt_mod)}</cptId>,
+                        <cptFullId >{concat($acn_id, $cpt_id, $cpt_mod)}</cptFullId>,
                         <cpt >{$cpt_id}</cpt>,
                         <cptMod1>{$cpt_mod}</cptMod1>,
                         <mod2>{$cpt_mod2}</mod2>,
