@@ -5,7 +5,9 @@ import com.mongodb.client.FindIterable
 import org.bson.Document
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
+import java.util.*
 import javax.json.Json
+import javax.json.JsonArray
 import javax.json.JsonNumber
 import javax.json.JsonObject
 import javax.servlet.annotation.WebServlet
@@ -26,6 +28,7 @@ class ClaimServlet : HttpServlet() {
 
     private val mongoHost = System.getProperty("claims.mongo.host", "127.0.0.1")
     private val mongoDB = System.getProperty("claims.mongo.db", "claims")
+    private val decoder: Base64.Decoder = Base64.getUrlDecoder()
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         val path = request.pathInfo.split('/')
@@ -42,25 +45,30 @@ class ClaimServlet : HttpServlet() {
 
         val paging = Paging.of(request.parameterMap)
 
-        val documents: FindIterable<Document> = when {
-            id.startsWith("{") -> collection.find(Document.parse(id))
-            id.startsWith("[") -> Json.createReader(id.reader()).readArray().let { json ->
-                fun JsonObject.toDocument(): Document = Document.parse((this).toString())
-                collection.find((json[0] as JsonObject).toDocument()).apply {
-                    for (i in 1..json.size - 1) {
-                        when(i) {
-                            1 -> projection((json[i] as JsonObject).toDocument())
-                            2 -> sort((json[i] as JsonObject).toDocument())
-                            3 -> skip((json[i] as JsonNumber).intValue())
-                            4 -> limit((json[i] as JsonNumber).intValue())
-                        }
-                    }
-                    if (paging.isPageable) {
-                        skip(paging.ps * paging.pn)
-                        limit(paging.ps)
+        fun find(json: JsonArray): FindIterable<Document> {
+            fun JsonObject.toDocument(): Document = Document.parse((this).toString())
+            return collection.find((json[0] as JsonObject).toDocument()).apply {
+                for (i in 1..json.size - 1) {
+                    when(i) {
+                        1 -> projection((json[i] as JsonObject).toDocument())
+                        2 -> sort((json[i] as JsonObject).toDocument())
+                        3 -> skip((json[i] as JsonNumber).intValue())
+                        4 -> limit((json[i] as JsonNumber).intValue())
                     }
                 }
+                if (paging.isPageable) {
+                    skip(paging.ps * paging.pn)
+                    limit(paging.ps)
+                }
             }
+        }
+
+        fun String.decode(): String = decoder.decode(this).toString(Charsets.UTF_8)
+
+        val documents: FindIterable<Document> = when {
+            id.startsWith("{") -> collection.find(Document.parse(id))
+            id.startsWith("[") -> find(Json.createReader(id.reader()).readArray())
+            id.startsWith("=") -> find(Json.createReader(id.substring(1).decode().reader()).readArray())
             id.contains("-R-") -> collection.find(Document("_id", id))
             else -> collection.find(Document("acn", id))
         }

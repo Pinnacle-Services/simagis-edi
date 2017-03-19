@@ -31,8 +31,6 @@
             </option>
             <option name="_commonCompilerArguments">
               <DummyImpl>
-                <option name="languageVersion" value="1.1" />
-                <option name="apiVersion" value="1.1" />
                 <option name="pluginClasspaths">
                   <array />
                 </option>
@@ -76,6 +74,15 @@
     <orderEntry type="library" name="Maven: org.mongodb:bson:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-core:3.4.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:javax.servlet-api:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.vaadin:vaadin-server:8.0.3" level="project" />
+    <orderEntry type="library" name="Maven: com.vaadin:vaadin-sass-compiler:0.9.13" level="project" />
+    <orderEntry type="library" name="Maven: org.w3c.css:sac:1.3" level="project" />
+    <orderEntry type="library" name="Maven: com.vaadin.external.flute:flute:1.3.0.gg2" level="project" />
+    <orderEntry type="library" name="Maven: com.vaadin:vaadin-shared:8.0.3" level="project" />
+    <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.8.3" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.gentyref:gentyref:1.2.0" level="project" />
+    <orderEntry type="library" name="Maven: com.vaadin:vaadin-client-compiled:8.0.3" level="project" />
+    <orderEntry type="library" name="Maven: com.vaadin:vaadin-themes:8.0.3" level="project" />
     <orderEntry type="library" name="Maven: javax.json:javax.json-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.4" level="project" />
   </component>

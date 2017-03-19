@@ -2,46 +2,8 @@
 <html>
 <head>
     <title>Claim Viewer</title>
-    <script>
-        function toText(id) {
-            return document.getElementById(id).value;
-        }
-
-        function buildLink(pageable) {
-            var json =  "[" + toText("find") + "," + toText("projection") + "," + toText("sort") + "]";
-            var href = "/claim/" + toText("claim") + "/" + encodeURIComponent(json);
-            if (pageable) {
-                href += "?ps=" + toText("ps")
-            }
-            document.getElementById("link").innerHTML = "<a target='_blank' href='" + href + "'>" + href + "</a>"
-        }
-    </script>
 </head>
 <body>
-<table width="50%">
-    <tr>
-        <td><label for="claim">EDI Document Type</label></td>
-        <td width="80%"><input id="claim" type="text" value="835"><br></td>
-    </tr>
-    <tr>
-        <td><label for="find">find</label></td>
-        <td width="80%"><input style="width: 100%" id="find" type="text" value="{}"><br></td>
-    </tr>
-    <tr>
-        <td><label for="projection">projection</label></td>
-        <td width="80%"><input style="width: 100%" id="projection" type="text" value="{}"><br></td>
-    </tr>
-    <tr>
-        <td><label for="sort">sort</label></td>
-        <td width="80%"><input style="width: 100%" id="sort" type="text" value="{}"><br></td>
-    </tr>
-    <tr>
-        <td><label for="ps">page size</label></td>
-        <td width="80%"><input id="ps" type="number" value="20"><br></td>
-    </tr>
-</table>
-<button onclick="buildLink(true)">Build URL</button>
-<br>
-<div id="link"></div>
+<a href="/cqb/">Claim Query Builder</a>
 </body>
 </html>
