@@ -8,6 +8,9 @@
       <element id="directory" name="apps">
         <element id="dir-copy" path="$PROJECT_DIR$/claims-web/apps" />
       </element>
+      <element id="directory" name="isa-claims-xq">
+        <element id="dir-copy" path="$PROJECT_DIR$/isa-claims-xq" />
+      </element>
     </root>
   </artifact>
 </component>
