@@ -304,26 +304,23 @@ class ClaimQueryBuilderUI : UI() {
         fun toDocument(): Document = Document().apply {
             if (_id != null) append("_id", _id)
             append("type", type)
-            append("find", find.toJsonObject().toDocument())
-            append("projection", projection.toJsonObject().toDocument())
-            append("sort", sort.toJsonObject().toDocument())
+            append("find", find.toJsonObject().toString())
+            append("projection", projection.toJsonObject().toString())
+            append("sort", sort.toJsonObject().toString())
             append("pageSize", pageSize)
             append("date", date)
         }
     }
 
-    private fun Document.toClaimQuery(): ClaimQuery {
-        fun Document.getJsonAsString(key: String) = (get(key) as? Document)?.toJson()
-        return ClaimQuery(
-                _id = get("_id"),
-                type = getString("type") ?: "Invalid",
-                find = getJsonAsString("find") ?: "{}",
-                projection = getJsonAsString("projection") ?: "{}",
-                sort = getJsonAsString("sort") ?: "{}",
-                pageSize = getInteger("pageSize") ?: 20,
-                date = getDate("date") ?: Date()
-        )
-    }
+    private fun Document.toClaimQuery(): ClaimQuery = ClaimQuery(
+            _id = get("_id"),
+            type = getString("type") ?: "Invalid",
+            find = getString("find") ?: "{}",
+            projection = getString("projection") ?: "{}",
+            sort = getString("sort") ?: "{}",
+            pageSize = getInteger("pageSize") ?: 20,
+            date = getDate("date") ?: Date()
+    )
 
     @WebServlet(urlPatterns = arrayOf("/cqb/*", "/VAADIN/*"), name = "CQBServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = ClaimQueryBuilderUI::class, productionMode = false)
