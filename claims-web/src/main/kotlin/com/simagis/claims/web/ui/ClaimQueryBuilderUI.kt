@@ -18,6 +18,7 @@ import com.vaadin.server.Sizeable
 import com.vaadin.server.VaadinRequest
 import com.vaadin.server.VaadinServlet
 import com.vaadin.ui.*
+import com.vaadin.ui.components.grid.MultiSelectionModelImpl
 import com.vaadin.ui.renderers.ButtonRenderer
 import com.vaadin.ui.renderers.DateRenderer
 import com.vaadin.ui.themes.ValoTheme
@@ -47,8 +48,8 @@ class ClaimQueryBuilderUI : UI() {
 
         val validatorOnErroMessage = "Invalid fields"
         val binder = Binder<ClaimQuery>(ClaimQuery::class.java)
-        fun Binder<ClaimQuery>.validate(onErroMessage: String): Boolean = validate().isOk.also {
-            if (!it) Notification.show(onErroMessage, Notification.Type.WARNING_MESSAGE)
+        fun Binder<ClaimQuery>.validate(onErrorMessage: String): Boolean = validate().isOk.also {
+            if (!it) Notification.show(onErrorMessage, Notification.Type.WARNING_MESSAGE)
         }
 
         val splitPanel = HorizontalSplitPanel().apply {
@@ -60,6 +61,10 @@ class ClaimQueryBuilderUI : UI() {
         val favoritesGrid = Grid<ClaimQuery>().apply {
             setSizeFull()
             setSelectionMode(Grid.SelectionMode.MULTI)
+            (selectionModel as? MultiSelectionModelImpl<ClaimQuery>)?.apply {
+                selectAllCheckBoxVisibility = MultiSelectionModelImpl.SelectAllCheckBoxVisibility.VISIBLE
+            }
+
 
             addColumn({ VaadinIcons.ARROW_CIRCLE_LEFT.html }, ButtonRenderer<ClaimQuery>({
                 binder.readBean(it.item.format())
@@ -113,10 +118,47 @@ class ClaimQueryBuilderUI : UI() {
                 description = "Delete selected"
                 addStyleName(ValoTheme.BUTTON_BORDERLESS)
                 addClickListener {
-                    favoritesGrid.selectedItems.forEach {
-                        ClaimDb.cqb.deleteOne(Document("_id", it._id))
+                    Window("Delete Favorites").also { dialog ->
+                        dialog.content = VerticalLayout().also { content ->
+                            Label().apply {
+                                content.addComponent(this)
+                                styleName = ValoTheme.LABEL_LARGE
+                                value = favoritesGrid.selectedItems.size.let {
+                                    when (it) {
+                                        1 -> "Do you wish to delete selected item"
+                                        else -> "Do you wish to delete $it selected items"
+                                    }
+                                }
+                            }
+                            HorizontalLayout().also { buttons ->
+                                content.addComponent(buttons)
+                                content.setComponentAlignment(buttons, Alignment.BOTTOM_RIGHT)
+                                Button("Delete").apply {
+                                    buttons.addComponent(this)
+                                    addStyleName(ValoTheme.BUTTON_DANGER)
+                                    addClickListener {
+                                        favoritesGrid.selectedItems.forEach {
+                                            ClaimDb.cqb.deleteOne(Document("_id", it._id))
+                                        }
+                                        favoritesGrid.refresh()
+                                        dialog.close()
+                                    }
+                                }
+                                Button("Cancel").apply {
+                                    buttons.addComponent(this)
+                                    addClickListener { dialog.close() }
+                                }
+                            }
+                        }
+                        dialog.isResizable = false
+                        dialog.isModal = true
+                        dialog.setWidth(50f, Sizeable.Unit.PERCENTAGE)
+                        ui.addWindow(dialog)
                     }
-                    favoritesGrid.refresh()
+                }
+                isEnabled = false
+                favoritesGrid.addSelectionListener {
+                    isEnabled = !it.allSelectedItems.isEmpty()
                 }
             })
         }
