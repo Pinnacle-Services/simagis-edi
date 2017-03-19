@@ -1,0 +1,9 @@
+{
+  "className": "com.simagis.edi.mongodb.ToMongoDBKt",
+  "options": [
+    "-Xmx16g"
+  ],
+  "parameters": [
+    "/DATA/source_files"
+  ]
+}
