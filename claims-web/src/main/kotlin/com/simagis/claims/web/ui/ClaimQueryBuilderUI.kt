@@ -66,7 +66,6 @@ class ClaimQueryBuilderUI : UI() {
             }).apply {
                 isHtmlContentAllowed = true
             }).apply {
-                width = 64.toDouble()
                 isSortable = false
                 frozenColumnCount++
             }
