@@ -329,7 +329,13 @@ fun main(args: Array<String>) {
                             val collection = mongoClaims.get()[isa.type]
                             val document = Document.parse(it.toString()).prepare()
                             try {
-                                if (after == null || document.getDate("procDate")?.after(after) ?: false) {
+                                fun Document.inRange(start: Date) = when (isa.type) {
+                                    "835" -> getDate("procDate")?.after(start) ?: false
+                                    "837" -> getDate("sendDate")?.after(start) ?: false
+                                    else -> true
+                                }
+
+                                if (after == null || document.inRange(after)) {
                                     if (insert) {
                                         collection.insertOne(document)
                                     }
