@@ -645,7 +645,7 @@
     "Reason": "204",
     "Recoverable": "Recoverable",
     "Party": "Patient",
-    "Description": "This service/equipment/drug is not covered under the patient’s current benefit plan"
+    "Description": "This service/equipment/drug is not covered under the patient's current benefit plan"
   },
   {
     "Reason": "205",
@@ -1029,7 +1029,7 @@
     "Reason": "270",
     "Recoverable": null,
     "Party": null,
-    "Description": "Claim received by the medical plan, but benefits not available under this plan. Submit these services to the patient’s dental plan for further consideration."
+    "Description": "Claim received by the medical plan, but benefits not available under this plan. Submit these services to the patientï¿½s dental plan for further consideration."
   },
   {
     "Reason": "271",
