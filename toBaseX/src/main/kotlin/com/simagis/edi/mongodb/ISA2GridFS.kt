@@ -2,11 +2,10 @@ package com.simagis.edi.mongodb
 
 import com.mongodb.DB
 import com.mongodb.DBObject
-import com.mongodb.MongoClient
-import com.mongodb.ServerAddress
 import com.mongodb.gridfs.GridFS
 import com.simagis.edi.basex.ISA
 import com.simagis.edi.basex.get
+import com.simagis.edi.mdb.MDBCredentials
 import java.io.File
 import java.security.MessageDigest
 
@@ -21,7 +20,7 @@ fun main(args: Array<String>) {
     val _mode = commandLine["mode"] ?: "R"
     val _path = File(commandLine[0])
 
-    val mongo = MongoClient(ServerAddress(_host), MDBCredentials[_host])
+    val mongo = MDBCredentials.mongoClient(_host)
     val db = DB(mongo, _fs)
 
     val fs = GridFS(db)

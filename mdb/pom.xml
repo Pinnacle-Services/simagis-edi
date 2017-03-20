@@ -5,16 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.simagis.edi</groupId>
-    <artifactId>claims-web</artifactId>
+    <artifactId>mdb</artifactId>
     <version>0.1.0.0</version>
-    <packaging>war</packaging>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.1.0</kotlin.version>
+        <basex.version>8.6</basex.version>
         <mongodb.version>3.4.2</mongodb.version>
         <junit.version>4.12</junit.version>
-        <vaadin.version>8.0.3</vaadin.version>
     </properties>
 
     <dependencies>
@@ -37,49 +37,21 @@
         </dependency>
 
         <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
             <version>${mongodb.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-server</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-client-compiled</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-themes</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
             <version>1.0.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.simagis.edi</groupId>
-            <artifactId>mdb</artifactId>
-            <version>0.1.0.0</version>
         </dependency>
     </dependencies>
 
@@ -111,4 +83,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

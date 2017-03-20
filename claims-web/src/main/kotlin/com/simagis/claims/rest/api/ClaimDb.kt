@@ -1,9 +1,9 @@
 package com.simagis.claims.rest.api
 
-import com.mongodb.MongoClient
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.CreateCollectionOptions
+import com.simagis.edi.mdb.MDBCredentials
 import org.bson.Document
 import java.io.ByteArrayOutputStream
 import java.io.PrintWriter
@@ -23,7 +23,7 @@ import javax.json.stream.JsonGenerator
 internal object ClaimDb {
     val mongoHost: String = System.getProperty("claims.mongo.host", "127.0.0.1")
     private val mongoDB = System.getProperty("claims.mongo.jobs.db", "claimsAPI")
-    private val mongoClient = MongoClient(mongoHost)
+    private val mongoClient = MDBCredentials.mongoClient(mongoHost)
     private val db: MongoDatabase = mongoClient.getDatabase(mongoDB)
 
     val apiJobs: MongoCollection<Document> by lazy { db.openCappedCollection("apiJobs") }

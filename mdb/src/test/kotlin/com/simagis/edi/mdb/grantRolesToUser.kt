@@ -1,7 +1,9 @@
-package com.simagis.edi.mongodb
+package com.simagis.edi.mdb
 
 import com.mongodb.MongoClient
 import com.mongodb.ServerAddress
+import com.simagis.edi.mdb.MDBCredentials
+import com.simagis.edi.mdb.grantRolesToUser
 
 /**
  *
@@ -10,6 +12,6 @@ import com.mongodb.ServerAddress
  */
 fun main(args: Array<String>) {
     val host = "mongodb.loc"
-    val mongo = MongoClient(ServerAddress(host), MDBCredentials[host])
+    val mongo = MDBCredentials.mongoClient(host)
     mongo.grantRolesToUser("admin", "readWriteAnyDatabase" to "admin")
 }

@@ -1,6 +1,8 @@
-package com.simagis.edi.mongodb
+package com.simagis.edi.mdb
 
+import com.mongodb.MongoClient
 import com.mongodb.MongoCredential
+import com.mongodb.ServerAddress
 import java.io.File
 import javax.json.Json
 import javax.json.JsonObject
@@ -13,6 +15,8 @@ import javax.json.stream.JsonGenerator
  */
 object MDBCredentials {
     operator fun get(host: String): List<MongoCredential> = map[host] ?: listOf<MongoCredential>()
+
+    fun mongoClient(host: String): MongoClient = MongoClient(ServerAddress(host), MDBCredentials[host])
 
     private val map: Map<String, List<MongoCredential>> by lazy {
         mutableMapOf<String, List<MongoCredential>>().also { map ->

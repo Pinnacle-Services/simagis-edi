@@ -12,6 +12,7 @@
     <modules>
         <module>edireader</module>
         <module>toBaseX</module>
+        <module>mdb</module>
         <module>claims-web</module>
     </modules>
 </project>
