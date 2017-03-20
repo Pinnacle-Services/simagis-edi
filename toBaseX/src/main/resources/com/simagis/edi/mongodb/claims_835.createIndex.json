@@ -3,5 +3,9 @@
   {"procDate": -1},
   {"svc.cpt": 1},
   {"svc.adj.adjReason": 1},
-  {"prn": 1}
+  {"prn": 1},
+  {"status":1},
+  {"clmAsk":1},
+  {"sys":1},
+  {"ref":1}
 ]
