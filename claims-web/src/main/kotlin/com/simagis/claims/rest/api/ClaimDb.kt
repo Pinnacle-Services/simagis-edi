@@ -26,7 +26,7 @@ internal object ClaimDb {
     private val mongoClient = MongoClient(mongoHost)
     private val db: MongoDatabase = mongoClient.getDatabase(mongoDB)
 
-    val apiJobs: MongoCollection<Document> by lazy { db.openCappedCollection("apiJobs") }
+    val apiJobs: MongoCollection<Document> by lazy { db.getCollection("apiJobs") }
     val apiLog: MongoCollection<Document> by lazy { db.openCappedCollection("apiLog") }
     val cqb: MongoCollection<Document> by lazy { db.getCollection("cqb") }
 
