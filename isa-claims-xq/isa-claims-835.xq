@@ -22,7 +22,6 @@ declare option output:method "json";
     let $freq := $clp/segment[@Id = "CLP"]/element[@Id = "CLP09"]/text()
     let $ask_amt := number($clp/segment[@Id = "CLP"]/element[@Id = "CLP03"])
     let $pay_amt := number($clp/segment[@Id = "CLP"]/element[@Id = "CLP04"])
-    let $pr := 0
     let $pr := number($clp/segment[@Id = "CLP"]/element[@Id = "CLP05"])
     let $filing := $clp/segment[@Id = "CLP"]/element[@Id = "CLP06"]/text()
     return
