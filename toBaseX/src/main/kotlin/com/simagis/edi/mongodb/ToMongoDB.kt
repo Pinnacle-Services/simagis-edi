@@ -413,9 +413,9 @@ private class MFiles(
 
     fun upload(): Boolean {
         fun restartRequired(): Boolean {
-            val freeMemory = Runtime.getRuntime().freeMemory()
-            if (freeMemory < 100 * 1024 * 1024) {
-                println("restartRequired: freeMemory = $freeMemory")
+            val memory = Runtime.getRuntime().let { it.maxMemory() - it.totalMemory() }
+            if (memory < 500 * 1024 * 1024) {
+                println("restartRequired: memory = $memory")
                 return true
             }
             if (Instant.now().isAfter(restartAt)) {
