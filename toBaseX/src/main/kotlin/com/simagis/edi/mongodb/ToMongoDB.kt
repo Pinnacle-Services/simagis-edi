@@ -396,7 +396,7 @@ fun main(args: Array<String>) {
     }
 }
 
-private data class MFile(val id: ObjectId, val file: File)
+private data class MFile(val id: ObjectId?, val file: File)
 
 private class MFiles(
         private val session: String?,
@@ -490,11 +490,11 @@ private class MFiles(
                 path.walk(mode).forEach { file ->
                     val document = Document("session", session).append("file", file.absolutePath)
                     importFiles?.insertOne(document)
-                    it += MFile(document.getObjectId("_id"), file)
+                    it += MFile(document["_id"] as? ObjectId, file)
                 }
             } else {
                 importFiles?.find(Document("session", session))?.forEach { document ->
-                    it += MFile(document.getObjectId("_id"), File(document.getString("file")))
+                    it += MFile(document["_id"] as? ObjectId, File(document.getString("file")))
                 }
             }
         }
