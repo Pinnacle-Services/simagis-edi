@@ -6,6 +6,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/claims-web" />
       <excludeFolder url="file://$MODULE_DIR$/edireader" />
+      <excludeFolder url="file://$MODULE_DIR$/mdb" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/toBaseX" />
     </content>

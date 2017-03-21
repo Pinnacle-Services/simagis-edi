@@ -2,6 +2,7 @@ package com.simagis.claims.web
 
 import com.mongodb.MongoClient
 import com.mongodb.client.FindIterable
+import com.simagis.edi.mdb.MDBCredentials
 import org.bson.Document
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
@@ -29,6 +30,7 @@ class ClaimServlet : HttpServlet() {
     private val mongoHost = System.getProperty("claims.mongo.host", "127.0.0.1")
     private val mongoDB = System.getProperty("claims.mongo.db", "claims")
     private val decoder: Base64.Decoder = Base64.getUrlDecoder()
+    private val mongoClient: MongoClient by lazy { MDBCredentials.mongoClient(mongoHost) }
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         val path = request.pathInfo.split('/')
@@ -39,7 +41,6 @@ class ClaimServlet : HttpServlet() {
         val collectionName = "claims_${path[1]}"
         val id = path[2]
 
-        val mongoClient = MongoClient(mongoHost)
         val db = mongoClient.getDatabase(mongoDB)
         val collection = db.getCollection(collectionName)
 

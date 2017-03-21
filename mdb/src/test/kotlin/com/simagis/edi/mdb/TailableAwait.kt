@@ -1,4 +1,4 @@
-package com.simagis.edi.mongodb
+package com.simagis.edi.mdb
 
 import com.mongodb.CursorType
 import com.mongodb.MongoClient

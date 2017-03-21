@@ -1,10 +1,11 @@
 package com.simagis.edi.mongodb
 
 import com.mongodb.DB
-import com.mongodb.MongoClient
+import com.mongodb.DBObject
 import com.mongodb.gridfs.GridFS
 import com.simagis.edi.basex.ISA
 import com.simagis.edi.basex.get
+import com.simagis.edi.mdb.MDBCredentials
 import java.io.File
 import java.security.MessageDigest
 
@@ -19,7 +20,7 @@ fun main(args: Array<String>) {
     val _mode = commandLine["mode"] ?: "R"
     val _path = File(commandLine[0])
 
-    val mongo = MongoClient(_host)
+    val mongo = MDBCredentials.mongoClient(_host)
     val db = DB(mongo, _fs)
 
     val fs = GridFS(db)
@@ -40,12 +41,22 @@ fun main(args: Array<String>) {
         Integer.toHexString(it.toInt() and 0xff)
     }
 
+    val names = mutableSetOf<String>().also { names: MutableSet<String> ->
+        fs.fileList.forEach { file: DBObject ->
+            (file["filename"] as? String?)?.let {
+                names += it
+            }
+        }
+    }
+
     _path.walk(_mode).forEach {
         try {
             ISA.read(it).forEach { isa ->
                 val byteArray = isa.code.toByteArray(ISA.CHARSET)
-                val digest = md().digest(byteArray).toHexString()
-                fs.createFile(byteArray.inputStream(), "/isa/$digest").save()
+                val name = md().digest(byteArray).toHexString() + ".isa"
+                if (names.add(name)) {
+                    fs.createFile(byteArray.inputStream(), name).save()
+                }
             }
         } catch(e: Exception) {
             e.printStackTrace()

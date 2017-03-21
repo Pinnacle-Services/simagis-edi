@@ -1,4 +1,5 @@
 declare option output:method "json";
+
 <json type='array'>{
     for $grp in collection()//group
     (: transmission date:)
@@ -20,9 +21,10 @@ declare option output:method "json";
     let $ref := $clp/segment[@Id = "CLP"]/element[@Id = "CLP07"]/text()
     let $loc := $clp/segment[@Id = "CLP"]/element[@Id = "CLP08"]/text()
     let $freq := $clp/segment[@Id = "CLP"]/element[@Id = "CLP09"]/text()
-    let $ask_amt := number($clp/segment[@Id = "CLP"]/element[@Id = "CLP03"])
-    let $pay_amt := number($clp/segment[@Id = "CLP"]/element[@Id = "CLP04"])
-    let $pr := number($clp/segment[@Id = "CLP"]/element[@Id = "CLP05"])
+    let $ask_amt := data($clp/segment[@Id = "CLP"]/element[@Id = "CLP03"])
+    let $pay_amt := data($clp/segment[@Id = "CLP"]/element[@Id = "CLP04"])
+    let $pr := data($clp/segment[@Id = "CLP"]/element[@Id = "CLP05"])
+    let $total_pay := fn:sum((xs:decimal($pr), xs:decimal($pay_amt)))
     let $filing := $clp/segment[@Id = "CLP"]/element[@Id = "CLP06"]/text()
     return
         <_ type='object'> {
@@ -36,7 +38,7 @@ declare option output:method "json";
             then <sys>{"X"}</sys>
             else if (matches($acn_id,"^GN\d{5}"))
             then <sys>{"Q"}</sys>
-            else <sys>{"U"}</sys>,
+            else <sys>{"U"}</sys>,                  
             
             <ref>{$ref}</ref>,
             <status>{$status}</status>,
@@ -52,9 +54,13 @@ declare option output:method "json";
             <fCode>{$filing}</fCode>,
             <clmAsk-F>{$ask_amt}</clmAsk-F>,
             <clmPay-F>{$pay_amt}</clmPay-F>,
-            <pr-F>{$pr}</pr-F>,
-            <clmPayTotal-F>{sum($pay_amt, $pr)}</clmPayTotal-F>,
             
+            (: Patien Responsibility:)
+            if (string($pr) != '')
+            then <pr-F>{$pr}</pr-F>                    
+            else <pr-F>{0}</pr-F>,
+            <clmPayTotal-F>{$total_pay}</clmPayTotal-F>,        
+                 
             (:Claim Remarks:)            
             <remarks type='array'>{
               for $rem in $clp/segment[@Id="MOA" or @Id="MIA"]/element

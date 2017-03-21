@@ -1,4 +1,4 @@
-package com.simagis.edi.mongodb
+package com.simagis.edi.mdb
 
 import org.bson.Document
 
