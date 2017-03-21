@@ -1,3 +1,14 @@
+(: process 835 EDI ERA docs:)
+declare namespace functx = "http://www.functx.com";
+declare function functx:if-empty
+  ( $arg as item()? ,
+    $value as item()* )  as item()* {
+
+  if (string($arg) != '')
+  then data($arg)
+  else $value
+ } ;
+
 declare option output:method "json";
 
 <json type='array'>{
@@ -47,9 +58,9 @@ declare option output:method "json";
             <payDate-DT8>{$paydt}</payDate-DT8>,
             <loc>{$loc}</loc>,
             <freq>{$freq}</freq>,
-            <frmn-CC>{$from_name}</frmn-CC>,
-            <frmid>{$from_id}</frmid>,
-            <prid>{$payer_id}</prid>,
+            <frmn-CC>{functx:if-empty($from_name,"")}</frmn-CC>,
+            <frmid>{functx:if-empty($from_id,"")}</frmid>,
+            <prid>{functx:if-empty($payer_id,"")}</prid>,
             <prn-CC>{$payer_name}</prn-CC>,
             <fCode>{$filing}</fCode>,
             <clmAsk-F>{$ask_amt}</clmAsk-F>,
