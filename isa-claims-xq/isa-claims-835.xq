@@ -34,8 +34,8 @@ declare option output:method "json";
     let $freq := $clp/segment[@Id = "CLP"]/element[@Id = "CLP09"]/text()
     let $ask_amt := data($clp/segment[@Id = "CLP"]/element[@Id = "CLP03"])
     let $pay_amt := data($clp/segment[@Id = "CLP"]/element[@Id = "CLP04"])
-    let $pr := data($clp/segment[@Id = "CLP"]/element[@Id = "CLP05"])
-    let $total_pay := fn:sum((xs:decimal($pr), xs:decimal($pay_amt)))
+    let $pr := functx:if-empty( data($clp/segment[@Id = "CLP"]/element[@Id = "CLP05"]), 0.00)
+    let $total_pay := fn:sum((number($pr), number($pay_amt)))
     let $filing := $clp/segment[@Id = "CLP"]/element[@Id = "CLP06"]/text()
     return
         <_ type='object'> {
@@ -64,13 +64,9 @@ declare option output:method "json";
             <prn-CC>{$payer_name}</prn-CC>,
             <fCode>{$filing}</fCode>,
             <clmAsk-C0>{$ask_amt}</clmAsk-C0>,
-            <clmPay-C0>{$pay_amt}</clmPay-C0>,
-            
-            (: Patien Responsibility:)
-            if (string($pr) != '')
-            then <pr-C0>{$pr}</pr-C0>
-            else <pr-C0>{0}</pr-C0>,
-            <clmPayTotal-C0>{$total_pay}</clmPayTotal-C0>,
+            <clmPay-C0>{$pay_amt}</clmPay-C0>,           
+            <pr-C0>{$pr}</pr-C0>,
+            <clmPayTotal-C0>{fn:round($total_pay, 2)}</clmPayTotal-C0>,
                  
             (:Claim Remarks:)            
             <remarks type='array'>{
