@@ -58,6 +58,7 @@ class ClaimServlet : HttpServlet() {
                     }
                 }
                 if (paging.isPageable) {
+                    paging.found = count()
                     skip(paging.ps * paging.pn)
                     limit(paging.ps)
                 }

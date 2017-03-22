@@ -21,15 +21,16 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
     private fun formatKey(key: String, value: Any?): String = keys.map.getOrDefault(key, key)
 
     private fun formatValue(key: String, value: Any?): String = when {
-        key == "cpt" && value is String -> value + " " + cptCodes.optString(value)
-        key == "status" && value is String -> value + " " + statusCodes.optString(value)
-        key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value)
-        key == "adjReason" && value is String -> value + " " + adjReasonCodes.optString(value)
-        key == "rem" && value is String -> value + " " + remCodes.optString(value)
-        key == "dxT" && value is String -> value + " " + dxT.optString(value)
-        key == "dxV" && value is String -> value + " " + icd10Codes.optString(value)
-        value is Date -> dateFormat.format(value)
-        else -> value.asHTML
+        key == "_id" && value is String -> "<a name='$value' href='#$value'>$value</a>"
+        key == "cpt" && value is String -> value + " " + cptCodes.optString(value).esc
+        key == "status" && value is String -> value + " " + statusCodes.optString(value).esc
+        key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value).esc
+        key == "adjReason" && value is String -> value + " " + adjReasonCodes.optString(value).esc
+        key == "rem" && value is String -> value + " " + remCodes.optString(value).esc
+        key == "dxT" && value is String -> value + " " + dxT.optString(value).esc
+        key == "dxV" && value is String -> value + " " + icd10Codes.optString(value).esc
+        value is Date -> dateFormat.format(value).esc
+        else -> value.asHTML.esc
     }
 
     private class Keys(private val order: List<String>, val map: Map<String, String>) {
@@ -209,7 +210,7 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
     private fun addProperty(maxKeyLength: Int, key: String, value: Any?) {
         val formattedKey = formatKey(key, value)
         val separator = "&nbsp;".repeat(maxKeyLength - formattedKey.length)
-        addIndentedText(keyToHTML(formattedKey) + ": " + separator + formatValue(key, value).esc)
+        addIndentedText(keyToHTML(formattedKey) + ": " + separator + formatValue(key, value))
     }
 
     private fun addClaimFooter(claim: Document) {
@@ -218,12 +219,29 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
 
     private fun addPageHeader() {
         html.append("<body style='font-family:monospace'>")
+        addPageNavigator()
+        html.append("<hr>\n")
     }
 
     private fun addPageFooter() {
+        addPageNavigator()
+        html.append("</body>")
+    }
+
+    private fun addPageNavigator() {
         if (paging.isPageable) {
             if (paging.pn > 0) addLink("$root?ps=${paging.ps}&pn=${paging.pn - 1}", "<-- Back".esc)
-            if (count == paging.ps) addLink("$root?ps=${paging.ps}&pn=${paging.pn + 1}", "Next -->".esc)
+            if (paging.pageCount > 1) {
+                html.append("&nbsp;[")
+                for (p in 0..paging.pageCount - 1) {
+                    when (p) {
+                        paging.pn -> html.append("<strong>${p + 1}</strong>&nbsp;")
+                        else -> addLink("$root?ps=${paging.ps}&pn=$p", "${p + 1}", separator = "&nbsp;")
+                    }
+                }
+                html.append("]&nbsp;")
+            }
+            if (paging.pn + 1 < paging.pageCount) addLink("$root?ps=${paging.ps}&pn=${paging.pn + 1}", "Next -->".esc)
         } else {
             if (count != 1) {
                 if (count == maxCount) {
@@ -233,8 +251,6 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
                 }
             }
         }
-
-        html.append("</body>")
     }
 
 
@@ -244,8 +260,8 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
         this.html.append("<div style='text-indent: ${indent}em;'>$html</div>\n")
     }
 
-    private fun addLink(href: String, html: String) {
-        this.html.append("<a href='$href'>$html</a>\n")
+    private fun addLink(href: String = "", html: String, separator: String = "\n", fragment: String = "") {
+        this.html.append("<a href='$href#$fragment'>$html</a>$separator")
     }
 
     private val String.esc get() = this.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
