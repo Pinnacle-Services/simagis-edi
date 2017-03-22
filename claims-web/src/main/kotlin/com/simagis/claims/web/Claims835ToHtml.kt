@@ -175,7 +175,11 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
     }
 
     private fun addDocHeader(key: String, value: Document) {
-        addIndentedText("{")
+        if (key.isBlank()) {
+            addIndentedText("{")
+        } else {
+            addIndentedText(keyToHTML(formatKey(key, 0)) + ":{")
+        }
     }
 
     private fun addDocBody(key: String, value: Document) {
