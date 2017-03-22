@@ -236,7 +236,7 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
                 for (p in 0..paging.pageCount - 1) {
                     when (p) {
                         paging.pn -> html.append("<strong>${p + 1}</strong>&nbsp;")
-                        else -> addLink("$root?ps=${paging.ps}&pn=$p", "${p + 1}", separator = "&nbsp;")
+                        else -> addLink("$root?ps=${paging.ps}&pn=$p", "${p + 1}", separator = " ")
                     }
                 }
                 html.append("]&nbsp;")
