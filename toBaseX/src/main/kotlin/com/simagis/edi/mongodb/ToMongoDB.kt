@@ -2,13 +2,13 @@ package com.simagis.edi.mongodb
 
 import com.berryworks.edireader.EDISyntaxException
 import com.mongodb.ErrorCategory
-import com.mongodb.MongoClient
 import com.mongodb.MongoWriteException
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.simagis.edi.basex.ISA
 import com.simagis.edi.basex.exit
 import com.simagis.edi.basex.get
+import com.simagis.edi.mdb.MDBCredentials
 import org.basex.core.Context
 import org.basex.core.MainOptions
 import org.basex.core.cmd.CreateDB
@@ -63,7 +63,7 @@ fun main(args: Array<String>) {
             mode: $mode
             parallel: $parallel""")
 
-    val mongoClient = MongoClient(host)
+    val mongoClient = MDBCredentials.mongoClient(host)
     val database: MongoDatabase = mongoClient.getDatabase(db)
     val path = File(commandLine[0])
 
