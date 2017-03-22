@@ -1,5 +1,7 @@
 package com.simagis.claims.web
 
+import com.mongodb.client.MongoDatabase
+import com.simagis.edi.mdb.*
 import org.bson.Document
 import java.text.SimpleDateFormat
 import java.util.*
@@ -11,7 +13,7 @@ import javax.json.JsonString
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/14/2017.
  */
-class Claims835ToHtml(val maxCount: Int = 100, val paging: Paging = Paging(0, 0), val root: String) {
+class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging: Paging = Paging(0, 0), val root: String) {
     private var count = 0
     private var indent = 0
     private val html = StringBuilder()
@@ -102,7 +104,31 @@ class Claims835ToHtml(val maxCount: Int = 100, val paging: Paging = Paging(0, 0)
         return html.toString().toByteArray()
     }
 
-    fun append(claim: Document): Boolean {
+    fun append(c835: Document): Boolean {
+        val claim = Document(c835)
+
+        val c835srvDate = c835["srvDate"] as? Date
+        if (c835srvDate != null) {
+            val c837 = db["claims_837"]
+                    .find(doc {
+                        `+`("acn", c835["acn"])
+                        `+`("srvDate", `+$lt`(c835srvDate))
+                    })
+                    .projection(doc {
+                        `+`("dx", 1)
+                        `+`("npi", 1)
+                        `+`("drFirsN", 1)
+                        `+`("drLastN", 1)
+                    })
+                    .sort(doc {
+                        `+`("srvDate", -1)
+                    })
+                    .first()
+            if (c837 != null) {
+                claim["c837"] = c837
+            }
+        }
+
         addClaimHeader(claim)
         addClaimBody(claim)
         addClaimFooter(claim)

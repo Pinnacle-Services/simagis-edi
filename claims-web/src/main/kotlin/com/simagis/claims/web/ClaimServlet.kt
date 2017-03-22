@@ -31,6 +31,7 @@ class ClaimServlet : HttpServlet() {
     private val mongoDB = System.getProperty("claims.mongo.db", "claims")
     private val decoder: Base64.Decoder = Base64.getUrlDecoder()
     private val mongoClient: MongoClient by lazy { MDBCredentials.mongoClient(mongoHost) }
+    private val db = mongoClient.getDatabase(mongoDB)
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         val path = request.pathInfo.split('/')
@@ -41,7 +42,6 @@ class ClaimServlet : HttpServlet() {
         val collectionName = "claims_${path[1]}"
         val id = path[2]
 
-        val db = mongoClient.getDatabase(mongoDB)
         val collection = db.getCollection(collectionName)
 
         val paging = Paging.of(request.parameterMap)
@@ -74,11 +74,15 @@ class ClaimServlet : HttpServlet() {
             else -> collection.find(Document("acn", id))
         }
 
-        val html = Claims835ToHtml(paging = paging, root = request.servletPath + request.pathInfo).apply {
-            documents.forEach { document ->
-                if (!append(document)) return@apply
-            }
-        }
+        val html = Claims835ToHtml(
+                db = db,
+                paging = paging,
+                root = request.servletPath + request.pathInfo)
+                .apply {
+                    documents.forEach { document ->
+                        if (!append(document)) return@apply
+                    }
+                }
         val bytes = html.toBytes()
 
         response.status = HTTP_OK

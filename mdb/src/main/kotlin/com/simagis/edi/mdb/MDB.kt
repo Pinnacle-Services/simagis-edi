@@ -2,6 +2,8 @@ package com.simagis.edi.mdb
 
 import com.mongodb.MongoClient
 import com.mongodb.ServerAddress
+import com.mongodb.client.MongoCollection
+import com.mongodb.client.MongoDatabase
 import org.bson.Document
 
 /**
@@ -19,6 +21,9 @@ fun MongoClient.grantRolesToUser(user: String, vararg roleToDBs: Pair<String, St
     })
 }
 
+operator fun MongoDatabase.get(collectionName: String): MongoCollection<Document> = getCollection(collectionName)
+
+
 @Suppress("unused")
 object `$` {
     override fun toString(): String = '$'.toString()
@@ -31,6 +36,18 @@ inline fun Document.`+`(key: String, value: Any?): Document = append(key, value)
 
 @Suppress("NOTHING_TO_INLINE", "unused")
 inline fun Document.`+$`(key: String, value: Any?): Document = append(`$`(key), value)
+
+@Suppress("NOTHING_TO_INLINE", "unused")
+inline fun Document.`+$gt`(value: Any?): Document = append(`$`("gt"), value)
+
+@Suppress("NOTHING_TO_INLINE", "unused")
+inline fun Document.`+$gte`(value: Any?): Document = append(`$`("gte"), value)
+
+@Suppress("NOTHING_TO_INLINE", "unused")
+inline fun Document.`+$lt`(value: Any?): Document = append(`$`("lt"), value)
+
+@Suppress("NOTHING_TO_INLINE", "unused")
+inline fun Document.`+$lte`(value: Any?): Document = append(`$`("lte"), value)
 
 @Suppress("unused")
 inline fun Document.`+$set`(build: Document.() -> Unit): Document {
