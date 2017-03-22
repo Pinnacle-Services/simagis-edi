@@ -413,6 +413,7 @@ private class MFiles(
 
     fun upload(): Boolean {
         fun restartRequired(): Boolean {
+            if (session == null) return false
             val memory = Runtime.getRuntime().let { it.maxMemory() - it.totalMemory() }
             if (memory < 500 * 1024 * 1024) {
                 println("restartRequired: memory = $memory")
