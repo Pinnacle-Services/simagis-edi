@@ -107,25 +107,26 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
     fun append(c835: Document): Boolean {
         val claim = Document(c835)
 
-        val c835srvDate = c835["srvDate"] as? Date
-        if (c835srvDate != null) {
+        val c835procDate = c835["procDate"] as? Date
+        if (c835procDate != null) {
             val c837 = db["claims_837"]
                     .find(doc {
                         `+`("acn", c835["acn"])
-                        `+`("srvDate", `+$lt`(c835srvDate))
+                        `+$lt`("sendDate", c835procDate)
                     })
                     .projection(doc {
                         `+`("dx", 1)
                         `+`("npi", 1)
                         `+`("drFirsN", 1)
                         `+`("drLastN", 1)
+                        `+`("sendDate", 1)
                     })
                     .sort(doc {
-                        `+`("srvDate", -1)
+                        `+`("sendDate", -1)
                     })
                     .first()
             if (c837 != null) {
-                claim["c837"] = c837
+                claim["c837"] = Document(c837)
             }
         }
 

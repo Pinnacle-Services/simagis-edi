@@ -38,16 +38,16 @@ inline fun Document.`+`(key: String, value: Any?): Document = append(key, value)
 inline fun Document.`+$`(key: String, value: Any?): Document = append(`$`(key), value)
 
 @Suppress("NOTHING_TO_INLINE", "unused")
-inline fun Document.`+$gt`(value: Any?): Document = append(`$`("gt"), value)
+inline fun Document.`+$gt`(key: String, value: Any?): Document = append(key, Document(`$`("gt"), value))
 
 @Suppress("NOTHING_TO_INLINE", "unused")
-inline fun Document.`+$gte`(value: Any?): Document = append(`$`("gte"), value)
+inline fun Document.`+$gte`(key: String, value: Any?): Document = append(key, Document(`$`("gte"), value))
 
 @Suppress("NOTHING_TO_INLINE", "unused")
-inline fun Document.`+$lt`(value: Any?): Document = append(`$`("lt"), value)
+inline fun Document.`+$lt`(key: String, value: Any?): Document = append(key, Document(`$`("lt"), value))
 
 @Suppress("NOTHING_TO_INLINE", "unused")
-inline fun Document.`+$lte`(value: Any?): Document = append(`$`("lte"), value)
+inline fun Document.`+$lte`(key: String, value: Any?): Document = append(key, Document(`$`("lte"), value))
 
 @Suppress("unused")
 inline fun Document.`+$set`(build: Document.() -> Unit): Document {
