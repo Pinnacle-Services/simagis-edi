@@ -261,14 +261,29 @@ fun main(args: Array<String>) {
                 fun String.name() = substringBefore('-')
                 keys.toList().forEach { key ->
                     try {
-                        fun append(value: String?, cast: (String) -> Any) {
+                        fun append(value: String?, cast: (String) -> Any?) {
                             if (value != null && value.isNotBlank())
                                 append(key.name(), cast(value))
                         }
+
+                        fun Double.toD0(): Double = if (isFinite()) this else 0.toDouble()
+
+                        fun Double.toC0(): Double = if (isFinite()) "%.2f".format(this).toDouble() else 0.toDouble()
+
                         when (key.type()) {
-                            "I" -> append(getString(key), String::toInt)
-                            "L" -> append(getString(key), String::toLong)
-                            "F" -> append(getString(key), String::toDouble)
+                            "I" -> append(getString(key)) { it.toIntOrNull() }
+                            "I0" -> append(getString(key)) { it.toIntOrNull() ?: 0 }
+                            "L" -> append(getString(key)) { it.toLongOrNull() }
+                            "L0" -> append(getString(key)) { it.toLongOrNull() ?: 0.toLong() }
+
+                            "D",
+                            "F" -> append(getString(key)) { it.toDoubleOrNull()?.toD0() }
+                            "D0",
+                            "F0" -> append(getString(key)) { it.toDoubleOrNull()?.toD0() ?: 0.0.toD0() }
+
+                            "C" -> append(getString(key)) { it.toDoubleOrNull()?.toC0() }
+                            "C0" -> append(getString(key)) { it.toDoubleOrNull()?.toC0() ?: 0.0.toC0() }
+
                             "CC" -> append(getString(key)) {
                                 it.split("[\\s,;.]".toRegex())
                                         .filter(String::isNotEmpty)

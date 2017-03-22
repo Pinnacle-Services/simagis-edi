@@ -63,14 +63,14 @@ declare option output:method "json";
             <prid>{functx:if-empty($payer_id,"Empty")}</prid>,
             <prn-CC>{$payer_name}</prn-CC>,
             <fCode>{$filing}</fCode>,
-            <clmAsk-F>{$ask_amt}</clmAsk-F>,
-            <clmPay-F>{$pay_amt}</clmPay-F>,
+            <clmAsk-C0>{$ask_amt}</clmAsk-C0>,
+            <clmPay-C0>{$pay_amt}</clmPay-C0>,
             
             (: Patien Responsibility:)
             if (string($pr) != '')
-            then <pr-F>{$pr}</pr-F>                    
-            else <pr-F>{0}</pr-F>,
-            <clmPayTotal-F>{$total_pay}</clmPayTotal-F>,        
+            then <pr-C0>{$pr}</pr-C0>
+            else <pr-C0>{0}</pr-C0>,
+            <clmPayTotal-C0>{$total_pay}</clmPayTotal-C0>,
                  
             (:Claim Remarks:)            
             <remarks type='array'>{
@@ -102,9 +102,9 @@ declare option output:method "json";
                         <cptMod1>{$cpt_mod}</cptMod1>,
                         <mod2>{$cpt_mod2}</mod2>,
                         <mod3>{$cpt_mod3}</mod3>,
-                        <qty-F>{$cpt_qty}</qty-F>,
-                        <cptAsk-F>{$cpt_ask}</cptAsk-F>,
-                        <cptPay-F>{$cpt_pay}</cptPay-F>,
+                        <qty-C0>{$cpt_qty}</qty-C0>,
+                        <cptAsk-C0>{$cpt_ask}</cptAsk-C0>,
+                        <cptPay-C0>{$cpt_pay}</cptPay-C0>,
                         <srvDate-DT8>{$date_srv[1]}</srvDate-DT8>,
                         (: adjustments information:)
                         <adj type = 'array'> {
@@ -116,7 +116,7 @@ declare option output:method "json";
                             <_ type='object'>{
                             <adjGrp>{$adj_group}</adjGrp>,
                             <adjReason>{$adj_reason}</adjReason>,
-                            <adjAmt-F>{$adj_amount}</adjAmt-F>
+                            <adjAmt-C0>{$adj_amount}</adjAmt-C0>
                             }</_>
                         }</adj>
                     } </_>

@@ -41,7 +41,7 @@ return
 <recId>{ $rec_id}</recId>,
 <prn-CC>{$payer_name}</prn-CC>,
 <prid>{$payer_id}</prid>,
-<clmAsk-F>{ $ask_amt}</clmAsk-F>,
+<clmAsk-C0>{ $ask_amt}</clmAsk-C0>,
 
 (:billing system:)
 if (matches($acn_id, "^\D{3}\d{9}"))
@@ -94,7 +94,7 @@ let $svc_dt:= $svc/segment[@Id="DTP" and *:element[@Id="DTP01" and .=472]]/eleme
     <cptFullId >{concat($acn_id,$cpt,$mod)}</cptFullId>,
     <cptDsc>{$cpt_descr}</cptDsc>,
     <qty-I>{$qty}</qty-I>,
-    <cptAsk-F>{$cpt_ask}</cptAsk-F>
+    <cptAsk-C0>{$cpt_ask}</cptAsk-C0>
     
   }</_>
   
