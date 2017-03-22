@@ -26,6 +26,7 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
         key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value)
         key == "adjReason" && value is String -> value + " " + adjReasonCodes.optString(value)
         key == "rem" && value is String -> value + " " + remCodes.optString(value)
+        key == "dxT" && value is String -> value + " " + dxT.optString(value)
         value is Date -> dateFormat.format(value)
         else -> value.asHTML
     }
@@ -79,6 +80,11 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
         private val remCodes: Map<String, String> by lazy {
             loadAsMap("claim835-rem-codes.json", {
                 it.getString("Remark") to it.getString("Description")
+            })
+        }
+        private val dxT: Map<String, String> by lazy {
+            loadAsMap("dxT-codes.json", {
+                it.getString("id") to it.getString("caption")
             })
         }
 
