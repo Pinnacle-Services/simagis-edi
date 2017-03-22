@@ -16,12 +16,11 @@ import javax.xml.transform.stream.StreamResult
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 2/1/2017.
  */
-class ISA private constructor(private val text: CharSequence, private val start: Int, private val end: Int) {
-    val code: String
-        get() = when (end) {
-            -1 -> text.substring(start)
-            else -> text.substring(start, end)
-        }
+class ISA private constructor(text: String, private val start: Int, private val end: Int) {
+    val code: String = when (end) {
+        -1 -> text.substring(start)
+        else -> text.substring(start, end)
+    }
 
     val position: String get() = "$start.." + if (end == -1) "end" else "$end"
     val valid: Boolean get() = stat.status == Status.VALID
@@ -63,7 +62,7 @@ class ISA private constructor(private val text: CharSequence, private val start:
             val isaPattern = "${terminator}ISA$s1"
             while (true) {
                 next = text.indexOf(isaPattern, index + isaPattern.length, false)
-                this += ISA(text, index, next)
+                this += ISA(text.toString(), index, next)
                 if (next == -1) break
                 index = next + 1
                 if (index >= text.length) break
