@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact name="mdb:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/mdb_jar</output-path>
+    <root id="root">
+      <element id="archive" name="mdb.jar">
+        <element id="module-output" name="mdb" />
+      </element>
+      <element id="library" level="project" name="Maven: org.glassfish:javax.json:1.0.4" />
+      <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver-core:3.4.2" />
+      <element id="library" level="project" name="Maven: org.jetbrains:annotations:13.0" />
+      <element id="library" level="project" name="Maven: org.mongodb:bson:3.4.2" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.1.0" />
+      <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver:3.4.2" />
+      <element id="library" level="project" name="Maven: javax.json:javax.json-api:1.0" />
+    </root>
+  </artifact>
+</component>
