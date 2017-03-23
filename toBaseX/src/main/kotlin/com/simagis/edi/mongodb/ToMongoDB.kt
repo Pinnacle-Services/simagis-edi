@@ -89,7 +89,7 @@ fun main(args: Array<String>) {
     }
 
     class MongoClaims {
-        val collectionNameFormat = System.getProperty("claims.collection.nameFormat", "claims_%s")
+        val collectionNameFormat = System.getProperty("claims.collection.nameFormat", "claims_new_%s")
         val log: MongoCollection<Document> = database.getCollection("claimsLog")
         operator fun get(type: String): MongoCollection<Document> = claimTypeMap.getOrPut(type) {
             database.getCollection(collectionNameFormat.format(type))
