@@ -23,7 +23,7 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
     private fun formatKey(key: String, value: Any?): String = keys.map.getOrDefault(key, key)
 
     private fun formatValue(key: String, value: Any?): String = when {
-        key == "_id" && value is String -> "<a href='#$value'>$value</a>"
+        key == "_id" && value is String -> value
         key == "cpt" && value is String -> value + " " + cptCodes.optString(value).esc
         key == "status" && value is String -> value + " " + statusCodes.optString(value).esc
         key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value).esc
@@ -236,38 +236,9 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
 
     private fun addPageNavigator() {
         if (paging.isPageable) {
-            if (paging.pn > 0) addLink("$root?ps=${paging.ps}&pn=${paging.pn - 1}", "<-- Back".esc)
-            if (paging.pageCount > 1) {
-                html.append("&nbsp;[")
-                fun addPageLink(p: Long, separator: String) {
-                    when (p) {
-                        paging.pn -> html.append("<strong>${p + 1}</strong>&nbsp;")
-                        else -> addLink("$root?ps=${paging.ps}&pn=$p", "${p + 1}", separator = separator)
-                    }
-                }
-
-                var pp = 0.toLong()
-                val pl = paging.pageCount - 1
-                val rpf = max(0, paging.pn - 5)
-                val rpl = min(paging.pn + 5, pl)
-                if (rpf > 0L) {
-                    html.append("(")
-                    addPageLink(0, "")
-                    html.append(") ")
-                }
-                for (p in rpf..rpl) {
-                    pp = p
-                    addPageLink(p, if (p == pl) "" else " ")
-                }
-                if (pp < pl) {
-                    html.append(" (")
-                    addPageLink(pl, "")
-                    html.append(")")
-                }
-                html.append("]&nbsp;")
-            }
-            if (paging.pn + 1 < paging.pageCount) addLink("$root?ps=${paging.ps}&pn=${paging.pn + 1}", "Next -->".esc )
-            html.append(" Total Claims found: ${paging.found}")
+            if (paging.pn > 0) addLink("$root?ps=${paging.ps}&pn=${paging.pn - 1}", "<- Previous ${paging.ps}".esc)
+            html.append(" Records ${paging.pn * paging.ps + 1}-${min(paging.found, (paging.pn + 1) * paging.ps)} of ${paging.found} ")
+            if (paging.pn + 1 < paging.pageCount) addLink("$root?ps=${paging.ps}&pn=${paging.pn + 1}", "Next ${paging.ps} ->".esc )
         } else {
             if (count != 1) {
                 if (count == maxCount) {
