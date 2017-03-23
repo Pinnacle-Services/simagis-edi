@@ -3,6 +3,8 @@ package com.simagis.claims.web
 import com.mongodb.client.MongoDatabase
 import com.simagis.edi.mdb.*
 import org.bson.Document
+import java.lang.Long.max
+import java.lang.Long.min
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.json.Json
@@ -50,7 +52,7 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
             val order = mutableListOf<String>()
             val map = loadAsMap("claim835.keyNames.json", {
                 val key = it.getString("key")
-                order+= key
+                order += key
                 key to it.getString("name")
             })
             Keys(order, map)
@@ -218,9 +220,13 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
     }
 
     private fun addPageHeader() {
-        html.append("<body style='font-family:monospace'>")
+        html.append("""<body style='font-family:monospace'>
+            <br>
+            <br>
+            <div style="position: fixed; overflow: auto; top: 0; left: 0; right: 0; background-color: #fff; padding: 5px">
+        """)
         addPageNavigator()
-        html.append("<hr>\n")
+        html.append("<hr></div>\n")
     }
 
     private fun addPageFooter() {
@@ -233,15 +239,35 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
             if (paging.pn > 0) addLink("$root?ps=${paging.ps}&pn=${paging.pn - 1}", "<-- Back".esc)
             if (paging.pageCount > 1) {
                 html.append("&nbsp;[")
-                for (p in 0..paging.pageCount - 1) {
+                fun addPageLink(p: Long, separator: String) {
                     when (p) {
                         paging.pn -> html.append("<strong>${p + 1}</strong>&nbsp;")
-                        else -> addLink("$root?ps=${paging.ps}&pn=$p", "${p + 1}", separator = " ")
+                        else -> addLink("$root?ps=${paging.ps}&pn=$p", "${p + 1}", separator = separator)
                     }
+                }
+
+                var pp = 0.toLong()
+                val pl = paging.pageCount - 1
+                val rpf = max(0, paging.pn - 5)
+                val rpl = min(paging.pn + 5, pl)
+                if (rpf > 0L) {
+                    html.append("(")
+                    addPageLink(0, "")
+                    html.append(") ")
+                }
+                for (p in rpf..rpl) {
+                    pp = p
+                    addPageLink(p, if (p == pl) "" else " ")
+                }
+                if (pp < pl) {
+                    html.append(" (")
+                    addPageLink(pl, "")
+                    html.append(")")
                 }
                 html.append("]&nbsp;")
             }
-            if (paging.pn + 1 < paging.pageCount) addLink("$root?ps=${paging.ps}&pn=${paging.pn + 1}", "Next -->".esc)
+            if (paging.pn + 1 < paging.pageCount) addLink("$root?ps=${paging.ps}&pn=${paging.pn + 1}", "Next -->".esc )
+            html.append(" Total Claims found: ${paging.found}")
         } else {
             if (count != 1) {
                 if (count == maxCount) {

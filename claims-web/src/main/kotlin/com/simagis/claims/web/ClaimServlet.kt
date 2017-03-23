@@ -48,7 +48,11 @@ class ClaimServlet : HttpServlet() {
 
         fun find(json: JsonArray): FindIterable<Document> {
             fun JsonObject.toDocument(): Document = Document.parse((this).toString())
-            return collection.find((json[0] as JsonObject).toDocument()).apply {
+            val filter = (json[0] as JsonObject).toDocument()
+            if (paging.isPageable) {
+                paging.found = collection.count(filter)
+            }
+            return collection.find(filter).apply {
                 for (i in 1..json.size - 1) {
                     when(i) {
                         1 -> projection((json[i] as JsonObject).toDocument())
@@ -58,9 +62,8 @@ class ClaimServlet : HttpServlet() {
                     }
                 }
                 if (paging.isPageable) {
-                    paging.found = count()
-                    skip(paging.ps * paging.pn)
-                    limit(paging.ps)
+                    skip((paging.ps * paging.pn).toInt())
+                    limit(paging.ps.toInt())
                 }
             }
         }
