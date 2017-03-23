@@ -1,6 +1,6 @@
 (function (collection, indexes) {
     for (var i = 0; i < indexes.length; i++) collection.createIndex(indexes[i]);
-})(db.claims_835, [
+})(db.claims_new_835, [
     {"acn": 1},
     {"procDate": -1},
     {"svc.cpt": 1},
