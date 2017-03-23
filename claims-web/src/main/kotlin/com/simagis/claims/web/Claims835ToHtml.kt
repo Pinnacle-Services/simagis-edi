@@ -23,7 +23,7 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
     private fun formatKey(key: String, value: Any?): String = keys.map.getOrDefault(key, key)
 
     private fun formatValue(key: String, value: Any?): String = when {
-        key == "_id" && value is String -> "<a name='$value' href='#$value'>$value</a>"
+        key == "_id" && value is String -> "<a href='#$value'>$value</a>"
         key == "cpt" && value is String -> value + " " + cptCodes.optString(value).esc
         key == "status" && value is String -> value + " " + statusCodes.optString(value).esc
         key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value).esc
@@ -152,7 +152,7 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
     }
 
     private fun addClaimHeader(claim: Document) {
-
+        html.append("<a name='${claim._id}'></a><br><br>")
     }
 
     private fun addClaimBody(claim: Document) {
