@@ -29,6 +29,7 @@ internal object ClaimDb {
     val apiJobs: MongoCollection<Document> by lazy { db.getCollection("apiJobs") }
     val apiLog: MongoCollection<Document> by lazy { db.openCappedCollection("apiLog") }
     val cqb: MongoCollection<Document> by lazy { db.getCollection("cqb") }
+    val cq: MongoCollection<Document> by lazy { db.getCollection("cq") }
 
     val ex1: ExecutorService = Executors.newSingleThreadExecutor()
 

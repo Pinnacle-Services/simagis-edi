@@ -1,7 +1,6 @@
 package com.simagis.claims.web.ui
 
 import com.simagis.claims.rest.api.ClaimDb
-import com.simagis.claims.rest.api.toDocument
 import com.simagis.claims.rest.api.toJsonObject
 import com.simagis.claims.rest.api.toStringPP
 import com.vaadin.annotations.Title
@@ -322,7 +321,7 @@ class ClaimQueryBuilderUI : UI() {
             date = getDate("date") ?: Date()
     )
 
-    @WebServlet(urlPatterns = arrayOf("/cqb/*", "/VAADIN/*"), name = "CQBServlet", asyncSupported = true)
+    @WebServlet(urlPatterns = arrayOf("/cqb/*"), name = "CQBServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = ClaimQueryBuilderUI::class, productionMode = false)
     class MyUIServlet : VaadinServlet()
 }
