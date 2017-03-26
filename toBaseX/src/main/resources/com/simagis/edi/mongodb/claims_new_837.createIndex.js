@@ -3,6 +3,6 @@
 })(db.claims_new_837, [
     {"acn": 1},
     {"sendDate": -1},
-    { "dx" : 1 },
-    { "npi" :1 }
+    {"dx": 1},
+    {"npi": 1}
 ]);
