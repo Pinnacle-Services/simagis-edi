@@ -32,6 +32,8 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
     private val binder = Binder<ClaimQuery>(ClaimQuery::class.java)
     private val descriptionField = TextField()
     private val queryPanel = HorizontalSplitPanel()
+    private lateinit var find: TextArea
+
     var value: ClaimQuery = ClaimQuery()
         get() {
             binder.writeBean(field)
@@ -106,6 +108,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 addClickListener {
                     value = ClaimQuery()
                     explorer.cqGrid.deselectAll()
+                    find.focus()
                 }
             })
 
@@ -355,7 +358,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                             setSizeFull()
                             margin = margins(right = true, bottom = true)
                             addComponents(
-                                    jsonTextArea("find").apply { focus() },
+                                    jsonTextArea("find").apply { find = this; focus() },
                                     jsonTextArea("sort"))
                         }
                         secondComponent = VerticalLayout().apply {
