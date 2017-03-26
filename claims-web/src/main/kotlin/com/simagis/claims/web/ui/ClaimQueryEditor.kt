@@ -105,6 +105,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP)
                 addClickListener {
                     value = ClaimQuery()
+                    explorer.cqGrid.deselectAll()
                 }
             })
 
