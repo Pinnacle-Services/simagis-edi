@@ -2,6 +2,7 @@ package com.simagis.claims.web.ui
 
 import com.vaadin.event.ShortcutAction
 import com.vaadin.server.Sizeable
+import com.vaadin.shared.ui.MarginInfo
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
 
@@ -71,3 +72,48 @@ fun showConfirmationDialog(
             dialog.isModal = true
             dialog.setWidth(50f, Sizeable.Unit.PERCENTAGE)
         })
+
+object Margins {
+    val ON = MarginInfo(true)
+    val OFF = MarginInfo(false)
+}
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun margins(enabled: Boolean = false): MarginInfo
+        = if (enabled) Margins.ON else Margins.OFF
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun margins(
+        top: Boolean = false,
+        right: Boolean = false,
+        bottom: Boolean = false,
+        left: Boolean = false): MarginInfo
+        = MarginInfo(top, right, bottom, left)
+
+data class SizeableK1(val unit: Sizeable.Unit, val value: Float)
+
+val size100pc = SizeableK1(Sizeable.Unit.PERCENTAGE, 100f)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun sizePc(value: Float): SizeableK1 = SizeableK1(Sizeable.Unit.PERCENTAGE, value)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun sizeEm(value: Float): SizeableK1 = SizeableK1(Sizeable.Unit.EM, value)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun sizePx(value: Float): SizeableK1 = SizeableK1(Sizeable.Unit.PIXELS, value)
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun sizePt(value: Float): SizeableK1 = SizeableK1(Sizeable.Unit.POINTS, value)
+
+inline var Component.widthK1: SizeableK1
+    get() = SizeableK1(widthUnits, width)
+    set(value) {
+        setWidth(value.value, value.unit)
+    }
+
+inline var Component.heightK1: SizeableK1
+    get() = SizeableK1(heightUnits, height)
+    set(value) {
+        setHeight(value.value, value.unit)
+    }

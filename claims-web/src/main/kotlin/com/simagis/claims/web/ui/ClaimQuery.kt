@@ -1,6 +1,12 @@
 package com.simagis.claims.web.ui
 
+import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.claims.rest.api.toJsonObject
+import com.simagis.edi.mdb.`+`
+import com.simagis.edi.mdb.doc
+import com.vaadin.data.provider.QuerySortOrder
+import com.vaadin.shared.data.sort.SortDirection
+import com.vaadin.ui.Grid
 import org.bson.Document
 import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
@@ -26,10 +32,6 @@ data class ClaimQuery(
 ) {
     companion object {
         private val encoder: Base64.Encoder = Base64.getUrlEncoder()
-        private val jsonWriterSettings = JsonWriterSettings(JsonMode.STRICT, true)
-        private fun String.toJsonFormatted(): String {
-            return Document.parse(this).toJson(jsonWriterSettings)
-        }
     }
 
     val href: String get() = "/claim/$type/=${encode()}?ps=$pageSize"
@@ -41,13 +43,6 @@ data class ClaimQuery(
     }.build()
 
     fun encode(): String = encoder.encodeToString(toJsonArray().toString().toByteArray())
-
-    fun format(): ClaimQuery {
-        find = find.toJsonFormatted()
-        projection = projection.toJsonFormatted()
-        sort = sort.toJsonFormatted()
-        return this
-    }
 
     fun toDocument(): Document = Document().apply {
         if (_id != null) append("_id", _id)
@@ -75,3 +70,38 @@ fun Document.toClaimQuery(): ClaimQuery = ClaimQuery(
         created = getDate("created") ?: Date(),
         modified = getDate("modified") ?: Date()
 )
+
+private val jsonWriterSettings = JsonWriterSettings(JsonMode.STRICT, true)
+
+fun String.toJsonFormatted(): String {
+    return Document.parse(this).toJson(jsonWriterSettings)
+}
+
+fun Grid<ClaimQuery>.refresh() = setDataProvider(
+        { _: List<QuerySortOrder>, offset, limit ->
+            val sort = doc {
+                fun SortDirection.toInt(): Int = when (this) {
+                    SortDirection.DESCENDING -> 1
+                    SortDirection.ASCENDING -> -1
+                }
+                sortOrder.forEach {
+                    when (it.sorted.caption) {
+                        "Name" -> `+`("name", it.direction.toInt())
+                        "Type" -> `+`("type", it.direction.toInt())
+                        "Created" -> `+`("created", it.direction.toInt())
+                        "Modified" -> `+`("modified", it.direction.toInt())
+                        "page size" -> `+`("pageSize", it.direction.toInt())
+                    }
+                }
+            }
+            ClaimDb.cq.find()
+                    .sort(sort)
+                    .skip(offset)
+                    .limit(limit)
+                    .toList()
+                    .map { it.toClaimQuery() }
+                    .stream()
+        },
+        {
+            ClaimDb.cq.find().count()
+        })

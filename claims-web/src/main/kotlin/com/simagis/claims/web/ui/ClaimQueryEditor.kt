@@ -4,6 +4,7 @@ import com.mongodb.client.model.FindOneAndReplaceOptions
 import com.mongodb.client.model.ReturnDocument
 import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.edi.mdb._id
+import com.simagis.edi.mdb.`+$set`
 import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
 import com.vaadin.data.Binder
@@ -11,11 +12,12 @@ import com.vaadin.data.ValidationResult
 import com.vaadin.data.Validator
 import com.vaadin.data.converter.StringToIntegerConverter
 import com.vaadin.data.validator.IntegerRangeValidator
+import com.vaadin.data.validator.StringLengthValidator
 import com.vaadin.event.ShortcutAction
 import com.vaadin.icons.VaadinIcons
 import com.vaadin.server.ExternalResource
 import com.vaadin.server.Page
-import com.vaadin.server.Sizeable
+import com.vaadin.shared.ui.ContentMode
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
 import org.bson.Document
@@ -26,8 +28,10 @@ import java.util.*
  *
  * Created by alexei.vylegzhanin@gmail.com on 3/24/2017.
  */
-class ClaimQueryEditor : VerticalLayout() {
+class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLayout() {
     private val binder = Binder<ClaimQuery>(ClaimQuery::class.java)
+    private val descriptionField = TextField()
+    private val queryPanel = HorizontalSplitPanel()
     var value: ClaimQuery = ClaimQuery()
         get() {
             binder.writeBean(field)
@@ -37,23 +41,21 @@ class ClaimQueryEditor : VerticalLayout() {
             field = value
             binder.readBean(field)
             updateURL()
-            onValueChanged.forEach { it(ValueChangedEvent(this, field)) }
         }
-    val onValueChanged: MutableList<(ValueChangedEvent) -> Unit> = mutableListOf()
-    data class ValueChangedEvent(val source: ClaimQueryEditor, val value: ClaimQuery)
 
     private val urlLink = Link().apply {
         icon = VaadinIcons.EXTERNAL_LINK
+        description = "Open Query Link in new window"
         targetName = "_blank"
     }
 
     private val urlText = TextField().apply {
-        setWidth(100f, Sizeable.Unit.PERCENTAGE)
-        addStyleName(ValoTheme.TEXTFIELD_SMALL)
+        addStyleName(ValoTheme.TEXTFIELD_BORDERLESS)
         isReadOnly = true
     }
 
     init {
+        margin = margins()
         val jsonValidator = Validator<String> { value, _ ->
             try {
                 Document.parse(value)
@@ -63,16 +65,49 @@ class ClaimQueryEditor : VerticalLayout() {
             }
         }
 
-        fun jsonTextArea(name: String): TextArea = TextArea(name).apply {
-            setSizeFull()
+        var jsonTextAreaCurrent: TextArea? = null
+        val jsonTextAreaList = mutableListOf<TextArea>()
+        fun jsonTextArea(name: String, compactable: Boolean = true): TextArea = TextArea(name).apply {
+            jsonTextAreaList += this
+            widthK1 = size100pc
+            rows = 3
             binder.forField(this)
                     .withValidator(jsonValidator)
                     .bind(name)
+
+            addFocusListener {
+                jsonTextAreaCurrent = this
+                (parent as? AbstractOrderedLayout)?.let { layout ->
+                    jsonTextAreaList
+                            .filter { compactable && it !== this && layout === it.parent }
+                            .forEach {
+                                it.setHeightUndefined()
+                                layout.setExpandRatio(it, 0f)
+                            }
+                    heightK1 = size100pc
+                    layout.setExpandRatio(this, 1f)
+                }
+            }
         }
 
+        fun reload(current: ClaimQuery) {
+            explorer.cqGrid.refresh()
+            explorer.cqGrid.select(current)
+            value = current
+        }
 
         val toolbar = HorizontalLayout().apply {
-            setMargin(false)
+            margin = margins()
+
+            addComponent(Button("New").apply {
+                icon = VaadinIcons.FILE_ADD
+                addStyleName(ValoTheme.BUTTON_BORDERLESS)
+                addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP)
+                addClickListener {
+                    value = ClaimQuery()
+                }
+            })
+
             addComponents(Button("Save").apply {
                 icon = VaadinIcons.SERVER
                 addStyleName(ValoTheme.BUTTON_BORDERLESS)
@@ -98,7 +133,7 @@ class ClaimQueryEditor : VerticalLayout() {
                                 ClaimDb.cq.insertOne(document)
                                 current._id = document._id
                             }
-                            value = current
+                            reload(current)
                         }
 
                         if (current._id == null) {
@@ -109,7 +144,7 @@ class ClaimQueryEditor : VerticalLayout() {
                             val override = CheckBox("Override").apply { isVisible = false }
                             val nameEditor = VerticalLayout(nameField, override).apply {
                                 setSizeFull()
-                                setMargin(false)
+                                margin = margins()
                             }
                             showConfirmationDialog(
                                     "Saving Claim Query",
@@ -137,7 +172,7 @@ class ClaimQueryEditor : VerticalLayout() {
                         } else {
                             current.modified = Date()
                             ClaimDb.cq.replaceOne(doc(current._id), current.toDocument())
-                            value = current
+                            reload(current)
                         }
                         updateURL()
                     } else {
@@ -149,79 +184,209 @@ class ClaimQueryEditor : VerticalLayout() {
                 }
             })
 
-            addComponents(Button("Format").apply {
-                icon = VaadinIcons.CURLY_BRACKETS
+            addComponent(Button("Rename").apply {
+                icon = VaadinIcons.INPUT
                 addStyleName(ValoTheme.BUTTON_BORDERLESS)
                 addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP)
-                setClickShortcut(
-                        ShortcutAction.KeyCode.N,
-                        ShortcutAction.ModifierKey.CTRL,
-                        ShortcutAction.ModifierKey.ALT)
+                setClickShortcut(ShortcutAction.KeyCode.F2)
                 addClickListener {
-                    if (binder.validate().isOk) {
-                        val temp = ClaimQuery()
-                        binder.writeBean(temp)
-                        binder.readBean(temp.format())
+                    val current = explorer.cqGrid.selectedItems.first()
+                    val nameField = TextField("Name", current.name).apply {
+                        setSizeFull()
+                        focus()
+                    }
+                    val nameEditor = VerticalLayout(nameField).apply {
+                        setSizeFull()
+                        margin = margins()
+                    }
+
+                    showConfirmationDialog(
+                            "Renaming Claim Query",
+                            actionType = ConfirmationActionType.FRIENDLY,
+                            actionCaption = "Rename",
+                            body = nameEditor
+                    )
+                    {
+                        val exists = ClaimDb.cq.find(doc { `+`("name", nameField.value) })
+                                .first() != null
+                        if (exists) {
+                            Notification.show(
+                                    """Claim Query "${nameField.value}" already exists""",
+                                    Notification.Type.HUMANIZED_MESSAGE)
+                        } else {
+                            current.name = nameField.value
+                            ClaimDb.cq.updateOne(doc(current._id), doc {
+                                `+$set` { `+`("name", current.name) }
+                            })
+                            reload(current)
+                        }
+                        !exists
                     }
                 }
-            })
-
-
-            addComponents(Button("Build").apply {
-                icon = VaadinIcons.PLAY
-                addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED)
-                addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP)
-                addClickListener {
-                    updateURL()
-                    urlText.focus()
-                    urlText.selectAll()
+                isEnabled = false
+                explorer.cqGrid.addSelectionListener {
+                    isEnabled = it.firstSelectedItem.isPresent
                 }
             })
 
-            addComponentsAndExpand(VerticalLayout().apply {
-                setWidth(100f, Sizeable.Unit.PERCENTAGE)
-                isSpacing = false
-                setMargin(false)
-                addComponent(urlLink)
-                addComponent(urlText)
-                setComponentAlignment(urlLink, Alignment.TOP_RIGHT)
+            addComponent(Button("Delete").apply {
+                icon = VaadinIcons.FILE_REMOVE
+                addStyleName(ValoTheme.BUTTON_BORDERLESS)
+                addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP)
+                addClickListener {
+                    val claimQuery = explorer.cqGrid.selectedItems.first()
+                    showConfirmationDialog(
+                            "Delete Claim Query",
+                            """Do you wish to delete "${claimQuery.name}"""") {
+                        ClaimDb.cq.deleteOne(Document("_id", claimQuery._id))
+                        explorer.cqGrid.refresh()
+                        true
+                    }
+                }
+                isEnabled = false
+                explorer.cqGrid.addSelectionListener {
+                    isEnabled = it.firstSelectedItem.isPresent
+                }
             })
         }
 
-        val description = RichTextArea().apply {
-            setSizeFull()
-            addStyleName(ValoTheme.TEXTAREA_SMALL)
+        val descriptionLabel = Label("", ContentMode.HTML).apply {
+            widthK1 = size100pc
+        }
+
+        with(descriptionField) {
+            addValueChangeListener {
+                descriptionLabel.value = it.value
+            }
             binder.forField(this)
                     .bind("description")
         }
 
-        val query = VerticalLayout().apply {
-            setSizeFull()
-            addComponentsAndExpand(VerticalLayout().apply {
-                setSizeFull()
-                setMargin(false)
-                addComponents(
-                        jsonTextArea("find").apply { focus() },
-                        jsonTextArea("projection"),
-                        jsonTextArea("sort"))
-            })
-            addComponent(
-                    TextField("page size").apply {
-                        binder.forField(this)
-                                .withConverter(StringToIntegerConverter("Must enter a number"))
-                                .withValidator(IntegerRangeValidator("Out of range", 1, 100))
-                                .bind("pageSize")
-                    })
-        }
+        val content = VerticalLayout().apply {
+            margin = margins()
+            isSpacing = false
 
-        val tabSheet = TabSheet().apply {
-            setSizeFull()
-            addTab(query, "Query")
-            addTab(description, "Description")
+            fun sectionCaption(caption: String) = Label("&nbsp;<b>$caption</b>", ContentMode.HTML)
+
+            fun verticalToolbar(init: VerticalLayout.() -> Unit) = VerticalLayout().apply {
+                margin = margins()
+                isSpacing = false
+                setWidthUndefined()
+                init()
+            }
+
+
+            addComponent(sectionCaption("Description"))
+            addComponent(HorizontalLayout().apply {
+                margin = margins(right = true)
+                addComponent(verticalToolbar {
+                    addComponent(Button().apply {
+                        description = "Edit Description"
+                        icon = VaadinIcons.EDIT
+                        addStyleName(ValoTheme.BUTTON_LINK)
+                        addClickListener {
+                            val richTextArea = RichTextArea().apply {
+                                value = descriptionField.value
+                                widthK1 = size100pc
+                            }
+                            showConfirmationDialog(
+                                    "Description",
+                                    body = richTextArea,
+                                    actionType = ConfirmationActionType.PRIMARY,
+                                    actionCaption = "Ok")
+                            {
+                                descriptionField.value = richTextArea.value
+                                true
+                            }
+                        }
+                    })
+                })
+                addComponentsAndExpand(descriptionLabel)
+            })
+
+            addComponent(sectionCaption("Query"))
+
+            addComponentsAndExpand(HorizontalLayout().apply {
+                margin = margins()
+
+                addComponent(verticalToolbar {
+                    addComponents(Button().apply {
+                        description = "Build Query URL"
+                        icon = VaadinIcons.PLAY
+                        addStyleName(ValoTheme.BUTTON_LINK)
+                        setClickShortcut(ShortcutAction.KeyCode.F9)
+                        addClickListener {
+                            updateURL()
+                            urlText.focus()
+                            urlText.selectAll()
+                        }
+                    })
+                    addComponents(Button().apply {
+                        description = "Reformat Code"
+                        icon = VaadinIcons.CURLY_BRACKETS
+                        addStyleName(ValoTheme.BUTTON_LINK)
+                        setClickShortcut(
+                                ShortcutAction.KeyCode.N,
+                                ShortcutAction.ModifierKey.CTRL,
+                                ShortcutAction.ModifierKey.ALT)
+                        addClickListener {
+                            jsonTextAreaCurrent?.let {
+                                it.value = it.value.toJsonFormatted()
+                                it.focus()
+                            }
+                        }
+                    })
+                })
+
+                addComponentsAndExpand(VerticalLayout().apply {
+                    margin = margins()
+                    isSpacing = false
+                    addComponent(HorizontalLayout().apply {
+                        margin = margins()
+                        isSpacing = false
+                        defaultComponentAlignment = Alignment.MIDDLE_LEFT
+                        addComponent(urlLink)
+                        addComponentsAndExpand(urlText)
+                    })
+
+                    addComponentsAndExpand(queryPanel.apply {
+                        firstComponent = VerticalLayout().apply {
+                            setSizeFull()
+                            margin = margins(right = true, bottom = true)
+                            addComponents(
+                                    jsonTextArea("find").apply { focus() },
+                                    jsonTextArea("sort"))
+                        }
+                        secondComponent = VerticalLayout().apply {
+                            setSizeFull()
+                            margin = margins(left = true, right = true, bottom = true)
+                            addComponentsAndExpand(
+                                    jsonTextArea("projection", false).apply { heightK1 = size100pc })
+                            addComponents(
+                                    ComboBox<String>("EDI Document Type").apply {
+                                        setItems("835", "837")
+                                        isEmptySelectionAllowed = false
+                                        isTextInputAllowed = false
+                                        binder.forField(this)
+                                                .bind("type")
+
+                                    },
+                                    TextField("Page Size").apply {
+                                        binder.forField(this)
+                                                .withValidator(StringLengthValidator("Must enter a number 1-100", 1, 3))
+                                                .withConverter(StringToIntegerConverter("Must enter a number"))
+                                                .withValidator(IntegerRangeValidator("Out of range", 1, 100))
+                                                .bind("pageSize")
+                                    })
+                        }
+                    })
+                })
+            }
+            )
         }
 
         addComponent(toolbar)
-        addComponentsAndExpand(tabSheet)
+        addComponentsAndExpand(content)
 
         value = ClaimQuery()
         updateURL()
@@ -239,26 +404,5 @@ class ClaimQueryEditor : VerticalLayout() {
             urlLink.resource = ExternalResource("#")
             urlText.value = ""
         }
-    }
-
-    class Dialog : Window() {
-        val editor: ClaimQueryEditor = ClaimQueryEditor()
-
-        companion object {
-            fun of(claimQuery: ClaimQuery): Dialog = Dialog().apply {
-                editor.value = claimQuery
-            }
-        }
-
-        init {
-            editor.onValueChanged += {
-                caption = it.value.name
-            }
-            content = editor
-            setWidth(40f, Sizeable.Unit.PERCENTAGE)
-            setHeight(90f, Sizeable.Unit.PERCENTAGE)
-            center()
-        }
-
     }
 }
