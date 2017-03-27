@@ -2,7 +2,12 @@ package com.simagis.claims.web
 
 import com.mongodb.MongoClient
 import com.mongodb.client.FindIterable
+import com.simagis.claims.rest.api.ClaimDb
+import com.simagis.claims.web.ui.applyParameters
+import com.simagis.claims.web.ui.toClaimQuery
 import com.simagis.edi.mdb.MDBCredentials
+import com.simagis.edi.mdb.`+`
+import com.simagis.edi.mdb.doc
 import org.bson.Document
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
@@ -21,7 +26,7 @@ import javax.servlet.http.HttpServletResponse
  *
  * Created by alexei.vylegzhanin@gmail.com on 3/10/2017.
  */
-@WebServlet(name = "ClaimServlet", urlPatterns = arrayOf("/claim/*"))
+@WebServlet(name = "ClaimServlet", urlPatterns = arrayOf("/claim/*", "/query/*"))
 class ClaimServlet : HttpServlet() {
     override fun doPost(request: HttpServletRequest, response: HttpServletResponse) {
         response.status = HTTP_NOT_FOUND
@@ -34,17 +39,42 @@ class ClaimServlet : HttpServlet() {
     private val db = mongoClient.getDatabase(mongoDB)
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
-        val path = request.pathInfo.split('/')
-        if (path.size != 3) {
-            response.status = HTTP_NOT_FOUND
-            return
-        }
-        val collectionName = "claims_${path[1]}"
-        val id = path[2]
-
-        val collection = db.getCollection(collectionName)
-
+        val servletPath = request.servletPath
+        val queryString = request.queryString ?: ""
         val paging = Paging.of(request.parameterMap)
+
+        val documents: FindIterable<Document> = (if (servletPath == "/query")
+            query(request, paging) else
+            find(request, paging))
+                ?: let { response.status = HTTP_NOT_FOUND; return }
+
+        val html = Claims835ToHtml(
+                db = db,
+                paging = paging,
+                root = servletPath + request.pathInfo,
+                queryString = queryString)
+                .apply {
+                    documents.forEach { document ->
+                        if (!append(document)) return@apply
+                    }
+                }
+        val bytes = html.toBytes()
+
+        response.status = HTTP_OK
+        response.contentType = "text/html"
+        response.characterEncoding = "UTF-8"
+        response.setContentLength(bytes.size)
+        response.outputStream.write(bytes)
+    }
+
+    private fun find(request: HttpServletRequest, paging: Paging): FindIterable<Document>? {
+        val pathInfo = request.pathInfo
+        val path = pathInfo.split('/')
+        if (path.size != 3) {
+            return null
+        }
+        val collection = db.getCollection("claims_${path[1]}")
+        val id = path[2]
 
         fun find(json: JsonArray): FindIterable<Document> {
             fun JsonObject.toDocument(): Document = Document.parse((this).toString())
@@ -54,7 +84,7 @@ class ClaimServlet : HttpServlet() {
             }
             return collection.find(filter).apply {
                 for (i in 1..json.size - 1) {
-                    when(i) {
+                    when (i) {
                         1 -> projection((json[i] as JsonObject).toDocument())
                         2 -> sort((json[i] as JsonObject).toDocument())
                         3 -> skip((json[i] as JsonNumber).intValue())
@@ -70,29 +100,30 @@ class ClaimServlet : HttpServlet() {
 
         fun String.decode(): String = decoder.decode(this).toString(Charsets.UTF_8)
 
-        val documents: FindIterable<Document> = when {
+        return when {
             id.startsWith("{") -> collection.find(Document.parse(id))
             id.startsWith("[") -> find(Json.createReader(id.reader()).readArray())
             id.startsWith("=") -> find(Json.createReader(id.substring(1).decode().reader()).readArray())
             id.contains("-R-") -> collection.find(Document("_id", id))
             else -> collection.find(Document("acn", id))
         }
+    }
 
-        val html = Claims835ToHtml(
-                db = db,
-                paging = paging,
-                root = request.servletPath + request.pathInfo)
+    private fun query(request: HttpServletRequest, paging: Paging): FindIterable<Document>? {
+        val name = request.pathInfo
+        val cq = ClaimDb.cq
+                .find(doc { `+`("name", name) })
+                .first()
+                ?.toClaimQuery()
+                ?: return null
+        return db.getCollection("claims_${cq.type}")
+                .find(Document.parse(cq.find).applyParameters({ name -> request.getParameter(name) }))
+                .projection(Document.parse(cq.projection))
+                .sort(Document.parse(cq.sort))
                 .apply {
-                    documents.forEach { document ->
-                        if (!append(document)) return@apply
-                    }
+                    paging.found = count().toLong()
+                    paging.ps = cq.pageSize.toLong()
                 }
-        val bytes = html.toBytes()
-
-        response.status = HTTP_OK
-        response.contentType = "text/html"
-        response.characterEncoding = "UTF-8"
-        response.setContentLength(bytes.size)
-        response.outputStream.write(bytes)
     }
 }
+

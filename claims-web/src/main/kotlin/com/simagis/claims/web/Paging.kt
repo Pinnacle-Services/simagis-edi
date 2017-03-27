@@ -1,7 +1,7 @@
 package com.simagis.claims.web
 
-class Paging(val ps: Long, val pn: Long) {
-    val isPageable = ps > 0
+class Paging(var ps: Long, val pn: Long) {
+    val isPageable get() = ps > 0
     var found: Long = 0
     val pageCount get() = (found + ps - 1) / ps
 

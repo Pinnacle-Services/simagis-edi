@@ -15,7 +15,11 @@ import javax.json.JsonString
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/14/2017.
  */
-class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging: Paging = Paging(0, 0), val root: String) {
+class Claims835ToHtml(val db: MongoDatabase,
+                      val maxCount: Int = 100,
+                      val paging: Paging = Paging(0, 0),
+                      val root: String,
+                      val queryString: String) {
     private var count = 0
     private var indent = 0
     private val html = StringBuilder()
@@ -235,10 +239,19 @@ class Claims835ToHtml(val db: MongoDatabase, val maxCount: Int = 100, val paging
     }
 
     private fun addPageNavigator() {
+        fun href(ps: Long, pn: Long): String {
+            val query = queryString
+                    .split("&")
+                    .filter { !(it.startsWith("pn=") || it.startsWith("ps=")) }
+                    .joinToString(separator = "&")
+            val paging = "ps=$ps&pn=$pn"
+            val separator = if (query.isEmpty()) "" else "&"
+            return "$root?$query$separator$paging"
+        }
         if (paging.isPageable) {
-            if (paging.pn > 0) addLink("$root?ps=${paging.ps}&pn=${paging.pn - 1}", "<- Previous ${paging.ps}".esc)
+            if (paging.pn > 0) addLink(href(paging.ps, paging.pn - 1), "<- Previous ${paging.ps}".esc)
             html.append(" Records ${paging.pn * paging.ps + 1}-${min(paging.found, (paging.pn + 1) * paging.ps)} of ${paging.found} ")
-            if (paging.pn + 1 < paging.pageCount) addLink("$root?ps=${paging.ps}&pn=${paging.pn + 1}", "Next ${paging.ps} ->".esc )
+            if (paging.pn + 1 < paging.pageCount) addLink(href(paging.ps, paging.pn + 1), "Next ${paging.ps} ->".esc )
         } else {
             if (count != 1) {
                 if (count == maxCount) {

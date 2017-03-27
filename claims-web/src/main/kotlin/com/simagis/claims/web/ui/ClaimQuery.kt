@@ -10,6 +10,7 @@ import com.vaadin.ui.Grid
 import org.bson.Document
 import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.json.Json
 import javax.json.JsonArray
@@ -105,3 +106,35 @@ fun Grid<ClaimQuery>.refresh() = setDataProvider(
         {
             ClaimDb.cq.find().count()
         })
+
+
+private val DATE by lazy { SimpleDateFormat("yyyy-MM-dd") }
+
+internal fun Document.applyParameters(request: (String) -> String?): Document = apply {
+    fun get(key: String, map: (String?) -> Any?): Any? = map(request(key))
+    fun getA(key: String, value: String, map: (String?) -> Any?): Any? = map(request(key)
+            ?: value.substringAfter('=', missingDelimiterValue = ""))
+
+    Document(this).forEach { key, value ->
+        when {
+            value is String && value.startsWith("#") -> {
+                when {
+                    value == "#" -> this[key] = get(key) { it }
+                    value == "#int" -> this[key] = get(key) { it?.toLongOrNull() }
+                    value == "#num" -> this[key] = get(key) { it?.toDoubleOrNull() }
+                    value == "#cur" -> this[key] = get(key) { it?.toDoubleOrNull() }
+                    value == "#date" -> this[key] = get(key) { it?.let { DATE.parse(it) } }
+                    value.startsWith("#=") -> this[key] = getA(key, value) { it }
+                    value.startsWith("#int=") -> this[key] = getA(key, value) { it?.toLongOrNull() }
+                    value.startsWith("#num=") -> this[key] = getA(key, value) { it?.toDoubleOrNull() }
+                    value.startsWith("#cur=") -> this[key] = getA(key, value) { it?.toDoubleOrNull() }
+                    value.startsWith("#date=") -> this[key] = getA(key, value) { it?.let { DATE.parse(it) } }
+                }
+            }
+            value is Document -> value.applyParameters(request)
+            value is List<*> -> value.forEach {
+                if (it is Document) it.applyParameters(request)
+            }
+        }
+    }
+}
