@@ -98,6 +98,81 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
             value = current
         }
 
+        fun save(saveAsMode: Boolean = false) {
+            with(binder.validate()) {
+                if (!isOk) {
+                    Notification.show(
+                            "Unable to save invalid values",
+                            beanValidationErrors.map { it.errorMessage }.joinToString(),
+                            Notification.Type.WARNING_MESSAGE)
+                    return
+                }
+            }
+
+            val current = value.copy()
+            binder.writeBean(current)
+            if (saveAsMode) {
+                current._id = null
+            }
+
+            fun insert(override: Boolean) {
+                if (override) {
+                    val filter = doc { `+`("name", current.name) }
+                    val document = current.toDocument()
+                    ClaimDb.cq.findOneAndReplace(filter, document,
+                            FindOneAndReplaceOptions()
+                                    .upsert(true)
+                                    .returnDocument(ReturnDocument.AFTER)).let {
+                        current._id = it._id
+                    }
+                } else {
+                    val document = current.toDocument()
+                    ClaimDb.cq.insertOne(document)
+                    current._id = document._id
+                }
+                reload(current)
+            }
+
+            if (current._id == null) {
+                val nameField = TextField("Name", current.name).apply {
+                    setSizeFull()
+                    focus()
+                }
+                val override = CheckBox("Override").apply { isVisible = false }
+                val nameEditor = VerticalLayout(nameField, override).apply {
+                    setSizeFull()
+                    margin = margins()
+                }
+                showConfirmationDialog(
+                        "Saving Claim Query",
+                        actionType = ConfirmationActionType.PRIMARY,
+                        actionCaption = "Save",
+                        body = nameEditor) {
+                    current.name = nameField.value
+                    if (override.value) {
+                        insert(true)
+                        true
+                    } else {
+                        val exists = ClaimDb.cq.find(doc { `+`("name", nameField.value) })
+                                .first() != null
+                        if (exists) {
+                            Notification.show(
+                                    """Claim Query "${nameField.value}" already exists""",
+                                    "Use the Override", Notification.Type.HUMANIZED_MESSAGE)
+                            override.isVisible = true
+                        } else {
+                            insert(false)
+                        }
+                        !exists
+                    }
+                }
+            } else {
+                current.modified = Date()
+                ClaimDb.cq.replaceOne(doc(current._id), current.toDocument())
+                reload(current)
+            }
+        }
+
         val toolbar = HorizontalLayout().apply {
             margin = margins()
 
@@ -112,79 +187,22 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 }
             })
 
+
             addComponents(Button("Save").apply {
                 icon = VaadinIcons.SERVER
                 addStyleName(ValoTheme.BUTTON_BORDERLESS)
                 addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP)
                 addClickListener {
-                    val validate = binder.validate()
-                    if (validate.isOk) {
-                        val current = value
-                        binder.writeBean(current)
+                    save()
+                }
+            })
 
-                        fun insert(override: Boolean) {
-                            if (override) {
-                                val filter = doc { `+`("name", current.name) }
-                                val document = current.toDocument()
-                                ClaimDb.cq.findOneAndReplace(filter, document,
-                                        FindOneAndReplaceOptions()
-                                                .upsert(true)
-                                                .returnDocument(ReturnDocument.AFTER)).let {
-                                    current._id = it._id
-                                }
-                            } else {
-                                val document = current.toDocument()
-                                ClaimDb.cq.insertOne(document)
-                                current._id = document._id
-                            }
-                            reload(current)
-                        }
-
-                        if (current._id == null) {
-                            val nameField = TextField("Name", current.name).apply {
-                                setSizeFull()
-                                focus()
-                            }
-                            val override = CheckBox("Override").apply { isVisible = false }
-                            val nameEditor = VerticalLayout(nameField, override).apply {
-                                setSizeFull()
-                                margin = margins()
-                            }
-                            showConfirmationDialog(
-                                    "Saving Claim Query",
-                                    actionType = ConfirmationActionType.PRIMARY,
-                                    actionCaption = "Save",
-                                    body = nameEditor) {
-                                current.name = nameField.value
-                                if (override.value) {
-                                    insert(true)
-                                    true
-                                } else {
-                                    val exists = ClaimDb.cq.find(doc { `+`("name", nameField.value) })
-                                            .first() != null
-                                    if (exists) {
-                                        Notification.show(
-                                                """Claim Query "${nameField.value}" already exists""",
-                                                "Use the Override", Notification.Type.HUMANIZED_MESSAGE)
-                                        override.isVisible = true
-                                    } else {
-                                        insert(false)
-                                    }
-                                    !exists
-                                }
-                            }
-                        } else {
-                            current.modified = Date()
-                            ClaimDb.cq.replaceOne(doc(current._id), current.toDocument())
-                            reload(current)
-                        }
-                        updateURL()
-                    } else {
-                        Notification.show(
-                                "Unable to save invalid values",
-                                validate.beanValidationErrors.map { it.errorMessage }.joinToString(),
-                                Notification.Type.WARNING_MESSAGE)
-                    }
+            addComponent(Button("Save as").apply {
+                icon = VaadinIcons.COPY
+                addStyleName(ValoTheme.BUTTON_BORDERLESS)
+                addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP)
+                addClickListener {
+                    save(saveAsMode = true)
                 }
             })
 
