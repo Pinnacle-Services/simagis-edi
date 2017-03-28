@@ -37,8 +37,6 @@ data class ClaimQuery(
         private val encoder: Base64.Encoder = Base64.getUrlEncoder()
     }
 
-    val href: String get() = "/claim/$type/=${encode()}?ps=$pageSize"
-
     private fun toJsonArray(): JsonArray = Json.createArrayBuilder().also { array ->
         array.add(find.toJsonFormatted().toJsonObject())
         array.add(projection.toJsonFormatted().toJsonObject())
@@ -59,6 +57,10 @@ data class ClaimQuery(
         append("created", created)
         append("modified", modified)
     }
+
+    fun toParameters(): Set<Parameter> = Document.parse(find).toParameters()
+
+    data class Parameter(val name: String, val operator: String, val default: String? = null)
 }
 
 fun Document.toClaimQuery(): ClaimQuery = ClaimQuery(
@@ -87,6 +89,7 @@ fun Grid<ClaimQuery>.refresh() = setDataProvider(
                     SortDirection.DESCENDING -> 1
                     SortDirection.ASCENDING -> -1
                 }
+                if (sortOrder.isEmpty()) `+`("name", 1)
                 sortOrder.forEach {
                     when (it.sorted.caption) {
                         "Name" -> `+`("name", it.direction.toInt())
@@ -114,29 +117,56 @@ private val DATE4 by lazy { SimpleDateFormat("yyyy") }
 private val DATE7 by lazy { SimpleDateFormat("yyyy-MM") }
 private val DATE10 by lazy { SimpleDateFormat("yyyy-MM-dd") }
 
+private fun String.toParameter(): ClaimQuery.Parameter? {
+    if (!startsWith("#")) return null
+    val icn = indexOf(':')
+    val ieq = indexOf('=')
+    val name = when {
+        icn == -1 && ieq == -1 -> substring(1)
+        icn != -1 && ieq == -1 -> substring(1, icn)
+        icn == -1 && ieq != -1 -> substring(1, ieq)
+        icn != -1 && ieq != -1 -> substring(1, icn)
+        else -> ""
+    }
+    if (name.isBlank()) return null
+
+    val operator = when {
+        icn != -1 && ieq != -1 -> substring(icn + 1, ieq)
+        icn != -1 && ieq == -1 -> substring(icn + 1)
+        else -> ""
+    }
+    val default: String? = when {
+        ieq != -1 -> substring(ieq + 1)
+        else -> null
+    }
+
+    return ClaimQuery.Parameter(name, operator, default)
+}
+
+private fun Document.toParameters(): Set<ClaimQuery.Parameter>
+        = mutableMapOf<String, ClaimQuery.Parameter>()
+        .apply map@ {
+            fun Document.searchParameters() {
+                values.forEach {
+                    when (it) {
+                        is String -> it.toParameter()?.let {
+                            this@map[it.name] = it
+                        }
+                        is Document -> it.searchParameters()
+                        is List<*> -> it.forEach {
+                            if (it is Document) it.searchParameters()
+                        }
+                    }
+                }
+            }
+            this@toParameters.searchParameters()
+        }
+        .toSortedMap().values.toSet()
+
 internal fun Document.applyParameters(request: (String) -> String?): Document = apply {
     Document(this).forEach { key, value ->
-        when {
-            value is String && value.startsWith("#") -> {
-                // #name=abc
-                val icn = value.indexOf(':')
-                val ieq = value.indexOf('=')
-                val name = when {
-                    icn == -1 && ieq == -1 -> value.substring(1)
-                    icn != -1 && ieq == -1 -> value.substring(1, icn)
-                    icn == -1 && ieq != -1 -> value.substring(1, ieq)
-                    icn != -1 && ieq != -1 -> value.substring(1, icn)
-                    else -> ""
-                }
-                val operator = when {
-                    icn != -1 && ieq != -1 -> value.substring(icn + 1, ieq)
-                    icn != -1 && ieq == -1 -> value.substring(icn + 1)
-                    else -> ""
-                }
-                val default: String? = when {
-                    ieq != -1 -> value.substring(ieq + 1)
-                    else -> null
-                }
+        when (value) {
+            is String -> value.toParameter()?.let { (name, operator, default) ->
 
                 fun apply(map: (String?) -> Any?) {
                     val mapped = map(request(name) ?: default)
@@ -157,7 +187,7 @@ internal fun Document.applyParameters(request: (String) -> String?): Document = 
                     else -> null
                 }
 
-                if (name.isNotBlank()) when (operator) {
+                when (operator) {
                     "" -> apply { it }
                     "int" -> apply { it?.toLongOrNull() }
                     "num" -> apply { it?.toDoubleOrNull() }
@@ -165,12 +195,12 @@ internal fun Document.applyParameters(request: (String) -> String?): Document = 
                     "date" -> apply { it?.toDate() }
                     "contains" -> apply { it?.let { ".*$it.*".toRegex("i") } }
                     "contains/" -> apply { it?.let { ".*$it.*".toRegex("") } }
-                    "startsWith" -> apply { it?.let { "$it.*".toRegex("i") } }
-                    "startsWith/" -> apply { it?.let { "$it.*".toRegex("") } }
+                    "startsWith" -> apply { it?.let { "^$it.*".toRegex("i") } }
+                    "startsWith/" -> apply { it?.let { "^$it.*".toRegex("") } }
                 }
             }
-            value is Document -> value.applyParameters(request)
-            value is List<*> -> value.forEach {
+            is Document -> value.applyParameters(request)
+            is List<*> -> value.forEach {
                 if (it is Document) it.applyParameters(request)
             }
         }

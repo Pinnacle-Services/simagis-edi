@@ -17,10 +17,14 @@ import com.vaadin.event.ShortcutAction
 import com.vaadin.icons.VaadinIcons
 import com.vaadin.server.ExternalResource
 import com.vaadin.server.Page
+import com.vaadin.server.UserError
 import com.vaadin.shared.ui.ContentMode
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
 import org.bson.Document
+import java.net.URI
+import java.net.URISyntaxException
+import java.net.URLEncoder
 import java.util.*
 
 /**
@@ -30,6 +34,7 @@ import java.util.*
  */
 class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLayout() {
     private val binder = Binder<ClaimQuery>(ClaimQuery::class.java)
+    private val nameField = TextField()
     private val descriptionField = TextField()
     private val queryPanel = HorizontalSplitPanel()
     private lateinit var find: TextArea
@@ -98,15 +103,24 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
             value = current
         }
 
-        fun save(saveAsMode: Boolean = false) {
-            with(binder.validate()) {
-                if (!isOk) {
-                    Notification.show(
-                            "Unable to save invalid values",
-                            beanValidationErrors.map { it.errorMessage }.joinToString(),
-                            Notification.Type.WARNING_MESSAGE)
-                    return
+        fun Binder.BindingBuilder<ClaimQuery, String>.withNameValidator(): Binder.BindingBuilder<ClaimQuery, String>
+                = withValidator(StringLengthValidator("Invalid length of Name", 1, 2048))
+                .withValidator { value, _ ->
+                    when {
+                        value.startsWith("/") -> try {
+                            URI(value)
+                            ValidationResult.ok()
+                        } catch(e: URISyntaxException) {
+                            ValidationResult.error("URL syntax error: " + e.reason)
+                        }
+                        else -> ValidationResult.ok()
+                    }
                 }
+
+        fun save(saveAsMode: Boolean = false) {
+            binder.validate().onError {
+                it.showError("Unable to save invalid values")
+                return
             }
 
             val current = value.copy()
@@ -134,8 +148,12 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
             }
 
             if (current._id == null) {
+                val nameBinder = Binder<ClaimQuery>(ClaimQuery::class.java)
                 val nameField = TextField("Name", current.name).apply {
                     setSizeFull()
+                    nameBinder.forField(this)
+                            .withNameValidator()
+                            .bind("name")
                     focus()
                 }
                 val override = CheckBox("Override").apply { isVisible = false }
@@ -148,22 +166,31 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                         actionType = ConfirmationActionType.PRIMARY,
                         actionCaption = "Save",
                         body = nameEditor) {
-                    current.name = nameField.value
-                    if (override.value) {
-                        insert(true)
-                        true
-                    } else {
-                        val exists = ClaimDb.cq.find(doc { `+`("name", nameField.value) })
-                                .first() != null
-                        if (exists) {
-                            Notification.show(
-                                    """Claim Query "${nameField.value}" already exists""",
-                                    "Use the Override", Notification.Type.HUMANIZED_MESSAGE)
-                            override.isVisible = true
+
+                    val validate = nameBinder.validate()
+                    if (validate.isOk) {
+                        val new = ClaimQuery()
+                        nameBinder.writeBean(new)
+                        current.name = new.name
+                        if (override.value) {
+                            insert(true)
+                            true
                         } else {
-                            insert(false)
+                            val exists = ClaimDb.cq.find(doc { `+`("name", new.name) })
+                                    .first() != null
+                            if (exists) {
+                                showError(
+                                        """Claim Query "${new.name}" already exists""",
+                                        "Use the Override")
+                                override.isVisible = true
+                            } else {
+                                insert(false)
+                            }
+                            !exists
                         }
-                        !exists
+                    } else {
+                        validate.showError("Invalid Name value")
+                        false
                     }
                 }
             } else {
@@ -213,8 +240,12 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 setClickShortcut(ShortcutAction.KeyCode.F2)
                 addClickListener {
                     val current = explorer.cqGrid.selectedItems.first()
+                    val nameBinder = Binder<ClaimQuery>(ClaimQuery::class.java)
                     val nameField = TextField("Name", current.name).apply {
                         setSizeFull()
+                        nameBinder.forField(this)
+                                .withNameValidator()
+                                .bind("name")
                         focus()
                     }
                     val nameEditor = VerticalLayout(nameField).apply {
@@ -229,20 +260,26 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                             body = nameEditor
                     )
                     {
-                        val exists = ClaimDb.cq.find(doc { `+`("name", nameField.value) })
-                                .first() != null
-                        if (exists) {
-                            Notification.show(
-                                    """Claim Query "${nameField.value}" already exists""",
-                                    Notification.Type.HUMANIZED_MESSAGE)
+                        val validate = nameBinder.validate()
+                        if (validate.isOk) {
+                            val new = ClaimQuery()
+                            nameBinder.writeBean(new)
+                            val exists = ClaimDb.cq.find(doc { `+`("name", new.name) })
+                                    .first() != null
+                            if (exists) {
+                                showError("""Claim Query "${new.name}" already exists""")
+                            } else {
+                                current.name = new.name
+                                ClaimDb.cq.updateOne(
+                                        doc(current._id),
+                                        doc { `+$set` { `+`("name", new.name) } })
+                                reload(current)
+                            }
+                            !exists
                         } else {
-                            current.name = nameField.value
-                            ClaimDb.cq.updateOne(doc(current._id), doc {
-                                `+$set` { `+`("name", current.name) }
-                            })
-                            reload(current)
+                            validate.showError("Invalid Name value")
+                            false
                         }
-                        !exists
                     }
                 }
                 isEnabled = false
@@ -274,6 +311,11 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
 
         val descriptionLabel = Label("", ContentMode.HTML).apply {
             widthK1 = size100pc
+        }
+
+        with(nameField) {
+            binder.forField(this)
+                    .bind("name")
         }
 
         with(descriptionField) {
@@ -416,12 +458,29 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
 
     private fun updateURL() = with(ClaimQuery()) {
         val valid = binder.validate().isOk
+        urlLink.componentError = null
         urlLink.isEnabled = valid
         urlText.isEnabled = valid
         if (valid) {
             binder.writeBean(this)
-            urlLink.resource = ExternalResource(href)
-            urlText.value = Page.getCurrent().location.resolve(href).toASCIIString()
+            val href = when {
+                nameField.value.startsWith("/") -> "/query$name?" + toParameters()
+                        .joinToString(separator = "&") {
+                            "${it.name}=${it.default?.let { URLEncoder.encode(it, "UTF-8") } ?: ""}"
+                        }
+                else -> "/claim/$type/=${encode()}?ps=$pageSize"
+            }
+
+            try {
+                val uri = URI(href)
+                urlLink.resource = ExternalResource(href)
+                urlText.value = Page.getCurrent().location.resolve(uri).toASCIIString()
+            } catch(e: URISyntaxException) {
+                urlLink.componentError = UserError("Invalid URL: ${e.reason}")
+                urlLink.isEnabled = false
+                urlLink.resource = ExternalResource("#")
+                urlText.value = href
+            }
         } else {
             urlLink.resource = ExternalResource("#")
             urlText.value = ""

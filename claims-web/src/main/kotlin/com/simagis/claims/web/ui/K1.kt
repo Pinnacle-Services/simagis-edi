@@ -1,7 +1,10 @@
 package com.simagis.claims.web.ui
 
+import com.vaadin.data.BinderValidationStatus
 import com.vaadin.event.ShortcutAction
+import com.vaadin.server.Page
 import com.vaadin.server.Sizeable
+import com.vaadin.shared.Position
 import com.vaadin.shared.ui.MarginInfo
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
@@ -117,3 +120,18 @@ inline var Component.heightK1: SizeableK1
     set(value) {
         setHeight(value.value, value.unit)
     }
+
+fun showError(caption: String, description: String? = null) {
+    Notification(caption, description, Notification.Type.WARNING_MESSAGE).apply {
+        position = Position.TOP_CENTER
+        show(Page.getCurrent())
+    }
+}
+
+fun <BEAN> BinderValidationStatus<BEAN>.showError(caption: String) = showError(
+        caption = caption,
+        description = validationErrors.joinToString(separator = "\n") { it.errorMessage })
+
+inline fun <BEAN> BinderValidationStatus<BEAN>.onError(function: (BinderValidationStatus<BEAN>) -> Unit) {
+    if (!isOk) function(this)
+}
