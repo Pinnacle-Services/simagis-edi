@@ -122,7 +122,13 @@ class ClaimServlet : HttpServlet() {
                 .sort(Document.parse(cq.sort))
                 .apply {
                     paging.found = count().toLong()
-                    paging.ps = cq.pageSize.toLong()
+                    if (paging.isPageable) {
+                        skip((paging.ps * paging.pn).toInt())
+                        limit(paging.ps.toInt())
+                    } else {
+                        paging.ps = cq.pageSize.toLong()
+                        limit(paging.ps.toInt())
+                    }
                 }
     }
 }
