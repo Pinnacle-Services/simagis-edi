@@ -49,6 +49,12 @@ inline fun Document.`+$lt`(key: String, value: Any?): Document = append(key, Doc
 @Suppress("NOTHING_TO_INLINE", "unused")
 inline fun Document.`+$lte`(key: String, value: Any?): Document = append(key, Document(`$`("lte"), value))
 
+@Suppress("NOTHING_TO_INLINE", "unused")
+inline fun Document.`+$regex`(regex: String): Document = append(`$`("regex"), regex)
+
+@Suppress("NOTHING_TO_INLINE", "unused")
+inline fun Document.`+$options`(options: String): Document = append(`$`("options"), options)
+
 @Suppress("unused")
 inline fun Document.`+$set`(build: Document.() -> Unit): Document {
     append(`$` + "set", Document().apply {

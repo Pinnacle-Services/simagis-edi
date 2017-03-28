@@ -2,6 +2,8 @@ package com.simagis.claims.web.ui
 
 import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.claims.rest.api.toJsonObject
+import com.simagis.edi.mdb.`+$options`
+import com.simagis.edi.mdb.`+$regex`
 import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
 import com.vaadin.data.provider.QuerySortOrder
@@ -108,27 +110,63 @@ fun Grid<ClaimQuery>.refresh() = setDataProvider(
         })
 
 
-private val DATE by lazy { SimpleDateFormat("yyyy-MM-dd") }
+private val DATE4 by lazy { SimpleDateFormat("yyyy") }
+private val DATE7 by lazy { SimpleDateFormat("yyyy-MM") }
+private val DATE10 by lazy { SimpleDateFormat("yyyy-MM-dd") }
 
 internal fun Document.applyParameters(request: (String) -> String?): Document = apply {
-    fun get(key: String, map: (String?) -> Any?): Any? = map(request(key))
-    fun getA(key: String, value: String, map: (String?) -> Any?): Any? = map(request(key)
-            ?: value.substringAfter('=', missingDelimiterValue = ""))
-
     Document(this).forEach { key, value ->
         when {
             value is String && value.startsWith("#") -> {
-                when {
-                    value == "#" -> this[key] = get(key) { it }
-                    value == "#int" -> this[key] = get(key) { it?.toLongOrNull() }
-                    value == "#num" -> this[key] = get(key) { it?.toDoubleOrNull() }
-                    value == "#cur" -> this[key] = get(key) { it?.toDoubleOrNull() }
-                    value == "#date" -> this[key] = get(key) { it?.let { DATE.parse(it) } }
-                    value.startsWith("#=") -> this[key] = getA(key, value) { it }
-                    value.startsWith("#int=") -> this[key] = getA(key, value) { it?.toLongOrNull() }
-                    value.startsWith("#num=") -> this[key] = getA(key, value) { it?.toDoubleOrNull() }
-                    value.startsWith("#cur=") -> this[key] = getA(key, value) { it?.toDoubleOrNull() }
-                    value.startsWith("#date=") -> this[key] = getA(key, value) { it?.let { DATE.parse(it) } }
+                // #name=abc
+                val icn = value.indexOf(':')
+                val ieq = value.indexOf('=')
+                val name = when {
+                    icn == -1 && ieq == -1 -> value.substring(1)
+                    icn != -1 && ieq == -1 -> value.substring(1, icn)
+                    icn == -1 && ieq != -1 -> value.substring(1, ieq)
+                    icn != -1 && ieq != -1 -> value.substring(1, icn)
+                    else -> ""
+                }
+                val operator = when {
+                    icn != -1 && ieq != -1 -> value.substring(icn + 1, ieq)
+                    icn != -1 && ieq == -1 -> value.substring(icn + 1)
+                    else -> ""
+                }
+                val default: String? = when {
+                    ieq != -1 -> value.substring(ieq + 1)
+                    else -> null
+                }
+
+                fun apply(map: (String?) -> Any?) {
+                    val mapped = map(request(name) ?: default)
+                    if (mapped != null)
+                        this[key] = mapped else
+                        this.remove(key)
+                }
+
+                fun String.toRegex(options: String): Document = doc {
+                    `+$regex`(this@toRegex)
+                    `+$options`(options)
+                }
+
+                fun String.toDate(): Date? = when(length) {
+                    10 -> DATE10.parse(this)
+                    7 -> DATE7.parse(this)
+                    4 -> DATE4.parse(this)
+                    else -> null
+                }
+
+                if (name.isNotBlank()) when (operator) {
+                    "" -> apply { it }
+                    "int" -> apply { it?.toLongOrNull() }
+                    "num" -> apply { it?.toDoubleOrNull() }
+                    "cur" -> apply { it?.toDoubleOrNull() }
+                    "date" -> apply { it?.toDate() }
+                    "contains" -> apply { it?.let { ".*$it.*".toRegex("i") } }
+                    "contains/" -> apply { it?.let { ".*$it.*".toRegex("") } }
+                    "startsWith" -> apply { it?.let { "$it.*".toRegex("i") } }
+                    "startsWith/" -> apply { it?.let { "$it.*".toRegex("") } }
                 }
             }
             value is Document -> value.applyParameters(request)
