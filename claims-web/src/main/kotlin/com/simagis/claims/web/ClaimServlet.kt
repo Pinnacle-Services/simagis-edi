@@ -12,6 +12,7 @@ import org.bson.Document
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_OK
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import javax.json.Json
 import javax.json.JsonArray
 import javax.json.JsonNumber
@@ -109,6 +110,7 @@ class ClaimServlet : HttpServlet() {
         }
     }
 
+    private val queryCountCache: MutableMap<Document, Long> = ConcurrentHashMap()
     private fun query(request: HttpServletRequest, paging: Paging): FindIterable<Document>? {
         val name = request.pathInfo
         val cq = ClaimDb.cq
@@ -116,12 +118,16 @@ class ClaimServlet : HttpServlet() {
                 .first()
                 ?.toClaimQuery()
                 ?: return null
-        return db.getCollection("claims_${cq.type}")
-                .find(Document.parse(cq.find).applyParameters({ name -> request.getParameter(name) }))
+        val collection = db.getCollection("claims_${cq.type}")
+        val filter = Document.parse(cq.find).applyParameters({ name -> request.getParameter(name) })
+        paging.found = queryCountCache.computeIfAbsent(filter) {
+            collection.count(it)
+        }
+        return collection
+                .find(filter)
                 .projection(Document.parse(cq.projection))
                 .sort(Document.parse(cq.sort))
                 .apply {
-                    paging.found = count().toLong()
                     if (paging.isPageable) {
                         skip((paging.ps * paging.pn).toInt())
                         limit(paging.ps.toInt())
