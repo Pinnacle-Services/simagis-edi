@@ -22,6 +22,8 @@ declare option output:method "json";
     (:Payment:)
     let $payby := $trn/segment[@Id="BPR"]/element[@Id="BPR04"]/text()
     let $paydt := $trn/segment[@Id="BPR"]/element[@Id="BPR16"]/text()
+    let $payacct := $trn/segment[@Id="BPR"]/element[@Id="BPR15"]/text()
+    let $checknum := $trn/segment[@Id="TRN"]/element[@Id="TRN02"]/text()
     (: Sender:)
     let $from_name := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PE"]/element[@Id = "N102"]/text()
     let $from_id := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PE"]/element[@Id = "N104"]/text()
@@ -55,6 +57,8 @@ declare option output:method "json";
             <status>{$status}</status>,
             <procDate-DT8>{$date_tr}</procDate-DT8>,
             <payBy>{$payby}</payBy>,
+            <accNum>{$payacct}</accNum>,
+            <payID>{$checknum}</payID>,            
             <payDate-DT8>{$paydt}</payDate-DT8>,
             <loc>{$loc}</loc>,
             <freq>{$freq}</freq>,     
