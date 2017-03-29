@@ -11,5 +11,7 @@
     {"svc.cpt": 1},
     {"svc.cptAsk": 1},
     {"svc.adj.adjGrp": 1},
-    {"svc.adj.adjReason": 1}
+    {"svc.adj.adjReason": 1},
+    {"clmPayTotal": 1},
+    {"clmPay": 1}
 ]);
