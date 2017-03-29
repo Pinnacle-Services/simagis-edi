@@ -24,6 +24,7 @@ import javax.json.JsonArray
 data class ClaimQuery(
         var _id: Any? = null,
         var name: String = "New Claim Query",
+        var path: String = UUID.randomUUID().toString(),
         var description: String = "",
         var type: String = "835",
         var find: String = "{}",
@@ -48,6 +49,7 @@ data class ClaimQuery(
     fun toDocument(): Document = Document().apply {
         if (_id != null) append("_id", _id)
         append("name", name)
+        append("path", path)
         append("description", description)
         append("type", type)
         append("find", find)
@@ -66,6 +68,7 @@ data class ClaimQuery(
 fun Document.toClaimQuery(): ClaimQuery = ClaimQuery(
         _id = get("_id"),
         name = getString("name") ?: "",
+        path = getString("path") ?: "",
         description = getString("description") ?: "",
         type = getString("type") ?: "Invalid",
         find = getString("find") ?: "{}",
@@ -93,6 +96,7 @@ fun Grid<ClaimQuery>.refresh() = setDataProvider(
                 sortOrder.forEach {
                     when (it.sorted.caption) {
                         "Name" -> `+`("name", it.direction.toInt())
+                        "Path" -> `+`("path", it.direction.toInt())
                         "Type" -> `+`("type", it.direction.toInt())
                         "Created" -> `+`("created", it.direction.toInt())
                         "Modified" -> `+`("modified", it.direction.toInt())

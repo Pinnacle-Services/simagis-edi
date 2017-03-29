@@ -43,11 +43,16 @@ class ClaimServlet : HttpServlet() {
         val servletPath = request.servletPath
         val queryString = request.queryString ?: ""
         val paging = Paging.of(request.parameterMap)
+        val errors = StringBuilder()
 
-        val documents: FindIterable<Document> = (if (servletPath == "/query")
-            query(request, paging) else
+        val documents: FindIterable<Document>? = (if (servletPath == "/query")
+            query(request, paging, errors) else
             find(request, paging))
-                ?: let { response.status = HTTP_NOT_FOUND; return }
+
+        if (documents == null) {
+            response.send(HTTP_NOT_FOUND, errors.toString().toByteArray(), "text/plain")
+            return
+        }
 
         val html = Claims835ToHtml(
                 db = db,
@@ -59,13 +64,16 @@ class ClaimServlet : HttpServlet() {
                         if (!append(document)) return@apply
                     }
                 }
-        val bytes = html.toBytes()
 
-        response.status = HTTP_OK
-        response.contentType = "text/html"
-        response.characterEncoding = "UTF-8"
-        response.setContentLength(bytes.size)
-        response.outputStream.write(bytes)
+        response.send(HTTP_OK, html.toBytes())
+    }
+
+    private fun HttpServletResponse.send(httpStatus: Int, content: ByteArray, contentType: String = "text/html") {
+        this.status = httpStatus
+        this.contentType = contentType
+        this.characterEncoding = "UTF-8"
+        this.setContentLength(content.size)
+        this.outputStream.write(content)
     }
 
     private fun find(request: HttpServletRequest, paging: Paging): FindIterable<Document>? {
@@ -111,18 +119,24 @@ class ClaimServlet : HttpServlet() {
     }
 
     private val queryCountCache: MutableMap<Document, Long> = ConcurrentHashMap()
-    private fun query(request: HttpServletRequest, paging: Paging): FindIterable<Document>? {
-        val name = request.pathInfo
-        val cq = ClaimDb.cq
-                .find(doc { `+`("name", name) })
-                .first()
-                ?.toClaimQuery()
-                ?: return null
+    private fun query(request: HttpServletRequest, paging: Paging, errors: StringBuilder): FindIterable<Document>? {
+        val path = request.pathInfo.removePrefix("/")
+        if (path.isBlank()) return null
+        val cq = ClaimDb.cq.find(doc { `+`("path", path) }).let {
+            when (it.count()) {
+                1 -> it.first()?.toClaimQuery()
+                0 -> null
+                else -> {
+                    errors.append("too many cq path '$path' found:\n")
+                    errors.append(it.joinToString(separator = "\n\n") { it.toJson() })
+                    null
+                }
+            }
+        } ?: return null
+
         val collection = db.getCollection("claims_${cq.type}")
-        val filter = Document.parse(cq.find).applyParameters({ name -> request.getParameter(name) })
-        paging.found = queryCountCache.computeIfAbsent(filter) {
-            collection.count(it)
-        }
+        val filter = Document.parse(cq.find).applyParameters { name -> request.getParameter(name) }
+        paging.found = queryCountCache.computeIfAbsent(filter) { collection.count(it) }
         return collection
                 .find(filter)
                 .projection(Document.parse(cq.projection))

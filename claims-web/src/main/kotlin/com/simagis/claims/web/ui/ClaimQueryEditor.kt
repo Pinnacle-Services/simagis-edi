@@ -15,7 +15,6 @@ import com.vaadin.data.validator.IntegerRangeValidator
 import com.vaadin.data.validator.StringLengthValidator
 import com.vaadin.event.ShortcutAction
 import com.vaadin.icons.VaadinIcons
-import com.vaadin.server.ExternalResource
 import com.vaadin.server.Page
 import com.vaadin.server.UserError
 import com.vaadin.shared.ui.ContentMode
@@ -37,6 +36,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
     private val nameField = TextField()
     private val descriptionField = TextField()
     private val queryPanel = HorizontalSplitPanel()
+    private var value_id: Any? = null
     private lateinit var find: TextArea
 
     var value: ClaimQuery = ClaimQuery()
@@ -46,19 +46,13 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
         }
         set(value) {
             field = value
+            value_id = value._id
             binder.readBean(field)
             updateURL()
         }
 
-    private val urlLink = Link().apply {
-        icon = VaadinIcons.EXTERNAL_LINK
+    private val urlLink = Label("", ContentMode.HTML).apply {
         description = "Open Query Link in new window"
-        targetName = "_blank"
-    }
-
-    private val urlText = TextField().apply {
-        addStyleName(ValoTheme.TEXTFIELD_BORDERLESS)
-        isReadOnly = true
     }
 
     init {
@@ -214,7 +208,6 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 }
             })
 
-
             addComponents(Button("Save").apply {
                 icon = VaadinIcons.SERVER
                 addStyleName(ValoTheme.BUTTON_BORDERLESS)
@@ -330,25 +323,22 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
             margin = margins()
             isSpacing = false
 
-            fun sectionCaption(caption: String) = Label("&nbsp;<b>$caption</b>", ContentMode.HTML)
-
-            fun verticalToolbar(init: VerticalLayout.() -> Unit) = VerticalLayout().apply {
-                margin = margins()
-                isSpacing = false
-                setWidthUndefined()
-                init()
+            fun sectionMenu(): MenuBar = MenuBar().apply {
+                addStyleName(ValoTheme.MENUBAR_BORDERLESS)
+                addStyleName(ValoTheme.MENUBAR_SMALL)
             }
 
+            fun sectionCaption(caption: String, menu: Component? = null) = HorizontalLayout().apply {
+                margin = margins()
+                isSpacing = false
+                defaultComponentAlignment = Alignment.MIDDLE_LEFT
+                addComponent(Label("&nbsp;<b>$caption</b>", ContentMode.HTML))
+                if (menu != null)
+                    addComponent(menu)
+            }
 
-            addComponent(sectionCaption("Description"))
-            addComponent(HorizontalLayout().apply {
-                margin = margins(right = true)
-                addComponent(verticalToolbar {
-                    addComponent(Button().apply {
-                        description = "Edit Description"
-                        icon = VaadinIcons.EDIT
-                        addStyleName(ValoTheme.BUTTON_LINK)
-                        addClickListener {
+            addComponent(sectionCaption("Description", sectionMenu().apply {
+                addItem("", null).addItem("Edit", VaadinIcons.EDIT, MenuBar.Command {
                             val richTextArea = RichTextArea().apply {
                                 value = descriptionField.value
                                 widthK1 = size100pc
@@ -362,91 +352,101 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                                 descriptionField.value = richTextArea.value
                                 true
                             }
-                        }
-                    })
                 })
-                addComponentsAndExpand(descriptionLabel)
+            }))
+            addComponent(VerticalLayout().apply {
+                margin = margins(left = true)
+                setSizeUndefined()
+                addComponent(descriptionLabel)
             })
 
-            addComponent(sectionCaption("Query"))
+            addComponent(sectionCaption("Link"))
+            addComponent(VerticalLayout().apply {
+                margin = margins(left = true)
+                isSpacing = false
+                addComponent(urlLink)
+                addComponent(Link())
+            })
 
-            addComponentsAndExpand(HorizontalLayout().apply {
+            val codeMenu = sectionMenu()
+            addComponent(sectionCaption("Code", codeMenu))
+            addComponentsAndExpand(VerticalLayout().apply {
                 margin = margins()
 
-                addComponent(verticalToolbar {
-                    addComponents(Button().apply {
-                        description = "Build Query URL"
-                        icon = VaadinIcons.PLAY
-                        addStyleName(ValoTheme.BUTTON_LINK)
-                        setClickShortcut(ShortcutAction.KeyCode.F9)
-                        addClickListener {
-                            updateURL()
-                            urlText.focus()
-                            urlText.selectAll()
-                        }
-                    })
-                    addComponents(Button().apply {
-                        description = "Reformat Code"
-                        icon = VaadinIcons.CURLY_BRACKETS
-                        addStyleName(ValoTheme.BUTTON_LINK)
-                        setClickShortcut(
-                                ShortcutAction.KeyCode.N,
-                                ShortcutAction.ModifierKey.CTRL,
-                                ShortcutAction.ModifierKey.ALT)
-                        addClickListener {
-                            jsonTextAreaCurrent?.let {
-                                it.value = it.value.toJsonFormatted()
-                                it.focus()
-                            }
-                        }
-                    })
-                })
-
-                addComponentsAndExpand(VerticalLayout().apply {
-                    margin = margins()
-                    isSpacing = false
-                    addComponent(HorizontalLayout().apply {
+                val sectionContent = VerticalLayout().apply {
+                    margin = margins(left = true)
+                    addComponentsAndExpand(VerticalLayout().apply {
                         margin = margins()
                         isSpacing = false
-                        defaultComponentAlignment = Alignment.MIDDLE_LEFT
-                        addComponent(urlLink)
-                        addComponentsAndExpand(urlText)
-                    })
+                        addComponentsAndExpand(queryPanel.apply {
+                            firstComponent = VerticalLayout().apply {
+                                setSizeFull()
+                                margin = margins(right = true, bottom = true)
+                                addComponents(
+                                        jsonTextArea("find").apply { find = this; focus() },
+                                        jsonTextArea("sort"))
+                            }
+                            secondComponent = VerticalLayout().apply {
+                                setSizeFull()
+                                margin = margins(left = true, right = true, bottom = true)
+                                addComponentsAndExpand(
+                                        jsonTextArea("projection", false).apply { heightK1 = size100pc })
+                                addComponents(
+                                        ComboBox<String>("EDI Document Type").apply {
+                                            setItems("835", "837")
+                                            isEmptySelectionAllowed = false
+                                            isTextInputAllowed = false
+                                            binder.forField(this)
+                                                    .bind("type")
 
-                    addComponentsAndExpand(queryPanel.apply {
-                        firstComponent = VerticalLayout().apply {
-                            setSizeFull()
-                            margin = margins(right = true, bottom = true)
-                            addComponents(
-                                    jsonTextArea("find").apply { find = this; focus() },
-                                    jsonTextArea("sort"))
-                        }
-                        secondComponent = VerticalLayout().apply {
-                            setSizeFull()
-                            margin = margins(left = true, right = true, bottom = true)
-                            addComponentsAndExpand(
-                                    jsonTextArea("projection", false).apply { heightK1 = size100pc })
-                            addComponents(
-                                    ComboBox<String>("EDI Document Type").apply {
-                                        setItems("835", "837")
-                                        isEmptySelectionAllowed = false
-                                        isTextInputAllowed = false
-                                        binder.forField(this)
-                                                .bind("type")
+                                        },
+                                        TextField("Page Size").apply {
+                                            binder.forField(this)
+                                                    .withValidator(StringLengthValidator("Must enter a number 1-100", 1, 3))
+                                                    .withConverter(StringToIntegerConverter("Must enter a number"))
+                                                    .withValidator(IntegerRangeValidator("Out of range", 1, 100))
+                                                    .bind("pageSize")
+                                        },
+                                        TextField("URL Path").apply {
+                                            widthK1 = size100pc
+                                            binder.forField(this)
+                                                    .bind("path")
+                                        }
+                                )
+                            }
+                        })
+                    })
+                }
 
-                                    },
-                                    TextField("Page Size").apply {
-                                        binder.forField(this)
-                                                .withValidator(StringLengthValidator("Must enter a number 1-100", 1, 3))
-                                                .withConverter(StringToIntegerConverter("Must enter a number"))
-                                                .withValidator(IntegerRangeValidator("Out of range", 1, 100))
-                                                .bind("pageSize")
-                                    })
+                codeMenu.addItem("", null).apply {
+                    val itemsOnEdit = mutableListOf<MenuBar.MenuItem>()
+                    fun updateVisibility() {
+                        val isCodeSectionOpen = componentCount > 0
+                        itemsOnEdit.forEach {
+                            it.isVisible = isCodeSectionOpen
+                        }
+                    }
+                    addItem("Show") {
+                        when (componentCount) {
+                            0 -> addComponentsAndExpand(sectionContent)
+                            else -> removeAllComponents()
+                        }
+                        it.text = when (componentCount) {
+                            0 -> "Show"
+                            else -> "Hide"
+                        }
+                        updateVisibility()
+                    }
+                    itemsOnEdit += addSeparator()
+                    itemsOnEdit += addItem("Reformat Code", VaadinIcons.CURLY_BRACKETS, MenuBar.Command {
+                        jsonTextAreaCurrent?.let {
+                            it.value = it.value.toJsonFormatted()
+                            it.focus()
                         }
                     })
-                })
-            }
-            )
+                    updateVisibility()
+                }
+            })
         }
 
         addComponent(toolbar)
@@ -460,11 +460,14 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
         val valid = binder.validate().isOk
         urlLink.componentError = null
         urlLink.isEnabled = valid
-        urlText.isEnabled = valid
+        fun URI.toHtml() = """<a
+            target="_blank"
+            href="${toASCIIString()}"
+            >${toString()}&nbsp;${VaadinIcons.EXTERNAL_LINK.html}</a>"""
         if (valid) {
             binder.writeBean(this)
             val href = when {
-                nameField.value.startsWith("/") -> "/query$name?" + toParameters()
+                path.isNotBlank() && value_id != null -> "/query/$path?" + toParameters()
                         .joinToString(separator = "&") {
                             "${it.name}=${it.default?.let { URLEncoder.encode(it, "UTF-8") } ?: ""}"
                         }
@@ -473,17 +476,14 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
 
             try {
                 val uri = URI(href)
-                urlLink.resource = ExternalResource(href)
-                urlText.value = Page.getCurrent().location.resolve(uri).toASCIIString()
+                urlLink.value = Page.getCurrent().location.resolve(uri).toHtml()
             } catch(e: URISyntaxException) {
                 urlLink.componentError = UserError("Invalid URL: ${e.reason}")
                 urlLink.isEnabled = false
-                urlLink.resource = ExternalResource("#")
-                urlText.value = href
+                urlLink.value = URI("#").toHtml()
             }
         } else {
-            urlLink.resource = ExternalResource("#")
-            urlText.value = ""
+            urlLink.value = URI("#").toHtml()
         }
     }
 }
