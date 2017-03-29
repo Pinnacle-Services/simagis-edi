@@ -10,6 +10,8 @@
   {"key": "clmPay", "name": "Claim Insurance Payment"},
   {"key": "payBy", "name": "Payment Method"},
   {"key": "payDate", "name": "Date of Payment"},
+  {"key": "accNum", "name": "Bank Account"},
+  {"key": "checknum", "name": "Check Number or Wire ID"},  
   {"key": "pr", "name": "Claim Patient Responsibility"},
   {"key": "clmPayTotal", "name": "Total Approved Claim Amount"},
   {"key": "c837", "name": "Referring Provider Information"},
