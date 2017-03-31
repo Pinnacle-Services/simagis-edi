@@ -3,15 +3,10 @@
   {"key": "prid", "name": "Payer ID"},
   {"key": "prn", "name": "Payer Name"},
   {"key": "ref", "name": "Processing Reference"},
-  {"key": "freq", "name": "Submission Frequency"},
   {"key": "procDate", "name": "Adjudication Date"},
   {"key": "status", "name": "Processing Status"},
   {"key": "clmAsk", "name": "Claim Bill Amount"},
   {"key": "clmPay", "name": "Claim Insurance Payment"},
-  {"key": "payBy", "name": "Payment Method"},
-  {"key": "payDate", "name": "Date of Payment"},
-  {"key": "accNum", "name": "Bank Account"},
-  {"key": "checknum", "name": "Check Number or Wire ID"},  
   {"key": "pr", "name": "Claim Patient Responsibility"},
   {"key": "clmPayTotal", "name": "Total Approved Claim Amount"},
   {"key": "c837", "name": "Referring Provider Information"},
@@ -37,5 +32,10 @@
   {"key": "frmid", "name": "Bill From ID"},
   {"key": "frmn", "name": "Bill From Name"},
   {"key": "loc", "name": "Service Location"},
-  {"key": "fCode", "name": "Filing Code"}
+  {"key": "fCode", "name": "Filing Code"},
+  {"key": "freq", "name": "Submission Frequency"},
+  {"key": "payBy", "name": "Payment Method"},
+  {"key": "payDate", "name": "Date of Payment"},
+  {"key": "accNum", "name": "Bank Account"},
+  {"key": "payID", "name": "Check Number or Wire ID"}  
 ]
