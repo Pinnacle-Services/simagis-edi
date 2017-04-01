@@ -10,18 +10,18 @@ import java.util.concurrent.Future
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/17/2017.
  */
-object JobManager {
-    private fun Document.toJob(): Job = Job.of(this)
+object RJobManager {
+    private fun Document.toJob(): RJob = RJob.of(this)
 
-    fun insert(job: Job) {
+    fun insert(job: RJob) {
         ClaimDb.apiJobs.insertOne(job.toDoc())
     }
 
-    fun replace(job: Job): UpdateResult = ClaimDb.apiJobs.replaceOne(Document("_id", job.id), job.toDoc())
+    fun replace(job: RJob): UpdateResult = ClaimDb.apiJobs.replaceOne(Document("_id", job.id), job.toDoc())
 
-    operator fun get(id: String): Job? = find { append("_id", id) }.firstOrNull()?.toJob()
+    operator fun get(id: String): RJob? = find { append("_id", id) }.firstOrNull()?.toJob()
 
-    fun find(status: JobStatus? = null, filter: Document.() -> Unit = {}): FindIterable<Document> = ClaimDb.apiJobs
+    fun find(status: RJobStatus? = null, filter: Document.() -> Unit = {}): FindIterable<Document> = ClaimDb.apiJobs
             .find(Document().apply {
                 if (status != null) append("status", status.name)
                 filter()

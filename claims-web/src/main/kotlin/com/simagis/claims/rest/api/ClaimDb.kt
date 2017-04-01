@@ -4,8 +4,11 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.CreateCollectionOptions
 import com.simagis.edi.mdb.MDBCredentials
+import com.simagis.edi.mdb.`+`
+import com.simagis.edi.mdb.doc
 import org.bson.Document
-import java.io.ByteArrayOutputStream
+import org.bson.json.JsonMode
+import org.bson.json.JsonWriterSettings
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.concurrent.ExecutorService
@@ -46,34 +49,25 @@ internal fun JsonObject?.toStringPP(): String = when {
     else -> StringWriter().use { jsonPP.createWriter(it).write(this); it.toString().trim() }
 }
 
-
-internal fun JsonObject?.toByteArray(): ByteArray = when {
-    this == null -> emptyJsonByteArray
-    else -> ByteArrayOutputStream().use { jsonPP.createWriter(it).write(this); it }.toByteArray()
-}
-
-
-internal val emptyJsonByteArray = "{}".toByteArray()
-internal val emptyJson = Json.createObjectBuilder().build()
-
-internal fun JsonObject?.toDocument(): Document? = if (this == null) null else Document.parse(toString())
-
-internal fun Document?.toJsonObject(): JsonObject? = if (this == null) null else Json.createReader(toJson().reader()).readObject()
-
 internal fun String.toJsonObject(): JsonObject = Json.createReader(reader()).readObject()
 
-internal fun Throwable?.toErrorJsonObject(uuid: String? = null): JsonObject? = if (this == null) null else Json.createObjectBuilder()
-        .also {
-            it.add("errorClass", this.javaClass.name)
-            it.add("message", message)
-            it.add("stackTrace", Json.createArrayBuilder().also { array ->
-                StringWriter().let {
-                    PrintWriter(it).use { printStackTrace(it) }
-                    it.toString().lines().forEach { array.add(it) }
-                }
-            })
-            if (uuid != null) it.add("uuid", uuid)
-        }.build()
+internal fun Document.appendError(e: Throwable, uuid: String? = null) {
+    `+`("error", doc {
+        `+`("errorClass", e.javaClass.name)
+        `+`("message", e.message)
+        `+`("stackTrace", StringWriter().let {
+            PrintWriter(it).use { e.printStackTrace(it) }
+            it.toString().lines()
+        })
+        uuid?.let { `+`("uuid", it) }
+    })
+}
+
+private val jsonWriterSettingsPP by lazy { JsonWriterSettings(JsonMode.STRICT, true) }
+internal fun Document?.toStringPP(): String = when {
+    this == null -> "{}"
+    else -> toJson(jsonWriterSettingsPP)
+}
 
 private fun MongoDatabase.openCappedCollection(collectionName: String,
                                                maxDocuments: Long = 10000,

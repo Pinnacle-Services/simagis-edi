@@ -1,13 +1,13 @@
 package com.simagis.claims.rest.api.jobs
 
 import com.simagis.claims.rest.api.*
+import com.simagis.edi.mdb.doc
 import org.bson.Document
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
-import javax.json.JsonObject
 import kotlin.concurrent.withLock
 
 /**
@@ -17,10 +17,11 @@ import kotlin.concurrent.withLock
 class Import private constructor(
         id: String = UUID.randomUUID().toString(),
         created: Date = Date(),
-        status: JobStatus = JobStatus.NEW,
-        error: JsonObject? = null,
+        status: RJobStatus = RJobStatus.NEW,
+        options: Document = doc {},
+        error: Document? = null,
         private var onDone: ((Import) -> Unit)? = null
-) : Job(id, created, status, error) {
+) : RJob(id, created, status, options, error) {
 
     private class Running(
             val id: String,
@@ -29,22 +30,23 @@ class Import private constructor(
     ) {
         private val isKillingA = AtomicBoolean(false)
         private val isAliveA = AtomicBoolean(false)
-        val isAlive: Boolean get() = isAliveA.get()
-        val session = UUID.randomUUID().toString()
+        internal val isAlive: Boolean get() = isAliveA.get()
 
         fun start(job: Import) {
             isAliveA.set(true)
-            future = JobManager.submit(Callable<Unit> {
+            future = RJobManager.submit(Callable<Unit> {
                 try {
+                    fun loadCommand(): JavaProcess.Command = JavaProcess.Command.load(TYPE).apply {
+                        parameters += "-host" to ClaimDb.mongoHost
+                        parameters += "-job" to id
+                    }
                     while (true) {
                         val process = JavaProcess
-                                .start(job.loadCommand().apply {
-                                    parameters += "-restartable" to session
-                                })
+                                .start(loadCommand())
                                 .also { process = it }
 
-                        job.status = JobStatus.RUNNING
-                        JobManager.replace(job)
+                        job.status = RJobStatus.RUNNING
+                        RJobManager.replace(job)
 
                         process.waitFor()
                         val exitValue = process.exitValue()
@@ -52,16 +54,18 @@ class Import private constructor(
                             continue
                         }
                         job.status = when (exitValue) {
-                            0 -> JobStatus.DONE
-                            else -> JobStatus.ERROR
+                            0 -> RJobStatus.DONE
+                            else -> RJobStatus.ERROR
                         }
-                        JobManager.replace(job)
+                        RJobManager.replace(job)
                         break
                     }
                 } catch(e: Throwable) {
-                    job.status = JobStatus.ERROR
-                    job.error = e.toErrorJsonObject()
-                    JobManager.replace(job)
+                    job.status = RJobStatus.ERROR
+                    job.error = doc {
+                        appendError(e)
+                    }
+                    RJobManager.replace(job)
                 } finally {
                     isAliveA.set(false)
                     job.onDone?.let { it(job) }
@@ -73,10 +77,13 @@ class Import private constructor(
             isKillingA.set(true)
             future?.cancel(false)
             process?.destroy()
-            future?.get()
+            future?.let { if (!it.isCancelled) it.get() }
             return !isAlive
         }
     }
+
+    override fun kill(): Boolean = lock.withLock { running[id] }?.kill()
+            ?: throw ClaimDbApiException("The job $id isn't running")
 
     companion object {
         val TYPE: String = "Import"
@@ -85,18 +92,20 @@ class Import private constructor(
         private val running: MutableMap<String, Running> = mutableMapOf()
         private val lock = ReentrantLock()
 
-        fun start(onDone: ((Import) -> Unit)? = null): Import = Import(onDone = onDone).apply {
+        fun start(options: Document = doc {}, onDone: ((Import) -> Unit)? = null): Import = Import(
+                options = options,
+                onDone = onDone).apply {
             val runningNew = lock.withLock {
-                Companion.running.values.forEach {
+                running.values.forEach {
                     if (it.isAlive) {
                         throw ClaimDbApiException("Import already running by job ${it.id}")
                     }
                 }
                 Running(id).apply {
-                    Companion.running[id] = this
+                    running[id] = this
                 }
             }
-            JobManager.insert(this)
+            RJobManager.insert(this)
             runningNew.start(this)
         }
 
@@ -107,13 +116,8 @@ class Import private constructor(
                 id = document.req("_id"),
                 created = document.req("created"),
                 status = enumValueOf(document.req("status")),
-                error = (document["error"] as? Document?)?.toJsonObject()
+                options = document["options"] as? Document ?: doc {},
+                error = document["error"] as? Document
         )
-    }
-
-    override fun kill(): Boolean = Companion.running[id]?.kill() ?: throw ClaimDbApiException("The job $id isn't running")
-
-    private fun loadCommand(): JavaProcess.Command = JavaProcess.Command.load("Import").apply {
-        parameters += "-host" to ClaimDb.mongoHost
     }
 }
