@@ -92,8 +92,8 @@ private object ImportJob {
                 val claimType = (claimTypes[type] as? Document) ?: Document()
                 ClaimType(
                         type = type,
-                        importTo = claimType["importTo"] as? String ?: "claims_$type.new",
-                        renameTo = claimType["renameTo"] as? String ?: "claims_$type",
+                        importTo = claimType["importTo"] as? String ?: "claims_$type.temp",
+                        renameTo = claimType["renameTo"] as? String ?: "claims_$type.target",
                         createIndexes = claimType["createIndexes"] as? Boolean ?: true
                 )
             }
