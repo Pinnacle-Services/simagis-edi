@@ -491,6 +491,15 @@ private class MFiles {
                             ImportJob.apiJobs.updateOne(ImportJob.jobFilter, doc {
                                 `+$set` { `+`("processing", doc { `+`("started", Date()) }) }
                             })
+                            val collectionNames = ImportJob.data.listCollectionNames()
+                            ImportJob.options.claimTypes.types
+                                    .map { ImportJob.options.claimTypes[it] }
+                                    .filter { collectionNames.contains(it.importTo) }
+                                    .forEach {
+                                        warning("${it.importToCollection.namespace}.drop()")
+                                        it.importToCollection.drop()
+                                    }
+
                         } else {
                             info("continue processing")
                         }
