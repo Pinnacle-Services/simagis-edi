@@ -2,6 +2,7 @@ package com.simagis.edi.mongodb
 
 import com.berryworks.edireader.EDISyntaxException
 import com.mongodb.ErrorCategory
+import com.mongodb.MongoNamespace
 import com.mongodb.MongoWriteException
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
@@ -53,8 +54,8 @@ private typealias DocumentCollection = MongoCollection<Document>
 private object ImportJob {
     lateinit var host: String
     lateinit var jobId: String
-    private lateinit var api: MongoDatabase
-    private lateinit var data: MongoDatabase
+    lateinit var api: MongoDatabase
+    lateinit var data: MongoDatabase
 
     val apiJobs: DocumentCollection by lazy { api.getCollection("apiJobs") }
     val apiJobsLog: DocumentCollection by lazy { api.getCollection("apiJobsLog") }
@@ -78,16 +79,35 @@ private object ImportJob {
                 }
             }
         }
-        val claimsCollectionFormat: String by lazy { (options["claimsCollectionFormat"] as? String) ?: "claims_new_%s" }
         val restartMemoryLimit: Long by lazy { (options["restartMemoryLimit"] as? Number)?.toLong() ?: 500 * 1024 * 1024 }
         val restartMaxDurationM: Long by lazy { (options["restartMaxDurationM"] as? Number)?.toLong() ?: 60 }
-    }
 
-    object claims {
-        private val cache: MutableMap<String, DocumentCollection> = ConcurrentHashMap()
+        object claimTypes {
+            private val claimTypes: Document by lazy { options["claimTypes"] as? Document ?: Document() }
+            private val cache: MutableMap<String, ClaimType> = ConcurrentHashMap()
 
-        operator fun get(type: String): DocumentCollection = cache.computeIfAbsent(type) {
-            data.getCollection(options.claimsCollectionFormat.format(type))
+            val types: Set<String> get() = claimTypes.keys
+
+            operator fun get(type: String): ClaimType = cache.computeIfAbsent(type) {
+                val claimType = (claimTypes[type] as? Document) ?: Document()
+                ClaimType(
+                        type = type,
+                        importTo = claimType["importTo"] as? String ?: "claims_$type.new",
+                        renameTo = claimType["renameTo"] as? String ?: "claims_$type",
+                        createIndexes = claimType["createIndexes"] as? Boolean ?: true
+                )
+            }
+
+        }
+
+        data class ClaimType(
+                val type: String,
+                val importTo: String,
+                val renameTo: String,
+                val createIndexes: Boolean) {
+            val importToCollection: DocumentCollection by lazy { data.getCollection(importTo) }
+            val renameToCollection: DocumentCollection by lazy { data.getCollection(renameTo) }
+            val renameToCollectionExists: Boolean by lazy { data.listCollectionNames().contains(renameTo) }
         }
     }
 
@@ -296,8 +316,9 @@ fun main(args: Array<String>) {
                 if (claims != null) {
                     isaCount.incrementAndGet()
                     claims.forEach {
-                        if (it is JsonObject) {
-                            val collection = ImportJob.claims[isa.type]
+                        val claimType = ImportJob.options.claimTypes[isa.type]
+                        if (claimType.importTo.isNotBlank() && it is JsonObject) {
+                            val collection = claimType.importToCollection
                             val document = Document.parse(it.toString()).prepare()
                             try {
                                 fun Document.inRange(start: Date?) = when (isa.type) {
@@ -345,9 +366,47 @@ fun main(args: Array<String>) {
 
         val done = importing.upload()
         threads.forEach(Thread::join)
-        info("DONE for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
-        if (!done) {
-            warning("RESTARTING")
+        if (done) {
+            fun ImportJob.options.ClaimType.createIndexes() {
+                info("createIndexes for $this")
+                if (importTo.isNotBlank()) {
+                    (Document.parse(ImportJob::class.java
+                            .getResourceAsStream("$type.createIndexes.json")
+                            .use { it.reader().readText() })
+                            ["indexes"] as? List<*>)
+                            ?.forEach {
+                                if (it is Document) {
+                                    info("$importTo.createIndex(${it.toJson()})")
+                                    importToCollection.createIndex(it)
+                                }
+                            }
+                }
+            }
+            ImportJob.options.claimTypes.types
+                    .map { ImportJob.options.claimTypes[it] }
+                    .filter { it.createIndexes }
+                    .forEach { it.createIndexes() }
+
+            fun ImportJob.options.ClaimType.renameTo() {
+                info("renameTo for $this")
+                if (renameTo.isNotBlank()) {
+                    if (renameToCollectionExists) {
+                        renameToCollection.renameCollection(
+                                MongoNamespace(ImportJob.data.name, renameTo
+                                        + ".backup." + SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSSS").format(Date()))
+                        )
+                    }
+                    importToCollection.renameCollection(MongoNamespace(ImportJob.data.name, renameTo))
+                }
+            }
+            ImportJob.options.claimTypes.types
+                    .map { ImportJob.options.claimTypes[it] }
+                    .filter { it.renameTo.isNotEmpty() }
+                    .forEach { it.renameTo() }
+
+            info("DONE for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
+        } else {
+            warning("RESTARTING for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
             exitProcess(302)
         }
     } catch(e: Throwable) {

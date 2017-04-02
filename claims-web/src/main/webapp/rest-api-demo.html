@@ -32,32 +32,38 @@
             xqDir: "isa-claims-xq",
             parallel: 8,
             after: "2014-01-01",
-            claimsCollectionFormat: "claims_new_%s"
+            claimTypes: {
+                "835": {importTo: "claims_835.new", renameTo: "claims_835", createIndexes: true},
+                "837": {importTo: "claims_837.new", renameTo: "claims_837", createIndexes: true}
+            }
         }
     </script>
 </head>
-<body onload="e('startImportOptions').value = JSON.stringify(defaultStartImportOptions, undefined, 4)">
+<body style="font-family:monospace"
+      onload="e('startImportOptions').value = JSON.stringify(defaultStartImportOptions, undefined, 4)">
 <table width="100%">
     <tr>
         <td nowrap valign="top">
-            <a href="#" onclick="POST('/api/jobs', {status: 'NEW'})">api/jobs {status: 'NEW'}</a><br>
-            <a href="#" onclick="POST('/api/jobs', {status: 'RUNNING'})">api/jobs {status: 'RUNNING'}</a><br>
-            <a href="#" onclick="POST('/api/jobs', {status: 'DONE'})">api/jobs {status: 'DONE'}</a><br>
-            <a href="#" onclick="POST('/api/jobs', {status: 'ERROR'})">api/jobs {status: 'ERROR'}</a><br>
-            <a href="#" onclick="POST('/api/jobs', {})">api/jobs {}</a><br>
-            <a href="#" onclick="POST('/api/job', {id: e('jobId').value})">api/job {id: "</a><input id="jobId"
-                                                                                              style="width: 32em"
-                                                                                              type="text"
-                                                                                              title="job._id">"}<br>
-            <a href="#" onclick="POST('/api/kill', {id: e('killId').value})">api/kill  {id: "</a><input id="killId"
-                                                                                                 style="width: 32em"
-                                                                                                 type="text"
-                                                                                                 title="job._id">"}<br>
+            <a href="#" onclick="POST('/api/jobs', {})">api/jobs</a> {}<br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'NEW'})">api/jobs</a> {status: 'NEW'}<br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'RUNNING'})">api/jobs</a> {status: 'RUNNING'}<br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'DONE'})">api/jobs</a> {status: 'DONE'}<br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'ERROR'})">api/jobs</a> {status: 'ERROR'}<br>
+            <hr>
+            <a href="#" onclick="POST('/api/job', {id: e('jobId').value})">api/job</a> {id: "<input id="jobId"
+                                                                                                    style="width: 32em"
+                                                                                                    type="text"
+                                                                                                    title="job._id">"}<br>
+            <a href="#" onclick="POST('/api/kill', {id: e('killId').value})">api/kill</a> {id: "<input id="killId"
+                                                                                                       style="width: 32em"
+                                                                                                       type="text"
+                                                                                                       title="job._id">"}<br>
         </td>
         <td width="100%" valign="top">
-            <a href="#" onclick="POST('/api/start', {type: 'Import', options:JSON.parse(e('startImportOptions').value)})">api/start
-                {type: 'Import', options: </a><br>
-                <textarea cols="64" rows="8" id="startImportOptions" title="json">{}</textarea>}
+            <a href="#"
+               onclick="POST('/api/start', {type: 'Import', options:JSON.parse(e('startImportOptions').value)})"
+            >api/start</a> {type: 'Import', options:<br>
+                <textarea cols="64" rows="20" id="startImportOptions" title="json">{}</textarea>}
         </td>
     </tr>
 </table>
