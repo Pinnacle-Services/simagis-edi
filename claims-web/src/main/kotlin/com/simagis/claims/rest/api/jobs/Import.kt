@@ -45,27 +45,22 @@ class Import private constructor(
                                 .start(loadCommand())
                                 .also { process = it }
 
-                        job.status = RJobStatus.RUNNING
-                        RJobManager.replace(job)
+                        RJobManager.update(job.apply { status = RJobStatus.RUNNING }, "status")
 
                         process.waitFor()
                         val exitValue = process.exitValue()
                         if (exitValue == RESTART_CODE && !isKillingA.get()) {
                             continue
                         }
-                        job.status = when (exitValue) {
-                            0 -> RJobStatus.DONE
-                            else -> RJobStatus.ERROR
-                        }
-                        RJobManager.replace(job)
+                        if (exitValue != 0) throw ClaimDbApiException("Invalid exitValue: $exitValue")
+                        RJobManager.update(job.apply { status = RJobStatus.DONE }, "status")
                         break
                     }
                 } catch(e: Throwable) {
-                    job.status = RJobStatus.ERROR
-                    job.error = doc {
-                        appendError(e)
-                    }
-                    RJobManager.replace(job)
+                    RJobManager.update(job.apply {
+                        status = RJobStatus.ERROR
+                        error = doc { appendError(e) }
+                    }, "status", "error")
                 } finally {
                     isAliveA.set(false)
                     job.onDone?.let { it(job) }

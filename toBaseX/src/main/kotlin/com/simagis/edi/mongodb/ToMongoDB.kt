@@ -69,7 +69,15 @@ private object ImportJob {
         val scanMode: String by lazy { (options["scanMode"] as? String) ?: "R" }
         val xqDir: File by lazy { (options["xqDir"] as? String)?.let(::File) ?: File("isa-claims-xq") }
         val parallel: Int by lazy { (options["parallel"] as? Int) ?: Runtime.getRuntime().availableProcessors() }
-        val after: Date?  by lazy { (options["after"] as? Date) }
+        val after: Date?  by lazy {
+            options["after"]?.let {
+                when (it) {
+                    is Date -> it
+                    is String -> java.sql.Date.valueOf(it)
+                    else -> null
+                }
+            }
+        }
         val claimsCollectionFormat: String by lazy { (options["claimsCollectionFormat"] as? String) ?: "claims_new_%s" }
         val restartMemoryLimit: Long by lazy { (options["restartMemoryLimit"] as? Number)?.toLong() ?: 500 * 1024 * 1024 }
         val restartMaxDurationM: Long by lazy { (options["restartMaxDurationM"] as? Number)?.toLong() ?: 60 }

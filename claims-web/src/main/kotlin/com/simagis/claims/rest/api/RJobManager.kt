@@ -1,7 +1,9 @@
 package com.simagis.claims.rest.api
 
 import com.mongodb.client.FindIterable
-import com.mongodb.client.result.UpdateResult
+import com.simagis.edi.mdb.`+$set`
+import com.simagis.edi.mdb.`+`
+import com.simagis.edi.mdb.doc
 import org.bson.Document
 import java.util.concurrent.Callable
 import java.util.concurrent.Future
@@ -17,8 +19,6 @@ object RJobManager {
         ClaimDb.apiJobs.insertOne(job.toDoc())
     }
 
-    fun replace(job: RJob): UpdateResult = ClaimDb.apiJobs.replaceOne(Document("_id", job.id), job.toDoc())
-
     operator fun get(id: String): RJob? = find { append("_id", id) }.firstOrNull()?.toJob()
 
     fun find(status: RJobStatus? = null, filter: Document.() -> Unit = {}): FindIterable<Document> = ClaimDb.apiJobs
@@ -28,5 +28,23 @@ object RJobManager {
             })
 
     fun submit(callable: Callable<Unit>): Future<Unit> = ClaimDb.ex1.submit(callable)
+
+    fun update(job: RJob, vararg names: String) {
+        if (names.isNotEmpty()) {
+            ClaimDb.apiJobs.updateOne(doc(job.id), doc {
+                `+$set` {
+                    names.forEach { name ->
+                        `+`(name, when (name) {
+                            "created" -> job.created
+                            "status" -> job.status.name
+                            "options" -> job.options
+                            "error" -> job.error
+                            else -> null
+                        })
+                    }
+                }
+            })
+        }
+    }
 }
 

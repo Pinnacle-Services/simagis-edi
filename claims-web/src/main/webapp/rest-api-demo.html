@@ -1,0 +1,67 @@
+<html>
+<head>
+    <title>REST API Demo</title>
+    <script type="text/javascript">
+        function e(id) {
+            return document.getElementById(id);
+        }
+        function toLogger(xhr) {
+            return function () {
+                if (xhr.readyState === 4) {
+                    var log = e("apiLog");
+                    if (xhr.status === 200) {
+                        log.innerText = xhr.responseText + "\n";
+                    } else {
+                        log.innerText = "ERROR response status: " + xhr.status + "\n";
+                        log.innerText += xhr.responseText + "\n";
+                    }
+                }
+            }
+        }
+        function POST(url, json) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = toLogger(xhr);
+            xhr.send(JSON.stringify(json));
+        }
+
+        var defaultStartImportOptions = {
+            sourceDir: "/DATA/sourceFiles",
+            scanMode: "R",
+            xqDir: "isa-claims-xq",
+            parallel: 8,
+            after: "2014-01-01",
+            claimsCollectionFormat: "claims_new_%s"
+        }
+    </script>
+</head>
+<body onload="e('startImportOptions').value = JSON.stringify(defaultStartImportOptions, undefined, 4)">
+<table width="100%">
+    <tr>
+        <td nowrap valign="top">
+            <a href="#" onclick="POST('/api/jobs', {status: 'NEW'})">api/jobs {status: 'NEW'}</a><br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'RUNNING'})">api/jobs {status: 'RUNNING'}</a><br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'DONE'})">api/jobs {status: 'DONE'}</a><br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'ERROR'})">api/jobs {status: 'ERROR'}</a><br>
+            <a href="#" onclick="POST('/api/jobs', {})">api/jobs {}</a><br>
+            <a href="#" onclick="POST('/api/job', {id: e('jobId').value})">api/job {id: "</a><input id="jobId"
+                                                                                              style="width: 32em"
+                                                                                              type="text"
+                                                                                              title="job._id">"}<br>
+            <a href="#" onclick="POST('/api/kill', {id: e('killId').value})">api/kill  {id: "</a><input id="killId"
+                                                                                                 style="width: 32em"
+                                                                                                 type="text"
+                                                                                                 title="job._id">"}<br>
+        </td>
+        <td width="100%" valign="top">
+            <a href="#" onclick="POST('/api/start', {type: 'Import', options:JSON.parse(e('startImportOptions').value)})">api/start
+                {type: 'Import', options: </a><br>
+                <textarea cols="64" rows="8" id="startImportOptions" title="json">{}</textarea>}
+        </td>
+    </tr>
+</table>
+
+<pre id="apiLog"></pre>
+</body>
+</html>

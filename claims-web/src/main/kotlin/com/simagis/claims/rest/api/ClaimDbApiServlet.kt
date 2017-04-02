@@ -46,19 +46,26 @@ class ClaimDbApiServlet : HttpServlet() {
 
     private fun Context.doGetJobList() = doJsonRequest {
         val status = opt("status")?.let { RJobStatus.valueOf(it) }
-        result.apply { `+`("jobs", RJobManager.find(status).toList()) }
+        val filter = status?.let { doc { `+`("status", status.name) } } ?: doc {}
+        jsonOut.apply {
+            `+`("jobs", ClaimDb.apiJobs
+                    .find(filter)
+                    .sort(doc { `+`("created", -1) })
+                    .toList())
+        }
     }
 
     private fun Context.doGetJob() = doJsonRequest {
         val id = get("id")
-        result.apply { `+`("job", RJobManager[id]?.toDoc()) }
+        val job = ClaimDb.apiJobs.find(doc(id)).first()
+        jsonOut.apply { `+`("job", job) }
     }
 
     private fun Context.doStartJob() = doJsonRequest {
         val type = get("type")
-        val options = parameters["options"] as? Document ?: doc {}
+        val options = jsonIn["options"] as? Document ?: doc {}
         when (type) {
-            Import.TYPE -> result.apply { `+`("job", Import.start(options).toDoc()) }
+            Import.TYPE -> jsonOut.apply { `+`("job", Import.start(options).toDoc()) }
             else -> throw ClaimDbApiException("Invalid job type: $type")
         }
     }
@@ -68,7 +75,7 @@ class ClaimDbApiServlet : HttpServlet() {
         RJobManager[id]
                 ?.let {
                     val done = it.kill()
-                    result.apply {
+                    jsonOut.apply {
                         `+`("done", done)
                         `+`("job", it.toDoc())
                     }
@@ -80,7 +87,7 @@ class ClaimDbApiServlet : HttpServlet() {
             private val request: HttpServletRequest,
             private val response: HttpServletResponse) {
 
-        val parameters: Document by lazy {
+        val jsonIn: Document by lazy {
             val estimatedSize = request.contentLength.let { if (it != -1) it else DEFAULT_BUFFER_SIZE }
             request.inputStream.readBytes(estimatedSize).let { body ->
                 if (body.isEmpty())
@@ -88,12 +95,12 @@ class ClaimDbApiServlet : HttpServlet() {
                     Document.parse(body.toString(request.characterEncoding?.let(::charset) ?: Charsets.UTF_8))
             }
         }
-        val result = doc {}
+        val jsonOut = doc {}
 
         fun get(name: String): String = opt(name) ?:
                 throw ClaimDbApiException("Invalid ${request.pathInfo} request: $name required")
 
-        fun opt(name: String): String? = parameters[name] as? String
+        fun opt(name: String): String? = jsonIn[name] as? String
 
         fun doJsonRequest(body: Context.() -> Unit) {
             try {
@@ -102,11 +109,11 @@ class ClaimDbApiServlet : HttpServlet() {
             } catch(e: Throwable) {
                 response.status = HTTP_BAD_REQUEST
                 val uuid = UUID.randomUUID().toString()
-                result.appendError(e, uuid)
+                jsonOut.appendError(e, uuid)
                 request.servletContext.log("${e.javaClass.name}: ${e.message} ($uuid)", e)
             }
 
-            val content = result.toStringPP().toByteArray()
+            val content = jsonOut.toStringPP().toByteArray()
             response.contentType = "application/json"
             response.characterEncoding = "UTF-8"
             response.setContentLength(content.size)
