@@ -54,12 +54,12 @@ private typealias DocumentCollection = MongoCollection<Document>
 private object ImportJob {
     lateinit var host: String
     lateinit var jobId: String
-    lateinit var api: MongoDatabase
-    lateinit var data: MongoDatabase
+    lateinit var claimsAPI: MongoDatabase
+    lateinit var claims: MongoDatabase
 
-    val apiJobs: DocumentCollection by lazy { api.getCollection("apiJobs") }
-    val apiJobsLog: DocumentCollection by lazy { api.getCollection("apiJobsLog") }
-    val importFiles: DocumentCollection by lazy { api.getCollection("importFiles") }
+    val apiJobs: DocumentCollection by lazy { claimsAPI.getCollection("apiJobs") }
+    val apiJobsLog: DocumentCollection by lazy { claimsAPI.getCollection("apiJobsLog") }
+    val importFiles: DocumentCollection by lazy { claimsAPI.getCollection("importFiles") }
     val jobFilter get() = doc(jobId)
 
     val jobDoc: Document? get() = apiJobs.find(jobFilter).first()
@@ -92,8 +92,8 @@ private object ImportJob {
                 val claimType = (claimTypes[type] as? Document) ?: Document()
                 ClaimType(
                         type = type,
-                        importTo = claimType["importTo"] as? String ?: "claims_$type.temp",
-                        renameTo = claimType["renameTo"] as? String ?: "claims_$type.target",
+                        temp = claimType["temp"] as? String ?: "claims_$type.temp",
+                        target = claimType["target"] as? String ?: "claims_$type.target",
                         createIndexes = claimType["createIndexes"] as? Boolean ?: true
                 )
             }
@@ -102,12 +102,11 @@ private object ImportJob {
 
         data class ClaimType(
                 val type: String,
-                val importTo: String,
-                val renameTo: String,
+                val temp: String,
+                val target: String,
                 val createIndexes: Boolean) {
-            val importToCollection: DocumentCollection by lazy { data.getCollection(importTo) }
-            val renameToCollection: DocumentCollection by lazy { data.getCollection(renameTo) }
-            val renameToCollectionExists: Boolean by lazy { data.listCollectionNames().contains(renameTo) }
+            val tempCollection: DocumentCollection by lazy { claims.getCollection(temp) }
+            val targetCollection: DocumentCollection by lazy { claims.getCollection(target) }
         }
     }
 
@@ -116,11 +115,11 @@ private object ImportJob {
         host = commandLine["host"] ?: "localhost"
         jobId = commandLine["job"] ?: throw IllegalArgumentException("argument -job required")
         val mongoClient = MDBCredentials.mongoClient(host)
-        api = mongoClient.getDatabase("claimsAPI")
-        data = mongoClient.getDatabase(commandLine["db"] ?: "claims")
+        claimsAPI = mongoClient.getDatabase("claimsAPI")
+        claims = mongoClient.getDatabase(commandLine["db"] ?: "claims")
     }
 
-    override fun toString(): String = "$host/${data.name}"
+    override fun toString(): String = "$host/${claims.name}"
 }
 
 fun main(args: Array<String>) {
@@ -317,8 +316,8 @@ fun main(args: Array<String>) {
                     isaCount.incrementAndGet()
                     claims.forEach {
                         val claimType = ImportJob.options.claimTypes[isa.type]
-                        if (claimType.importTo.isNotBlank() && it is JsonObject) {
-                            val collection = claimType.importToCollection
+                        if (claimType.temp.isNotBlank() && it is JsonObject) {
+                            val collection = claimType.tempCollection
                             val document = Document.parse(it.toString()).prepare()
                             try {
                                 fun Document.inRange(start: Date?) = when (isa.type) {
@@ -369,15 +368,15 @@ fun main(args: Array<String>) {
         if (done) {
             fun ImportJob.options.ClaimType.createIndexes() {
                 info("createIndexes for $this")
-                if (importTo.isNotBlank()) {
+                if (temp.isNotBlank()) {
                     (Document.parse(ImportJob::class.java
                             .getResourceAsStream("$type.createIndexes.json")
                             .use { it.reader().readText() })
                             ["indexes"] as? List<*>)
                             ?.forEach {
                                 if (it is Document) {
-                                    info("$importTo.createIndex(${it.toJson()})")
-                                    importToCollection.createIndex(it)
+                                    info("$temp.createIndex(${it.toJson()})")
+                                    tempCollection.createIndex(it)
                                 }
                             }
                 }
@@ -389,19 +388,19 @@ fun main(args: Array<String>) {
 
             fun ImportJob.options.ClaimType.renameTo() {
                 info("renameTo for $this")
-                if (renameTo.isNotBlank()) {
-                    if (renameToCollectionExists) {
-                        renameToCollection.renameCollection(
-                                MongoNamespace(ImportJob.data.name, renameTo
+                if (target.isNotBlank()) {
+                    if (targetCollection.isExists) {
+                        targetCollection.renameCollection(
+                                MongoNamespace(ImportJob.claims.name, target
                                         + ".backup." + SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSSS").format(Date()))
                         )
                     }
-                    importToCollection.renameCollection(MongoNamespace(ImportJob.data.name, renameTo))
+                    tempCollection.renameCollection(targetCollection.namespace)
                 }
             }
             ImportJob.options.claimTypes.types
                     .map { ImportJob.options.claimTypes[it] }
-                    .filter { it.renameTo.isNotEmpty() }
+                    .filter { it.target.isNotEmpty() }
                     .forEach { it.renameTo() }
 
             info("DONE for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
@@ -413,6 +412,11 @@ fun main(args: Array<String>) {
         error("ERROR: ${e.message} ${details()}", e)
         exitProcess(2)
     }
+}
+
+private val DocumentCollection.isExists: Boolean get() = namespace.let {
+    if (it.databaseName != ImportJob.claims.name) throw AssertionError("Invalid collection: $it")
+    ImportJob.claims.listCollectionNames().contains(it.collectionName)
 }
 
 private data class MFile(val id: ObjectId?, val file: File)
@@ -491,13 +495,13 @@ private class MFiles {
                             ImportJob.apiJobs.updateOne(ImportJob.jobFilter, doc {
                                 `+$set` { `+`("processing", doc { `+`("started", Date()) }) }
                             })
-                            val collectionNames = ImportJob.data.listCollectionNames()
+                            val collectionNames = ImportJob.claims.listCollectionNames()
                             ImportJob.options.claimTypes.types
                                     .map { ImportJob.options.claimTypes[it] }
-                                    .filter { collectionNames.contains(it.importTo) }
+                                    .filter { collectionNames.contains(it.temp) }
                                     .forEach {
-                                        warning("${it.importToCollection.namespace}.drop()")
-                                        it.importToCollection.drop()
+                                        warning("temp collection already exists -> ${it.tempCollection.namespace}.drop()")
+                                        it.tempCollection.drop()
                                     }
 
                         } else {
@@ -566,7 +570,7 @@ private fun log(
         detailsXml: String? = null) {
     val now = Date()
     fun printLog(message: String, _id: Any?) {
-        """${level.toString().padEnd(7)} $message at $now log: ObjectId("$_id")""".also {
+        "${level.toString().padEnd(7)} $message at $now${_id?.let { """ log: ObjectId("$_id")""" } ?: ""}".also {
             val detailsPP = if (detailsJson is Document)
                 detailsJson.toJson(JsonWriterSettings(JsonMode.SHELL, true)) else
                 null
@@ -590,25 +594,29 @@ private fun log(
         })
     }
     try {
-        val document = doc {
-            `+`("level", level.value)
-            `+`("msg", message)
-            `+`("time", now)
-            if (error != null) {
-                appendError(error)
+        if (level == TRACE)
+            printLog(message, null)
+        else
+            doc {
+                `+`("level", level.value)
+                `+`("msg", message)
+                `+`("time", now)
+                if (error != null) {
+                    appendError(error)
+                }
+                if (details != null) {
+                    `+`("details", details)
+                }
+                if (detailsJson != null) {
+                    `+`("detailsJson", detailsJson)
+                }
+                if (detailsXml != null) {
+                    `+`("detailsXml", detailsXml)
+                }
+            }.let {
+                ImportJob.apiJobsLog.insertOne(it)
+                printLog(message, it._id)
             }
-            if (details != null) {
-                `+`("details", details)
-            }
-            if (detailsJson != null) {
-                `+`("detailsJson", detailsJson)
-            }
-            if (detailsXml != null) {
-                `+`("detailsXml", detailsXml)
-            }
-        }
-        ImportJob.apiJobsLog.insertOne(document)
-        printLog(message, document._id)
     } catch(e: Throwable) {
         e.printStackTrace()
         printLog("${e.javaClass.simpleName} on $message", null)

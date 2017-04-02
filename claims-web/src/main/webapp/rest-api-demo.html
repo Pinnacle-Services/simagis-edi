@@ -8,7 +8,7 @@
         function toLogger(xhr) {
             return function () {
                 if (xhr.readyState === 4) {
-                    var log = e("apiLog");
+                    var log = e("response");
                     if (xhr.status === 200) {
                         log.innerText = xhr.responseText + "\n";
                     } else {
@@ -19,6 +19,7 @@
             }
         }
         function POST(url, json) {
+            e("request").innerText = "POST " + url + "\n" + JSON.stringify(json, undefined, 4);
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
             xhr.setRequestHeader("Content-type", "application/json");
@@ -33,8 +34,8 @@
             parallel: 8,
             after: "2014-01-01",
             claimTypes: {
-                "835": {importTo: "claims_835.temp", renameTo: "claims_835.target", createIndexes: true},
-                "837": {importTo: "claims_837.temp", renameTo: "claims_837.target", createIndexes: true}
+                "835": {temp: "claims_835.temp", target: "claims_835.target", createIndexes: true},
+                "837": {temp: "claims_837.temp", target: "claims_837.target", createIndexes: true}
             }
         }
     </script>
@@ -68,6 +69,18 @@
     </tr>
 </table>
 
-<pre id="apiLog"></pre>
+<table width="100%">
+    <tr>
+        <td valign="top" width="50%" bgcolor="#d3d3d3">
+            <strong>request</strong>
+            <pre id="request"></pre>
+        </td>
+        <td valign="top" width="50%">
+            <strong>response</strong>
+            <pre id="response"></pre>
+        </td>
+    </tr>
+</table>
+
 </body>
 </html>
