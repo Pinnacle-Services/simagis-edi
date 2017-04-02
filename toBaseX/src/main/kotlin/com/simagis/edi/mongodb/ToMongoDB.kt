@@ -444,16 +444,22 @@ private class MFiles {
             return false
         }
 
+        var count = sourceFiles.count()
+        ImportJob.updateFilesLeft(count)
         var restartRequired = false
         while (sourceFiles.isNotEmpty()) {
             val mFile = sourceFiles.removeAt(0)
             trace("queue.put($mFile)")
+            if (count-- % 10 == 0) {
+                ImportJob.updateFilesLeft(count)
+            }
             queue.put(mFile)
             if (restartRequired()) {
                 restartRequired = true
                 break
             }
         }
+        ImportJob.updateFilesLeft(0)
         if (restartRequired) {
             queue.clear()
         } else {
@@ -549,6 +555,10 @@ private class MFiles {
             }
         }
     }
+}
+
+private fun ImportJob.updateFilesLeft(count: Int) {
+    apiJobs.updateOne(jobFilter, doc { `+$set` { `+`("processing.filesLeft", count) } })
 }
 
 private sealed class LogLevel(val value: Int) {
