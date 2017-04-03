@@ -1,6 +1,7 @@
 package com.simagis.claims.rest.api
 
 import com.simagis.claims.rest.api.jobs.Import
+import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
 import org.bson.Document
 import java.util.*
@@ -19,20 +20,19 @@ abstract class RJob(
     val type: String get() = this.javaClass.simpleName
 
 
-    open fun toDoc(): Document = Document("_id", id).apply {
-        append("type", type)
-        append("created", created)
-        append("status", status.name)
-        append("options", options)
-        error?.get("error")?.let { append("error", it) }
+    open fun toDoc(): Document = doc(id).apply {
+        `+`("type", type)
+        `+`("created", created)
+        `+`("status", status.name)
+        `+`("options", options)
+        error?.get("error")?.let { `+`("error", it) }
     }
 
-    abstract fun kill(): Boolean
+    open fun kill(): Boolean = false
 
     companion object {
-        fun of(document: Document): RJob {
-            val type = document.getString("type")
-            return when (type) {
+        fun of(document: Document): RJob = document["type"].let { type ->
+            when (type) {
                 Import.TYPE -> Import.of(document)
                 else -> throw ClaimDbApiException("Invalid Job type: $type")
             }

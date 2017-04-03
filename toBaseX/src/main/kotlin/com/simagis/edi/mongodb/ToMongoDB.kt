@@ -4,25 +4,19 @@ import com.berryworks.edireader.EDISyntaxException
 import com.mongodb.ErrorCategory
 import com.mongodb.MongoNamespace
 import com.mongodb.MongoWriteException
-import com.mongodb.client.MongoCollection
-import com.mongodb.client.MongoDatabase
 import com.simagis.edi.basex.ISA
-import com.simagis.edi.basex.exit
-import com.simagis.edi.basex.get
-import com.simagis.edi.mdb.*
+import com.simagis.edi.mdb._id
+import com.simagis.edi.mdb.`+$set`
+import com.simagis.edi.mdb.`+`
+import com.simagis.edi.mdb.doc
 import org.basex.core.Context
 import org.basex.core.MainOptions
 import org.basex.core.cmd.CreateDB
 import org.basex.core.cmd.Replace
 import org.basex.core.cmd.XQuery
-import org.bson.BsonSerializationException
 import org.bson.Document
-import org.bson.json.JsonMode
-import org.bson.json.JsonWriterSettings
 import org.bson.types.ObjectId
 import java.io.File
-import java.io.PrintWriter
-import java.io.StringWriter
 import java.security.MessageDigest
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -35,12 +29,10 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
-import java.util.concurrent.locks.ReentrantLock
 import javax.json.Json
 import javax.json.JsonArray
 import javax.json.JsonObject
 import kotlin.concurrent.thread
-import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
 
 
@@ -49,20 +41,8 @@ import kotlin.system.exitProcess
  * Created by alexei.vylegzhanin@gmail.com on 3/9/2017.
  */
 
-private typealias DocumentCollection = MongoCollection<Document>
-
-private object ImportJob {
-    lateinit var host: String
-    lateinit var jobId: String
-    lateinit var claimsAPI: MongoDatabase
-    lateinit var claims: MongoDatabase
-
-    val apiJobs: DocumentCollection by lazy { claimsAPI.getCollection("apiJobs") }
-    val apiJobsLog: DocumentCollection by lazy { claimsAPI.getCollection("apiJobsLog") }
+private object ImportJob : AbstractJob() {
     val importFiles: DocumentCollection by lazy { claimsAPI.getCollection("importFiles") }
-    val jobFilter get() = doc(jobId)
-
-    val jobDoc: Document? get() = apiJobs.find(jobFilter).first()
 
     object options {
         private val options: Document by lazy { jobDoc?.get("options") as? Document ?: Document() }
@@ -109,17 +89,6 @@ private object ImportJob {
             val targetCollection: DocumentCollection by lazy { claims.getCollection(target) }
         }
     }
-
-    fun open(args: Array<String>) {
-        val commandLine = com.berryworks.edireader.util.CommandLine(args)
-        host = commandLine["host"] ?: "localhost"
-        jobId = commandLine["job"] ?: throw IllegalArgumentException("argument -job required")
-        val mongoClient = MDBCredentials.mongoClient(host)
-        claimsAPI = mongoClient.getDatabase("claimsAPI")
-        claims = mongoClient.getDatabase(commandLine["db"] ?: "claims")
-    }
-
-    override fun toString(): String = "$host/${claims.name}"
 }
 
 fun main(args: Array<String>) {
@@ -414,11 +383,6 @@ fun main(args: Array<String>) {
     }
 }
 
-private val DocumentCollection.isExists: Boolean get() = namespace.let {
-    if (it.databaseName != ImportJob.claims.name) throw AssertionError("Invalid collection: $it")
-    ImportJob.claims.listCollectionNames().contains(it.collectionName)
-}
-
 private data class MFile(val id: ObjectId?, val file: File)
 
 private class MFiles {
@@ -445,13 +409,13 @@ private class MFiles {
         }
 
         var count = sourceFiles.count()
-        ImportJob.updateFilesLeft(count)
+        ImportJob.updateProcessing("filesLeft", count)
         var restartRequired = false
         while (sourceFiles.isNotEmpty()) {
             val mFile = sourceFiles.removeAt(0)
             trace("queue.put($mFile)")
             if (count-- % 10 == 0) {
-                ImportJob.updateFilesLeft(count)
+                ImportJob.updateProcessing("filesLeft", count)
             }
             queue.put(mFile)
             if (restartRequired()) {
@@ -459,7 +423,7 @@ private class MFiles {
                 break
             }
         }
-        ImportJob.updateFilesLeft(0)
+        ImportJob.updateProcessing("filesLeft", 0)
         if (restartRequired) {
             queue.clear()
         } else {
@@ -556,116 +520,3 @@ private class MFiles {
         }
     }
 }
-
-private fun ImportJob.updateFilesLeft(count: Int) {
-    apiJobs.updateOne(jobFilter, doc { `+$set` { `+`("processing.filesLeft", count) } })
-}
-
-private sealed class LogLevel(val value: Int) {
-    override fun toString(): String = javaClass.simpleName
-}
-
-private object TRACE : LogLevel(100)
-private object INFO : LogLevel(500)
-private object WARNING : LogLevel(1000)
-private object ERROR : LogLevel(5000)
-
-private val printLogLock = ReentrantLock()
-private fun log(
-        level: LogLevel,
-        message: String,
-        error: Throwable? = null,
-        details: String? = null,
-        detailsJson: Any? = null,
-        detailsXml: String? = null) {
-    val now = Date()
-    fun printLog(message: String, _id: Any?) {
-        "${level.toString().padEnd(7)} $message at $now${_id?.let { """ log: ObjectId("$_id")""" } ?: ""}".also {
-            val detailsPP = if (detailsJson is Document)
-                detailsJson.toJson(JsonWriterSettings(JsonMode.SHELL, true)) else
-                null
-            printLogLock.withLock {
-                System.err.println(it)
-                if (detailsPP != null)
-                    System.err.println(detailsPP)
-                error?.printStackTrace()
-            }
-        }
-    }
-
-    fun Document.appendError(e: Throwable) {
-        `+`("error", doc {
-            `+`("errorClass", e.javaClass.name)
-            `+`("message", e.message)
-            `+`("stackTrace", StringWriter().let {
-                PrintWriter(it).use { e.printStackTrace(it) }
-                it.toString().lines()
-            })
-        })
-    }
-    try {
-        if (level == TRACE)
-            printLog(message, null)
-        else
-            doc {
-                `+`("level", level.value)
-                `+`("msg", message)
-                `+`("time", now)
-                if (error != null) {
-                    appendError(error)
-                }
-                if (details != null) {
-                    `+`("details", details)
-                }
-                if (detailsJson != null) {
-                    `+`("detailsJson", detailsJson)
-                }
-                if (detailsXml != null) {
-                    `+`("detailsXml", detailsXml)
-                }
-            }.let {
-                ImportJob.apiJobsLog.insertOne(it)
-                printLog(message, it._id)
-            }
-    } catch(e: Throwable) {
-        e.printStackTrace()
-        printLog("${e.javaClass.simpleName} on $message", null)
-        if (e !is BsonSerializationException) {
-            exit("Logging error: ${e.message}")
-        }
-    }
-}
-
-private fun trace(message: String, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) = log(
-        level = TRACE,
-        message = message,
-        details = details,
-        detailsJson = detailsJson,
-        detailsXml = detailsXml
-)
-
-private fun info(message: String, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) = log(
-        level = INFO,
-        message = message,
-        details = details,
-        detailsJson = detailsJson,
-        detailsXml = detailsXml
-)
-
-private fun warning(message: String, error: Throwable? = null, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) = log(
-        level = WARNING,
-        message = message,
-        error = error,
-        details = details,
-        detailsJson = detailsJson,
-        detailsXml = detailsXml
-)
-
-private fun error(message: String, error: Throwable? = null, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) = log(
-        level = ERROR,
-        message = message,
-        error = error,
-        details = details,
-        detailsJson = detailsJson,
-        detailsXml = detailsXml
-)
