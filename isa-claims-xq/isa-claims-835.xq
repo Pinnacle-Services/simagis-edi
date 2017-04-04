@@ -39,6 +39,8 @@ declare option output:method "json";
     let $pr := functx:if-empty( data($clp/segment[@Id = "CLP"]/element[@Id = "CLP05"]), 0.00)
     let $total_pay := fn:sum((number($pr), number($pay_amt)))
     let $filing := $clp/segment[@Id = "CLP"]/element[@Id = "CLP06"]/text()
+    let $ptnId := $clp/segment[@Id = "NM1" and *:element = "QC"]/element[@Id = "NM109"]/text()
+    let $insId := $clp/segment[@Id = "NM1" and *:element = "IL"]/element[@Id = "NM109"]/text()
     return
         <_ type='object'> {
             <id>{concat($acn_id, "-R-", $ref)}</id>,
@@ -71,6 +73,8 @@ declare option output:method "json";
             <clmPay-C0>{$pay_amt}</clmPay-C0>,           
             <pr-C0>{$pr}</pr-C0>,
             <clmPayTotal-C0>{fn:round($total_pay, 2)}</clmPayTotal-C0>,
+            <ptnId>{functx:if-empty($ptnId,"Empty")}</ptnId>,
+            <insId>{functx:if-empty($insId,"Empty")}</insId>,
                  
             (:Claim Remarks:)            
             <remarks type='array'>{

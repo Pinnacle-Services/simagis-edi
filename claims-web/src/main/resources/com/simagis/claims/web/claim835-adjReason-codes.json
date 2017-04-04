@@ -1173,7 +1173,7 @@
     "Reason": "45",
     "Recoverable": "Non-recoverable",
     "Party": null,
-    "Description": "Charge exceeds fee schedule/maximum allowable or contracted/legislated fee arrangement. Note: This adjustment amount cannot equal the total service or claim charge amount; and must not duplicate provider adjustment amounts (payments and contractual reductions) that have resulted from prior payer(s) adjudication. (Use only with Group Codes PR or CO depending upon liability)"
+    "Description": "Charge exceeds fee schedule/maximum allowable or contracted/legislated fee arrangement."
   },
   {
     "Reason": "46",
