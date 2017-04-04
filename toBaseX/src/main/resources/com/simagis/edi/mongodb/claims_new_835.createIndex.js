@@ -13,5 +13,6 @@
     {"svc.adj.adjGrp": 1},
     {"svc.adj.adjReason": 1},
     {"clmPayTotal": 1},
-    {"clmPay": 1}
+    {"clmPay": 1},
+    {"ptnId": 1}
 ]);
