@@ -1,6 +1,5 @@
 package com.simagis.edi.mongodb
 
-import com.simagis.edi.mdb.`+$lt`
 import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
 import org.bson.Document
@@ -15,30 +14,77 @@ fun main(args: Array<String>) {
     Build835cJob.open(args)
     info("starting job", detailsJson = Build835cJob.jobDoc)
     val docs835 = Build835cJob.options.claimTypes["835"].docs
-    val docs837 = Build835cJob.options.claimTypes["837"].docs
     val docs835c = Build835cJob.options.claimTypes["835c"].docs
+
+    class Client(val doc: Document) {
+        val npi = doc["npi"] as String
+    }
+
+    val npiMapClient = mutableMapOf<String, Client>().apply {
+        val clients = Build835cJob.claims.getCollection("clientid")
+        clients.find().forEach {
+            Client(it).let { this[it.npi] = it }
+        }
+    }
+
+    class Doc837(val doc: Document) {
+        val acn = doc["acn"] as String
+        val sendDate = doc["sendDate"] as Date?
+    }
+
+    val acnMap837 = mutableMapOf<String, MutableList<Doc837>>().apply {
+        val docs837 = Build835cJob.options.claimTypes["837"].docs
+        docs837.find()
+                .projection(doc {
+                    `+`("dx", 1)
+                    `+`("npi", 1)
+                    `+`("drFirsN", 1)
+                    `+`("drLastN", 1)
+                    `+`("sendDate", 1)
+                })
+                .sort(doc {
+                    `+`("sendDate", -1)
+                })
+                .forEach {
+                    val doc837 = Doc837(it)
+                    if (doc837.sendDate != null) {
+                        getOrPut(doc837.acn, { mutableListOf<Doc837>() }) += doc837
+                    }
+                }
+    }
     docs835c.drop()
     var claimsLeft = docs835.count()
     Build835cJob.updateProcessing("claimsLeft", claimsLeft)
+    val docs835cList = mutableListOf<Document>()
     docs835.find().forEach { c835 ->
-        val c835procDate = c835["procDate"] as? Date
-        if (c835procDate != null) {
-            val c837 = docs837.find(doc {
-                `+`("acn", c835["acn"])
-                `+$lt`("sendDate", c835procDate)
-            }).projection(doc {
-                `+`("dx", 1)
-                `+`("npi", 1)
-                `+`("drFirsN", 1)
-                `+`("drLastN", 1)
-                `+`("sendDate", 1)
-            }).sort(doc {
-                `+`("sendDate", -1)
-            }).first()
-            if (c837 != null) {
-                c835["c837"] = c837
-                docs835c.insertOne(c835)
+        val procDate = c835["procDate"] as? Date
+        val acn = c835["acn"] as? String
+        if (procDate != null && acn != null) {
+            acnMap837[acn]?.let { list ->
+                for (doc837 in list) {
+                    if (doc837.sendDate!! < procDate) {
+                        doc837.doc.forEach { key, value ->
+                            when {
+                                key == "npi" -> {
+                                    c835["npi"] = value
+                                    c835["client"] = npiMapClient[value]?.doc
+                                }
+                                key != "_id" -> c835[key] = value
+                            }
+                        }
+                        break
+                    }
+                }
             }
+            docs835cList += c835
+            if (docs835cList.size >= 100) {
+                docs835c.insertMany(docs835cList)
+                docs835cList.clear()
+            }
+        }
+        if (docs835cList.isNotEmpty()) {
+            docs835c.insertMany(docs835cList)
+            docs835cList.clear()
         }
         if (claimsLeft-- % 1000L == 0L) {
             Build835cJob.updateProcessing("claimsLeft", claimsLeft)
