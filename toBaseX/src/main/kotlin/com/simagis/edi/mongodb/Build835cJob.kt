@@ -5,6 +5,7 @@ import com.simagis.edi.mdb.doc
 import org.bson.Document
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.text.Charsets.UTF_8
 
 /**
  * <p>
@@ -27,19 +28,21 @@ fun main(args: Array<String>) {
         }
     }
 
-    class Doc837(val doc: Document) {
-        val acn = doc["acn"] as String
-        val sendDate = doc["sendDate"] as Date?
+    class Doc837(doc: Document) {
+        val json = doc.toJson().toByteArray(UTF_8)
+        val doc get() = Document.parse(json.toString(UTF_8))
+        val acn = doc["acn"] as? String?
+        val sendDate = doc["sendDate"] as? Date?
     }
 
     val acnMap837 = mutableMapOf<String, MutableList<Doc837>>().apply {
-        val docs837 = Build835cJob.options.claimTypes["837"].docs
-        docs837.find()
+        Build835cJob.options.claimTypes["837"].docs.find()
                 .projection(doc {
                     `+`("dx", 1)
                     `+`("npi", 1)
                     `+`("drFirsN", 1)
                     `+`("drLastN", 1)
+                    `+`("acn", 1)
                     `+`("sendDate", 1)
                 })
                 .sort(doc {
@@ -47,7 +50,7 @@ fun main(args: Array<String>) {
                 })
                 .forEach {
                     val doc837 = Doc837(it)
-                    if (doc837.sendDate != null) {
+                    if (doc837.sendDate != null && doc837.acn != null) {
                         getOrPut(doc837.acn, { mutableListOf<Doc837>() }) += doc837
                     }
                 }
@@ -56,6 +59,7 @@ fun main(args: Array<String>) {
     var claimsLeft = docs835.count()
     Build835cJob.updateProcessing("claimsLeft", claimsLeft)
     val docs835cList = mutableListOf<Document>()
+    val skipKeys = setOf("_id", "acn")
     docs835.find().forEach { c835 ->
         val procDate = c835["procDate"] as? Date
         val acn = c835["acn"] as? String
@@ -64,12 +68,12 @@ fun main(args: Array<String>) {
                 for (doc837 in list) {
                     if (doc837.sendDate!! < procDate) {
                         doc837.doc.forEach { key, value ->
-                            when {
-                                key == "npi" -> {
+                            when (key) {
+                                "npi" -> {
                                     c835["npi"] = value
                                     c835["client"] = npiMapClient[value]?.doc
                                 }
-                                key != "_id" -> c835[key] = value
+                                !in skipKeys -> c835[key] = value
                             }
                         }
                         break
