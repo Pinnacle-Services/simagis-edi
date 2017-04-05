@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -59,8 +60,8 @@ fun main(args: Array<String>) {
                 }
     }
     docs835c.drop()
-    var claimsLeft = docs835.count()
-    Build835cJob.updateProcessing("claimsLeft", claimsLeft)
+    var claimsLeft = AtomicLong(docs835.count())
+    Build835cJob.updateProcessing("claimsLeft", claimsLeft.get())
     var docs835cList = mutableListOf<Document>()
     val skipKeys = setOf("_id", "acn")
     val ex1: ExecutorService = Executors.newSingleThreadExecutor()
@@ -85,28 +86,27 @@ fun main(args: Array<String>) {
                 }
             }
             docs835cList.add(c835)
-            if (docs835cList.size >= 1000) {
+            if (docs835cList.size >= 100) {
                 docs835cList.let { list ->
                     docs835cList = mutableListOf<Document>()
-                    ex1.submit { docs835c.insertMany(list) }
+                    ex1.submit {
+                        docs835c.insertMany(list)
+                        Build835cJob.updateProcessing("claimsLeft", claimsLeft.addAndGet(-list.size.toLong()))
+                    }
                 }
             }
         }
-        ex1.shutdown()
-        while (!ex1.awaitTermination(10, TimeUnit.SECONDS)) {
-            info("waiting for docs835c.insertMany(list)")
-        }
-
-        if (docs835cList.isNotEmpty()) {
-            docs835c.insertMany(docs835cList)
-            docs835cList = mutableListOf<Document>()
-        }
-
-        if (--claimsLeft % 1000L == 0L) {
-            Build835cJob.updateProcessing("claimsLeft", claimsLeft)
-        }
     }
-    Build835cJob.updateProcessing("claimsLeft", 0)
+    ex1.shutdown()
+    while (!ex1.awaitTermination(10, TimeUnit.SECONDS)) {
+        info("waiting for docs835c.insertMany(list)")
+    }
+
+    if (docs835cList.isNotEmpty()) {
+        docs835c.insertMany(docs835cList)
+        docs835cList = mutableListOf<Document>()
+    }
+    Build835cJob.updateProcessing("claimsLeft", 0L)
     info("DONE", detailsJson = Build835cJob.jobDoc)
 }
 
