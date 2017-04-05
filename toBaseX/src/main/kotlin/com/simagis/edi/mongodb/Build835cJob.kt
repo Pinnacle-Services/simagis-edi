@@ -5,6 +5,9 @@ import com.simagis.edi.mdb.doc
 import org.bson.Document
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -58,8 +61,9 @@ fun main(args: Array<String>) {
     docs835c.drop()
     var claimsLeft = docs835.count()
     Build835cJob.updateProcessing("claimsLeft", claimsLeft)
-    val docs835cList = mutableListOf<Document>()
+    var docs835cList = mutableListOf<Document>()
     val skipKeys = setOf("_id", "acn")
+    val ex1: ExecutorService = Executors.newSingleThreadExecutor()
     docs835.find().forEach { c835 ->
         val procDate = c835["procDate"] as? Date
         val acn = c835["acn"] as? String
@@ -80,17 +84,25 @@ fun main(args: Array<String>) {
                     }
                 }
             }
-            docs835cList += c835
-            if (docs835cList.size >= 100) {
-                docs835c.insertMany(docs835cList)
-                docs835cList.clear()
+            docs835cList.add(c835)
+            if (docs835cList.size >= 1000) {
+                docs835cList.let { list ->
+                    docs835cList = mutableListOf<Document>()
+                    ex1.submit { docs835c.insertMany(list) }
+                }
             }
         }
+        ex1.shutdown()
+        while (!ex1.awaitTermination(10, TimeUnit.SECONDS)) {
+            info("waiting for docs835c.insertMany(list)")
+        }
+
         if (docs835cList.isNotEmpty()) {
             docs835c.insertMany(docs835cList)
-            docs835cList.clear()
+            docs835cList = mutableListOf<Document>()
         }
-        if (claimsLeft-- % 1000L == 0L) {
+
+        if (--claimsLeft % 1000L == 0L) {
             Build835cJob.updateProcessing("claimsLeft", claimsLeft)
         }
     }
