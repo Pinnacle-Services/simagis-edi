@@ -4,11 +4,9 @@ import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
 import org.bson.Document
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.concurrent.thread
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -60,11 +58,19 @@ fun main(args: Array<String>) {
                 }
     }
     docs835c.drop()
-    var claimsLeft = AtomicLong(docs835.count())
+    val claimsLeft = AtomicLong(docs835.count())
     Build835cJob.updateProcessing("claimsLeft", claimsLeft.get())
     var docs835cList = mutableListOf<Document>()
+    val insertQueue = LinkedBlockingQueue<List<Document>>(5)
+    val insertThread = thread(name = "docs835c.insertMany(list)") {
+        do {
+            val list: List<Document> = insertQueue.poll(5, TimeUnit.SECONDS) ?: continue
+            if (list.isEmpty()) break
+            docs835c.insertMany(list)
+            Build835cJob.updateProcessing("claimsLeft", claimsLeft.addAndGet(-list.size.toLong()))
+        } while (true)
+    }
     val skipKeys = setOf("_id", "acn")
-    val ex1: ExecutorService = Executors.newSingleThreadExecutor()
     docs835.find().forEach { c835 ->
         val procDate = c835["procDate"] as? Date
         val acn = c835["acn"] as? String
@@ -89,17 +95,17 @@ fun main(args: Array<String>) {
             if (docs835cList.size >= 100) {
                 docs835cList.let { list ->
                     docs835cList = mutableListOf<Document>()
-                    ex1.submit {
-                        docs835c.insertMany(list)
-                        Build835cJob.updateProcessing("claimsLeft", claimsLeft.addAndGet(-list.size.toLong()))
-                    }
+                    insertQueue.put(list)
                 }
             }
         }
     }
-    ex1.shutdown()
-    while (!ex1.awaitTermination(10, TimeUnit.SECONDS)) {
+
+    insertQueue.put(emptyList())
+    insertThread.join(1000)
+    while (insertThread.isAlive) {
         info("waiting for docs835c.insertMany(list)")
+        insertThread.join(5000)
     }
 
     if (docs835cList.isNotEmpty()) {
