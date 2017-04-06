@@ -41,6 +41,7 @@ internal abstract class AbstractJob {
         val mongoClient = MDBCredentials.mongoClient(host)
         claimsAPI = mongoClient.getDatabase("claimsAPI")
         claims = mongoClient.getDatabase(commandLine["db"] ?: "claims")
+        job = this
         logger = this::log
     }
 
