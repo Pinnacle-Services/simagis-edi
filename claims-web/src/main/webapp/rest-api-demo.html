@@ -22,7 +22,7 @@
             e("request").innerText = "POST " + url + "\n" + JSON.stringify(json, undefined, 4);
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
-            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.setRequestHeader("Content-type", "application/mongo-json");
             xhr.onreadystatechange = toLogger(xhr);
             xhr.send(JSON.stringify(json));
         }

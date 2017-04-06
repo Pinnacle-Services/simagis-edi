@@ -69,6 +69,12 @@ internal fun Document?.toStringPP(): String = when {
     else -> toJson(jsonWriterSettingsPP)
 }
 
+private val jsonWriterSettingsPPM by lazy { JsonWriterSettings(JsonMode.SHELL, true) }
+internal fun Document?.toStringPPM(): String = when {
+    this == null -> "{}"
+    else -> toJson(jsonWriterSettingsPPM)
+}
+
 private fun MongoDatabase.openCappedCollection(collectionName: String,
                                                maxDocuments: Long = 10000,
                                                sizeInBytes: Long = 1024 * 1024): MongoCollection<Document> {

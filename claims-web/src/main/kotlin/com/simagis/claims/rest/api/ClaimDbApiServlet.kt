@@ -103,6 +103,7 @@ class ClaimDbApiServlet : HttpServlet() {
         fun opt(name: String): String? = jsonIn[name] as? String
 
         fun doJsonRequest(body: Context.() -> Unit) {
+            val requestContentType = request.contentType
             try {
                 body()
                 response.status = HTTP_OK
@@ -113,7 +114,11 @@ class ClaimDbApiServlet : HttpServlet() {
                 request.servletContext.log("${e.javaClass.name}: ${e.message} ($uuid)", e)
             }
 
-            val content = jsonOut.toStringPP().toByteArray()
+            val content = when(requestContentType) {
+                "application/mongo-json" -> jsonOut.toStringPPM().toByteArray()
+                else -> jsonOut.toStringPP().toByteArray()
+            }
+
             response.contentType = "application/json"
             response.characterEncoding = "UTF-8"
             response.setContentLength(content.size)
