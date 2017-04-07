@@ -1,6 +1,7 @@
 package com.simagis.claims.web
 
 import com.mongodb.client.MongoDatabase
+import com.simagis.claims.web.ui.ClaimQuery
 import com.simagis.edi.mdb.*
 import org.bson.Document
 import java.lang.Long.max
@@ -16,6 +17,7 @@ import javax.json.JsonString
  * Created by alexei.vylegzhanin@gmail.com on 3/14/2017.
  */
 class Claims835ToHtml(val db: MongoDatabase,
+                      val cq: ClaimQuery?,
                       val maxCount: Int = 100,
                       val paging: Paging = Paging(0, 0),
                       val root: String,
@@ -123,31 +125,35 @@ class Claims835ToHtml(val db: MongoDatabase,
         return html.toString().toByteArray()
     }
 
-    fun append(c835: Document): Boolean {
-        val claim = Document(c835)
-
-        val c835procDate = c835["procDate"] as? Date
-        if (c835procDate != null) {
-            val c837 = db["claims_837"]
-                    .find(doc {
-                        `+`("acn", c835["acn"])
-                        `+$lt`("sendDate", c835procDate)
-                    })
-                    .projection(doc {
-                        `+`("dx", 1)
-                        `+`("npi", 1)
-                        `+`("drFirsN", 1)
-                        `+`("drLastN", 1)
-                        `+`("sendDate", 1)
-                    })
-                    .sort(doc {
-                        `+`("sendDate", -1)
-                    })
-                    .first()
-            if (c837 != null) {
-                claim["c837"] = Document(c837)
+    fun append(doc: Document): Boolean {
+        val claim = when (cq?.type) {
+            "835" -> Document(doc).also { claim835 ->
+                val c835procDate = doc["procDate"] as? Date
+                if (c835procDate != null) {
+                    val c837 = db["claims_837"]
+                            .find(doc {
+                                `+`("acn", doc["acn"])
+                                `+$lt`("sendDate", c835procDate)
+                            })
+                            .projection(doc {
+                                `+`("dx", 1)
+                                `+`("npi", 1)
+                                `+`("drFirsN", 1)
+                                `+`("drLastN", 1)
+                                `+`("sendDate", 1)
+                            })
+                            .sort(doc {
+                                `+`("sendDate", -1)
+                            })
+                            .first()
+                    if (c837 != null) {
+                        claim835["c837"] = Document(c837)
+                    }
+                }
             }
+            else -> doc
         }
+
 
         addClaimHeader(claim)
         addClaimBody(claim)

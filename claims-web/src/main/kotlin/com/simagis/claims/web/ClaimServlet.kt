@@ -3,6 +3,7 @@ package com.simagis.claims.web
 import com.mongodb.MongoClient
 import com.mongodb.client.FindIterable
 import com.simagis.claims.rest.api.ClaimDb
+import com.simagis.claims.web.ui.ClaimQuery
 import com.simagis.claims.web.ui.applyParameters
 import com.simagis.claims.web.ui.toClaimQuery
 import com.simagis.edi.mdb.MDBCredentials
@@ -45,8 +46,9 @@ class ClaimServlet : HttpServlet() {
         val paging = Paging.of(request.parameterMap)
         val errors = StringBuilder()
 
+        var cq: ClaimQuery? = null
         val documents: FindIterable<Document>? = (if (servletPath == "/query")
-            query(request, paging, errors) else
+            query(request, paging, errors) { cq = this} else
             find(request, paging))
 
         if (documents == null) {
@@ -56,6 +58,7 @@ class ClaimServlet : HttpServlet() {
 
         val html = Claims835ToHtml(
                 db = db,
+                cq = cq,
                 paging = paging,
                 root = servletPath + request.pathInfo,
                 queryString = queryString)
@@ -119,12 +122,16 @@ class ClaimServlet : HttpServlet() {
     }
 
     private val queryCountCache: MutableMap<Document, Long> = ConcurrentHashMap()
-    private fun query(request: HttpServletRequest, paging: Paging, errors: StringBuilder): FindIterable<Document>? {
+    private fun query(request: HttpServletRequest,
+                      paging: Paging,
+                      errors: StringBuilder,
+                      onNewCQ: ClaimQuery.() -> Unit)
+            : FindIterable<Document>? {
         val path = request.pathInfo.removePrefix("/")
         if (path.isBlank()) return null
         val cq = ClaimDb.cq.find(doc { `+`("path", path) }).let {
             when (it.count()) {
-                1 -> it.first()?.toClaimQuery()
+                1 -> it.first()?.toClaimQuery()?.apply { onNewCQ() }
                 0 -> null
                 else -> {
                     errors.append("too many cq path '$path' found:\n")

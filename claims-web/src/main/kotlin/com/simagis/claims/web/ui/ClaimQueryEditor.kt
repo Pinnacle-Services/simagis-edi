@@ -393,7 +393,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                                         jsonTextArea("projection", false).apply { heightK1 = size100pc })
                                 addComponents(
                                         ComboBox<String>("EDI Document Type").apply {
-                                            setItems("835", "837")
+                                            setItems("835", "835c", "837")
                                             isEmptySelectionAllowed = false
                                             isTextInputAllowed = false
                                             binder.forField(this)
