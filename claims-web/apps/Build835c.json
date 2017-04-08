@@ -1,0 +1,9 @@
+{
+  "className": "com.simagis.edi.mongodb.Build835cAppKt",
+  "options": [
+    "-Xms10g",
+    "-Xmx20g"
+  ],
+  "parameters": [
+  ]
+}

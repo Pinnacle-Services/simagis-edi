@@ -36,13 +36,13 @@ class Import private constructor(
             isAliveA.set(true)
             future = RJobManager.submit(Callable<Unit> {
                 try {
-                    fun loadCommand(): JavaProcess.Command = JavaProcess.Command.load(TYPE).apply {
+                    fun loadCommand(app: String): JavaProcess.Command = JavaProcess.Command.load(app).apply {
                         parameters += "-host" to ClaimDb.mongoHost
                         parameters += "-job" to id
                     }
                     while (true) {
                         val process = JavaProcess
-                                .start(loadCommand())
+                                .start(loadCommand("Import"))
                                 .also { process = it }
 
                         RJobManager.update(job.apply { status = RJobStatus.RUNNING }, "status")
@@ -53,9 +53,16 @@ class Import private constructor(
                             continue
                         }
                         if (exitValue != 0) throw ClaimDbApiException("Invalid exitValue: $exitValue")
-                        RJobManager.update(job.apply { status = RJobStatus.DONE }, "status")
                         break
                     }
+
+                    val process = JavaProcess
+                            .start(loadCommand("Build835c"))
+                            .also { process = it }
+                    process.waitFor()
+                    val exitValue = process.exitValue()
+                    if (exitValue != 0) throw ClaimDbApiException("Invalid exitValue: $exitValue")
+                    RJobManager.update(job.apply { status = RJobStatus.DONE }, "status")
                 } catch(e: Throwable) {
                     RJobManager.update(job.apply {
                         status = RJobStatus.ERROR

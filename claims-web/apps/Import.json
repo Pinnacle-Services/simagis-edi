@@ -1,9 +1,9 @@
 {
-  "className": "com.simagis.edi.mongodb.ToMongoDBKt",
+  "className": "com.simagis.edi.mongodb.ImportAppKt",
   "options": [
+    "-Xms10g",
     "-Xmx16g"
   ],
   "parameters": [
-    "/DATA/source_files"
   ]
 }

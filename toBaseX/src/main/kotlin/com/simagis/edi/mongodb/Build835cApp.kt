@@ -7,6 +7,7 @@ import java.util.*
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
+import kotlin.system.exitProcess
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -14,17 +15,24 @@ import kotlin.text.Charsets.UTF_8
  * Created by alexei.vylegzhanin@gmail.com on 4/3/2017.
  */
 fun main(args: Array<String>) {
-    Build835cJob.open(args)
-    info("starting job", detailsJson = Build835cJob.jobDoc)
-    val docs835 = Build835cJob.options.claimTypes["835"].docs
-    val docs835c = Build835cJob.options.claimTypes["835c"].docs
+    ImportJob.open(args)
+    info("starting job", detailsJson = ImportJob.jobDoc)
+    if (ImportJob.options.build835c._835c.temp.isBlank()) {
+        info("SKIP build835c")
+        exitProcess(0)
+    }
 
-    class Client(val doc: Document) {
+    val docs835 = ImportJob.options.claimTypes["835"].targetCollection
+    val docs837 = ImportJob.options.claimTypes["837"].targetCollection
+    val docs835c = ImportJob.options.build835c._835c.tempCollection
+
+    class Client(doc: Document) {
+        val doc = Document(doc).apply { remove("_id") }
         val npi = doc["npi"] as String
     }
 
     val npiMapClient = mutableMapOf<String, Client>().apply {
-        val clients = Build835cJob.claims.getCollection("clientid")
+        val clients = ImportJob.options.build835c.clients
         clients.find().forEach {
             Client(it).let { this[it.npi] = it }
         }
@@ -38,7 +46,7 @@ fun main(args: Array<String>) {
     }
 
     val acnMap837 = mutableMapOf<String, MutableList<Doc837>>().apply {
-        Build835cJob.options.claimTypes["837"].docs.find()
+        docs837.find()
                 .projection(doc {
                     `+`("dx", 1)
                     `+`("npi", 1)
@@ -59,7 +67,7 @@ fun main(args: Array<String>) {
     }
     docs835c.drop()
     val claimsLeft = AtomicLong(docs835.count())
-    Build835cJob.updateProcessing("claimsLeft", claimsLeft.get())
+    ImportJob.updateProcessing("claimsLeft", claimsLeft.get())
     var docs835cList = mutableListOf<Document>()
     val insertQueue = LinkedBlockingQueue<List<Document>>(5)
     val insertThread = thread(name = "docs835c.insertMany(list)") {
@@ -67,7 +75,7 @@ fun main(args: Array<String>) {
             val list: List<Document> = insertQueue.poll(5, TimeUnit.SECONDS) ?: continue
             if (list.isEmpty()) break
             docs835c.insertMany(list)
-            Build835cJob.updateProcessing("claimsLeft", claimsLeft.addAndGet(-list.size.toLong()))
+            ImportJob.updateProcessing("claimsLeft", claimsLeft.addAndGet(-list.size.toLong()))
         } while (true)
     }
     val skipKeys = setOf("_id", "acn")
@@ -112,31 +120,12 @@ fun main(args: Array<String>) {
         docs835c.insertMany(docs835cList)
         docs835cList = mutableListOf<Document>()
     }
-    Build835cJob.updateProcessing("claimsLeft", 0L)
-    info("DONE", detailsJson = Build835cJob.jobDoc)
-}
+    ImportJob.updateProcessing("claimsLeft", 0L)
 
-private object Build835cJob : AbstractJob() {
-    object options {
-        private val options: Document by lazy { jobDoc?.get("options") as? Document ?: Document() }
-
-        object claimTypes {
-            private val claimTypes: Document by lazy { options["claimTypes"] as? Document ?: Document() }
-            private val cache: MutableMap<String, ClaimType> = ConcurrentHashMap()
-
-            operator fun get(type: String): ClaimType = cache.computeIfAbsent(type) {
-                val claimType = (claimTypes[type] as? Document) ?: Document()
-                ClaimType(
-                        type = type,
-                        collection = claimType["collection"] as? String ?: "claims_$type")
-            }
-
-        }
-
-        data class ClaimType(
-                val type: String,
-                val collection: String) {
-            val docs: DocumentCollection by lazy { claims.getCollection(collection) }
-        }
+    with(ImportJob.options.build835c._835c) {
+        createIndexes()
+        renameToTarget()
     }
+
+    info("DONE", detailsJson = ImportJob.jobDoc)
 }
