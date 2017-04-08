@@ -332,7 +332,7 @@ private class MFiles {
         while (sourceFiles.isNotEmpty()) {
             val mFile = sourceFiles.removeAt(0)
             trace("queue.put($mFile)")
-            if (count-- % 10 == 0) {
+            if (--count % 10 == 0) {
                 ImportJob.updateProcessing("filesLeft", count)
             }
             queue.put(mFile)
@@ -341,7 +341,7 @@ private class MFiles {
                 break
             }
         }
-        ImportJob.updateProcessing("filesLeft", 0)
+        ImportJob.updateProcessing("filesLeft", count)
         if (restartRequired) {
             queue.clear()
         } else {
