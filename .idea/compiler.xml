@@ -9,6 +9,7 @@
         <module name="claims-web" />
         <module name="edireader" />
         <module name="mdb" />
+        <module name="swagger-test" />
         <module name="toBaseX" />
       </profile>
     </annotationProcessing>
@@ -17,6 +18,8 @@
       <module name="edi" target="1.5" />
       <module name="edireader" target="1.6" />
       <module name="mdb" target="1.5" />
+      <module name="swagger-java-client" target="1.7" />
+      <module name="swagger-test" target="1.7" />
       <module name="toBaseX" target="1.5" />
       <module name="toMongoDB" target="1.5" />
     </bytecodeTargetLevel>
