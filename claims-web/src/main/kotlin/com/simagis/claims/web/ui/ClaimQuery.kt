@@ -62,7 +62,7 @@ data class ClaimQuery(
 
     fun toParameters(): Set<Parameter> = Document.parse(find).toParameters()
 
-    data class Parameter(val name: String, val operator: String, val default: String? = null)
+    data class Parameter(val name: String, val operator: String, var default: String? = null)
 }
 
 fun Document.toClaimQuery(): ClaimQuery = ClaimQuery(

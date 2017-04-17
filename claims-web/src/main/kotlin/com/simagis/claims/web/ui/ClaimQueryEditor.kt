@@ -18,6 +18,7 @@ import com.vaadin.icons.VaadinIcons
 import com.vaadin.server.Page
 import com.vaadin.server.UserError
 import com.vaadin.shared.ui.ContentMode
+import com.vaadin.shared.ui.ValueChangeMode
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
 import org.bson.Document
@@ -50,6 +51,12 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
             binder.readBean(field)
             updateURL()
         }
+
+    private val parametersLayout = HorizontalLayout().apply {
+        margin = margins()
+        isSpacing = true
+        addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING)
+    }
 
     private val urlLink = Label("", ContentMode.HTML).apply {
         description = "Open Query Link in new window"
@@ -360,12 +367,19 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 addComponent(descriptionLabel)
             })
 
+            addComponent(sectionCaption("Link Parameters"))
+            addComponent(VerticalLayout().apply {
+                margin = margins(left = true)
+                isSpacing = false
+                addComponent(parametersLayout)
+            })
+
             addComponent(sectionCaption("Link"))
             addComponent(VerticalLayout().apply {
                 margin = margins(left = true)
                 isSpacing = false
                 addComponent(urlLink)
-                addComponent(Link())
+                addComponent(Label())
             })
 
             val codeMenu = sectionMenu()
@@ -458,6 +472,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
 
     private fun updateURL() = with(ClaimQuery()) {
         val valid = binder.validate().isOk
+        parametersLayout.removeAllComponents()
         urlLink.componentError = null
         urlLink.isEnabled = valid
         fun URI.toHtml() = """<a
@@ -466,22 +481,43 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
             >${toString()}&nbsp;${VaadinIcons.EXTERNAL_LINK.html}</a>"""
         if (valid) {
             binder.writeBean(this)
+            fun updateLink(href: String) {
+                try {
+                    val uri = URI(href)
+                    urlLink.value = Page.getCurrent().location.resolve(uri).toHtml()
+                } catch(e: URISyntaxException) {
+                    urlLink.componentError = UserError("Invalid URL: ${e.reason}")
+                    urlLink.isEnabled = false
+                    urlLink.value = URI("#").toHtml()
+                }
+            }
             val href = when {
-                path.isNotBlank() && value_id != null -> "/query/$path?" + toParameters()
-                        .joinToString(separator = "&") {
+                path.isNotBlank() && value_id != null -> {
+                    val parameters = toParameters()
+                    fun toHRef() :String {
+                        return  "/query/$path?" + parameters.joinToString(separator = "&") {
                             "${it.name}=${it.default?.let { URLEncoder.encode(it, "UTF-8") } ?: ""}"
                         }
+                    }
+                    parameters.forEach { parameter ->
+                        TextField(parameter.name, parameter.default).apply {
+                            parametersLayout.addComponent(VerticalLayout(this).apply {
+                                margin = margins()
+                                setSizeUndefined()
+                            })
+                            valueChangeMode = ValueChangeMode.EAGER
+                            addValueChangeListener {
+                                parameter.default = it.value
+                                updateLink(toHRef())
+                            }
+                        }
+                    }
+                    toHRef()
+                }
                 else -> "/claim/$type/=${encode()}?ps=$pageSize"
             }
+            updateLink(href)
 
-            try {
-                val uri = URI(href)
-                urlLink.value = Page.getCurrent().location.resolve(uri).toHtml()
-            } catch(e: URISyntaxException) {
-                urlLink.componentError = UserError("Invalid URL: ${e.reason}")
-                urlLink.isEnabled = false
-                urlLink.value = URI("#").toHtml()
-            }
         } else {
             urlLink.value = URI("#").toHtml()
         }
