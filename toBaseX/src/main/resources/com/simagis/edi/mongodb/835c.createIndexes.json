@@ -13,6 +13,10 @@
     {"svc.adj.adjReason": 1},
     {"clmPayTotal": 1},
     {"clmPay": 1},
-    {"ptnId": 1}
+    {"ptnId": 1},
+
+    {"sendDate": -1},
+    {"dx": 1},
+    {"npi": 1}
   ]
 }
