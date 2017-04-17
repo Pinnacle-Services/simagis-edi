@@ -14,9 +14,9 @@
     {"clmPayTotal": 1},
     {"clmPay": 1},
     {"ptnId": 1},
-
     {"sendDate": -1},
     {"dx": 1},
-    {"npi": 1}
+    {"npi": 1},
+    {"client.clientId":1}
   ]
 }
