@@ -2,7 +2,6 @@ package com.simagis.edi.mongodb
 
 import com.berryworks.edireader.EDISyntaxException
 import com.mongodb.ErrorCategory
-import com.mongodb.MongoNamespace
 import com.mongodb.MongoWriteException
 import com.simagis.edi.basex.ISA
 import com.simagis.edi.mdb._id
@@ -228,13 +227,13 @@ fun main(args: Array<String>) {
                 val claims = isa.toClaimsJsonArray(file)
                 if (claims != null) {
                     isaCount.incrementAndGet()
-                    claims.forEach {
-                        val claimType = ImportJob.options.claimTypes[isa.type]
-                        if (claimType.temp.isNotBlank() && it is JsonObject) {
-                            val collection = claimType.tempCollection
-                            val document = Document.parse(it.toString()).prepare()
+                    claims.forEach { json ->
+                        fun ImportJob.options.ClaimType.insert(archiveMode: Boolean) {
+                            if (temp.isBlank()) return
+                            val collection = tempCollection
+                            val document = Document.parse(json.toString()).prepare()
                             try {
-                                fun Document.inRange(start: Date?) = when (isa.type) {
+                                fun Document.inRange(start: Date?) = archiveMode || when (isa.type) {
                                     "835" -> getDate("procDate")?.after(start) ?: false
                                     "837" -> getDate("sendDate")?.after(start) ?: false
                                     else -> true
@@ -255,6 +254,10 @@ fun main(args: Array<String>) {
                                 }
 
                             }
+                        }
+                        if (json is JsonObject) {
+                            ImportJob.options.claimTypes[isa.type].insert(false)
+                            ImportJob.options.archive["${isa.type}a"].insert(true)
                         }
                     }
                 } else {
@@ -280,13 +283,15 @@ fun main(args: Array<String>) {
         val done = importing.upload()
         threads.forEach(Thread::join)
         if (done) {
-            ImportJob.options.claimTypes.types
+            val claimTypes: List<ImportJob.options.ClaimType> = ImportJob.options.archive.types
+                    .map { ImportJob.options.archive[it] } + ImportJob.options.claimTypes.types
                     .map { ImportJob.options.claimTypes[it] }
+
+            claimTypes
                     .filter { it.createIndexes }
                     .forEach { it.createIndexes() }
 
-            ImportJob.options.claimTypes.types
-                    .map { ImportJob.options.claimTypes[it] }
+            claimTypes
                     .filter { it.target.isNotEmpty() }
                     .forEach { it.renameToTarget() }
 

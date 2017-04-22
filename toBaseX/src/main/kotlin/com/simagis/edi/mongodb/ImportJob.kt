@@ -44,6 +44,17 @@ internal object ImportJob : AbstractJob() {
             }
         }
 
+        object archive {
+            private val archive: Document by lazy { options["archive"] as? Document ?: Document() }
+            private val cache: MutableMap<String, ClaimType> = ConcurrentHashMap()
+
+            val types: Set<String> get() = archive.keys
+
+            operator fun get(type: String): ClaimType = cache.computeIfAbsent(type) {
+                ClaimType.of(type, (archive[type] as? Document) ?: Document())
+            }
+        }
+
         object build835c {
             private val build835c: Document by lazy { options["build835c"] as? Document ?: Document() }
             val _835c: ClaimType by lazy {
@@ -80,7 +91,8 @@ internal fun ImportJob.options.ClaimType.createIndexes() {
     if (temp.isNotBlank()) {
         (Document.parse(ImportJob::class.java
                 .getResourceAsStream("$type.createIndexes.json")
-                .use { it.reader().readText() })
+                ?.use { it.reader().readText() }
+                ?: "{}")
                 ["indexes"] as? List<*>)
                 ?.forEach {
                     if (it is Document) {
