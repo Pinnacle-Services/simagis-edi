@@ -47,7 +47,7 @@ class ClaimQueryExplorerUI : UI() {
 
             addColumn("Name", isSortable = true) { it.name }
             addColumn("Path", isHidable = true, isHidden = true, isSortable = true) { it.path }
-            addColumn("Type", isSortable = true) { it.type }.apply { maximumWidth = 72.0 }
+            addColumn("Type", isSortable = true) { it.type }.apply { maximumWidth = 96.0 }
             addColumn("Created", isHidable = true, isHidden = true, isSortable = true) { it.created }.setRenderer(DateRenderer(SimpleDateFormat("yyyy-MM-dd HH:mm:ss")))
             addColumn("Modified", isHidable = true, isHidden = true, isSortable = true) { it.modified }.setRenderer(DateRenderer(SimpleDateFormat("yyyy-MM-dd HH:mm:ss")))
             addColumn("find", isHidable = true, isHidden = true) { it.find }

@@ -407,9 +407,12 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                                         jsonTextArea("projection", false).apply { heightK1 = size100pc })
                                 addComponents(
                                         ComboBox<String>("EDI Document Type").apply {
-                                            setItems("835", "835c", "837")
+                                            setItems("835", "835c", "837", "835a", "837a")
                                             isEmptySelectionAllowed = false
                                             isTextInputAllowed = false
+                                            itemCaptionGenerator = ItemCaptionGenerator {
+                                                if (it.endsWith("a")) "$it (archive)" else it
+                                            }
                                             binder.forField(this)
                                                     .bind("type")
 
