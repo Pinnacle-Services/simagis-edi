@@ -70,16 +70,6 @@ internal abstract class AbstractJob {
             }
         }
 
-        fun Document.appendError(e: Throwable) {
-            `+`("error", doc {
-                `+`("errorClass", e.javaClass.name)
-                `+`("message", e.message)
-                `+`("stackTrace", StringWriter().let {
-                    PrintWriter(it).use { e.printStackTrace(it) }
-                    it.toString().lines()
-                })
-            })
-        }
         try {
             if (level == TRACE)
                 printLog(message, null)
@@ -136,6 +126,17 @@ object TRACE : LogLevel(100)
 object INFO : LogLevel(500)
 object WARNING : LogLevel(1000)
 object ERROR : LogLevel(5000)
+
+fun Document.appendError(e: Throwable) {
+    `+`("error", doc {
+        `+`("errorClass", e.javaClass.name)
+        `+`("message", e.message)
+        `+`("stackTrace", StringWriter().let {
+            PrintWriter(it).use { e.printStackTrace(it) }
+            it.toString().lines()
+        })
+    })
+}
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun log(

@@ -4,10 +4,7 @@ import com.berryworks.edireader.EDISyntaxException
 import com.mongodb.ErrorCategory
 import com.mongodb.MongoWriteException
 import com.simagis.edi.basex.ISA
-import com.simagis.edi.mdb._id
-import com.simagis.edi.mdb.`+$set`
-import com.simagis.edi.mdb.`+`
-import com.simagis.edi.mdb.doc
+import com.simagis.edi.mdb.*
 import org.basex.core.Context
 import org.basex.core.MainOptions
 import org.basex.core.cmd.CreateDB
@@ -41,22 +38,6 @@ fun main(args: Array<String>) {
     val importing = MFiles()
 
     val xqTypes: MutableMap<String, String> = ConcurrentHashMap()
-
-    val digests: MutableSet<String> = Collections.synchronizedSet(mutableSetOf<String>())
-    fun File.digest() = inputStream().use { stream ->
-        fun md(): MessageDigest = MessageDigest.getInstance("SHA")
-        fun ByteArray.toHexString(): String = joinToString(separator = "") {
-            Integer.toHexString(it.toInt() and 0xff)
-        }
-        md().apply {
-            val bytes = ByteArray(4096)
-            while (true) {
-                val len = stream.read(bytes)
-                if (len == -1) break
-                update(bytes, 0, len)
-            }
-        }.digest().toHexString()
-    }
 
     val inMemoryBaseX: ThreadLocal<Context> = ThreadLocal.withInitial {
         Context().apply {
@@ -207,63 +188,66 @@ fun main(args: Array<String>) {
             return this
         }
 
-        fun import(file: File) {
-            if (!digests.add(file.digest())) {
-                fileCountDuplicate.incrementAndGet()
-                info("Duplicate file $file")
-                return
-            }
-
+        fun import(mFile: MFile) {
             val isaList: List<ISA>
             try {
-                isaList = ISA.read(file)
+                isaList = ISA.read(mFile.file)
                 fileCount.incrementAndGet()
             } catch(e: Exception) {
                 fileCountInvalid.incrementAndGet()
-                warning("Invalid file $file", e)
+                warning("Invalid file $mFile", e)
+                importing.fileStatusUpdate(mFile, e)
                 return
             }
+
             isaList.forEach { isa ->
-                val claims = isa.toClaimsJsonArray(file)
-                if (claims != null) {
-                    isaCount.incrementAndGet()
-                    claims.forEach { json ->
-                        fun ImportJob.options.ClaimType.insert(archiveMode: Boolean) {
-                            if (temp.isBlank()) return
-                            val collection = tempCollection
-                            val document = Document.parse(json.toString()).prepare()
-                            try {
-                                fun Document.inRange(start: Date?) = archiveMode || when (isa.type) {
-                                    "835" -> getDate("procDate")?.after(start) ?: false
-                                    "837" -> getDate("sendDate")?.after(start) ?: false
-                                    else -> true
-                                }
+                val mISA = MISA(mFile, isa)
+                if (importing.isaStatus(mISA) == "NEW") {
+                    val claims = isa.toClaimsJsonArray(mFile.file)
+                    if (claims != null) {
+                        isaCount.incrementAndGet()
+                        claims.forEach { json ->
+                            fun ImportJob.options.ClaimType.insert(archiveMode: Boolean) {
+                                if (name.isBlank()) return
+                                val document = Document.parse(json.toString()).prepare()
+                                try {
+                                    fun Document.inRange(start: Date?) = archiveMode || when (isa.type) {
+                                        "835" -> getDate("procDate")?.after(start) ?: false
+                                        "837" -> getDate("sendDate")?.after(start) ?: false
+                                        else -> true
+                                    }
 
-                                if (document.inRange(ImportJob.options.after)) {
-                                    collection.insertOne(document)
-                                    claimCount.incrementAndGet()
-                                }
-                            } catch(e: Throwable) {
-                                if (e is MongoWriteException && ErrorCategory.fromErrorCode(e.code)
-                                        == ErrorCategory.DUPLICATE_KEY) {
-                                    claimCountDuplicate.incrementAndGet()
-                                } else {
-                                    claimCountInvalid.incrementAndGet()
-                                    warning("insertOne error: ${e.message}", e,
-                                            detailsJson = document)
-                                }
+                                    if (document.inRange(ImportJob.options.after)) {
+                                        collection.insertOne(document)
+                                        claimCount.incrementAndGet()
+                                    }
+                                } catch(e: Throwable) {
+                                    if (e is MongoWriteException && ErrorCategory.fromErrorCode(e.code)
+                                            == ErrorCategory.DUPLICATE_KEY) {
+                                        claimCountDuplicate.incrementAndGet()
+                                    } else {
+                                        claimCountInvalid.incrementAndGet()
+                                        warning("insertOne error: ${e.message}", e,
+                                                detailsJson = document)
+                                    }
 
+                                }
+                            }
+                            if (json is JsonObject) {
+                                ImportJob.options.claimTypes[isa.type].insert(false)
+                                ImportJob.options.archive["${isa.type}a"].insert(true)
                             }
                         }
-                        if (json is JsonObject) {
-                            ImportJob.options.claimTypes[isa.type].insert(false)
-                            ImportJob.options.archive["${isa.type}a"].insert(true)
-                        }
+                        importing.isaStatusUpdate(mISA, "ARCHIVED")
+                    } else {
+                        isaCountInvalid.incrementAndGet()
+                        importing.isaStatusUpdate(mISA, AssertionError(
+                                "isa.toClaimsJsonArray(mFile.file) == null"))
                     }
-                } else {
-                    isaCountInvalid.incrementAndGet()
                 }
             }
+
+            importing.fileStatusUpdate(mFile, "ARCHIVED")
         }
 
         info("Starting import ${ImportJob.options.sourceDir} into $ImportJob")
@@ -273,7 +257,7 @@ fun main(args: Array<String>) {
                     val mFile: MFile? = importing.poll()
                     if (mFile != null) {
                         importing.start(mFile)
-                        import(mFile.file)
+                        import(mFile)
                         importing.delete(mFile)
                     }
                 }
@@ -291,10 +275,6 @@ fun main(args: Array<String>) {
                     .filter { it.createIndexes }
                     .forEach { it.createIndexes() }
 
-            claimTypes
-                    .filter { it.target.isNotEmpty() }
-                    .forEach { it.renameToTarget() }
-
             info("DONE for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
         } else {
             warning("RESTARTING for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
@@ -306,7 +286,27 @@ fun main(args: Array<String>) {
     }
 }
 
-private data class MFile(val id: ObjectId?, val file: File)
+private fun md(): MessageDigest = MessageDigest.getInstance("SHA")
+
+private fun ByteArray.toHexString(): String = joinToString(separator = "") {
+    Integer.toHexString(it.toInt() and 0xff)
+}
+
+private fun File.digest() = inputStream().use { stream ->
+    md().apply {
+        val bytes = ByteArray(4096)
+        while (true) {
+            val len = stream.read(bytes)
+            if (len == -1) break
+            update(bytes, 0, len)
+        }
+    }.digest().toHexString()
+}
+
+
+private data class MISA(val mFile: MFile, val isa: ISA, var digest: String = "")
+
+private data class MFile(val id: ObjectId?, val file: File, var digest: String = "")
 
 private class MFiles {
     private val queue = LinkedBlockingQueue<MFile>(1)
@@ -340,7 +340,9 @@ private class MFiles {
             if (--count % 10 == 0) {
                 ImportJob.updateProcessing("filesLeft", count)
             }
-            queue.put(mFile)
+            if (fileStatus(mFile) == "NEW") {
+                queue.put(mFile)
+            }
             if (restartRequired()) {
                 restartRequired = true
                 break
@@ -366,6 +368,78 @@ private class MFiles {
         return !restartRequired
     }
 
+    fun fileStatus(mFile: MFile): String? {
+        mFile.digest = mFile.file.digest()
+        val filter = doc(mFile.digest)
+        ImportJob.digest.file.find(filter).first().let { found: Document? ->
+            if (found == null) {
+                ImportJob.digest.file.insertOne(doc {
+                    `+`("_id", mFile.digest)
+                    `+`("names", listOf(mFile.file.name))
+                    `+`("status", "NEW")
+                })
+                return "NEW"
+            } else {
+                ImportJob.digest.file.updateOne(filter, doc {
+                    `+$addToSet` { `+`("names", mFile.file.name) }
+                })
+                return found["status"] as? String
+            }
+        }
+    }
+
+    fun fileStatusUpdate(mFile: MFile, value: String) {
+        ImportJob.digest.file.updateOne(doc(mFile.digest), doc {
+            `+$set` { `+`("status", value) }
+        })
+    }
+
+    fun fileStatusUpdate(mFile: MFile, error: Throwable) {
+        ImportJob.digest.file.updateOne(doc(mFile.digest), doc {
+            `+$set` {
+                `+`("status", "ERROR")
+                appendError(error)
+            }
+        })
+    }
+
+    fun isaStatus(mISA: MISA): String? {
+        val byteArray = mISA.isa.code.toByteArray(ISA.CHARSET)
+        mISA.digest = md().digest(byteArray).toHexString()
+
+        val filter = doc(mISA.digest)
+        ImportJob.digest.isa.find(filter).first().let { found: Document? ->
+            if (found == null) {
+                ImportJob.digest.isa.insertOne(doc {
+                    `+`("_id", mISA.digest)
+                    `+`("files", listOf(mISA.mFile.digest))
+                    `+`("status", "NEW")
+                })
+                return "NEW"
+            } else {
+                ImportJob.digest.isa.updateOne(filter, doc {
+                    `+$addToSet` { `+`("files", mISA.mFile.digest) }
+                })
+                return found["status"] as? String
+            }
+        }
+    }
+
+    fun isaStatusUpdate(mISA: MISA, value: String) {
+        ImportJob.digest.isa.updateOne(doc(mISA.digest), doc {
+            `+$set` { `+`("status", value) }
+        })
+    }
+
+    fun isaStatusUpdate(mISA: MISA, error: Throwable) {
+        ImportJob.digest.isa.updateOne(doc(mISA.digest), doc {
+            `+$set` {
+                `+`("status", "ERROR")
+                appendError(error)
+            }
+        })
+    }
+
     fun start(file: MFile) {
         ImportJob.importFiles.updateOne(doc(file.id), doc { `+$set` { `+`("started", Date()) } })
     }
@@ -388,15 +462,6 @@ private class MFiles {
                             ImportJob.apiJobs.updateOne(ImportJob.jobFilter, doc {
                                 `+$set` { `+`("processing", doc { `+`("started", Date()) }) }
                             })
-                            val collectionNames = ImportJob.claims.listCollectionNames()
-                            ImportJob.options.claimTypes.types
-                                    .map { ImportJob.options.claimTypes[it] }
-                                    .filter { collectionNames.contains(it.temp) }
-                                    .forEach {
-                                        warning("temp collection already exists -> ${it.tempCollection.namespace}.drop()")
-                                        it.tempCollection.drop()
-                                    }
-
                         } else {
                             info("continue processing")
                         }
@@ -423,6 +488,7 @@ private class MFiles {
             if (isStarting) {
                 with(ImportJob.options) {
                     info("scanning $sourceDir in $scanMode mode")
+                    ImportJob.importFiles.drop()
                     sourceDir.walk(scanMode).forEach { file ->
                         val fileDoc = doc {
                             `+`("job", ImportJob.jobId)

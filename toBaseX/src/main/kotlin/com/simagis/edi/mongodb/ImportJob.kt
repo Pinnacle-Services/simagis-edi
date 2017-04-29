@@ -1,10 +1,7 @@
 package com.simagis.edi.mongodb
 
-import com.mongodb.MongoNamespace
 import org.bson.Document
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -13,6 +10,28 @@ import java.util.concurrent.ConcurrentHashMap
  */
 
 internal object ImportJob : AbstractJob() {
+    object digest {
+        val isa: DocumentCollection by lazy { claimsAPI.getCollection("digest.isa") }
+        /*
+        {
+          "_id": "0f6c0903ca5e2f45bf53d6d3274379b5afee3aba",
+          "files": [
+              "15a3fc927d2cce8ec84d2f040d1de6a70593aadf",
+              "16b55fe965458e554d9ccccb52371eb9c055627f"],
+          "status": "NEW" // "NEW" | "ARCIVED" | "ERROR"
+        }
+         */
+
+        val file: DocumentCollection by lazy { claimsAPI.getCollection("digest.file") }
+        /*
+        {
+          "_id": "15a3fc927d2cce8ec84d2f040d1de6a70593aadf",
+          "names": ["835Ansi_from_flat.6528.txt_001.txt"],
+          "status": "NEW" // "NEW" | "ARCIVED" | "ERROR"
+        }
+         */
+    }
+
     val importFiles: DocumentCollection by lazy { claimsAPI.getCollection("importFiles") }
 
     object options {
@@ -67,16 +86,13 @@ internal object ImportJob : AbstractJob() {
 
         data class ClaimType(
                 val type: String,
-                val temp: String,
-                val target: String,
+                val name: String,
                 val createIndexes: Boolean) {
-            val tempCollection: DocumentCollection by lazy { claims.getCollection(temp) }
-            val targetCollection: DocumentCollection by lazy { claims.getCollection(target) }
+            val collection: DocumentCollection by lazy { claims.getCollection(name) }
             companion object {
                 internal fun of(type: String, claimType: Document) = ClaimType(
                         type = type,
-                        temp = claimType["temp"] as? String ?: "claims_$type.temp",
-                        target = claimType["target"] as? String ?: "claims_$type.target",
+                        name = claimType["name"] as? String ?: "claims_$type",
                         createIndexes = claimType["createIndexes"] as? Boolean ?: true
                 )
             }
@@ -88,30 +104,15 @@ internal object ImportJob : AbstractJob() {
 internal fun ImportJob.options.ClaimType.createIndexes() {
     if (!createIndexes) return
     info("createIndexes for $this")
-    if (temp.isNotBlank()) {
-        (Document.parse(ImportJob::class.java
-                .getResourceAsStream("$type.createIndexes.json")
-                ?.use { it.reader().readText() }
-                ?: "{}")
-                ["indexes"] as? List<*>)
-                ?.forEach {
-                    if (it is Document) {
-                        info("$temp.createIndex(${it.toJson()})")
-                        tempCollection.createIndex(it)
-                    }
+    (Document.parse(ImportJob::class.java
+            .getResourceAsStream("$type.createIndexes.json")
+            ?.use { it.reader().readText() }
+            ?: "{}")
+            ["indexes"] as? List<*>)
+            ?.forEach {
+                if (it is Document) {
+                    info("$name.createIndex(${it.toJson()})")
+                    collection.createIndex(it)
                 }
-    }
-}
-
-internal fun ImportJob.options.ClaimType.renameToTarget() {
-    info("renameToTarget for $this")
-    if (target.isNotBlank()) {
-        if (targetCollection.isExists) {
-            targetCollection.renameCollection(
-                    MongoNamespace(ImportJob.claims.name, target
-                            + ".backup." + SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSSS").format(Date()))
-            )
-        }
-        tempCollection.renameCollection(targetCollection.namespace)
-    }
+            }
 }

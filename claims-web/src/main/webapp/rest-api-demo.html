@@ -34,15 +34,15 @@
             parallel: 8,
             after: "2014-01-01",
             claimTypes: {
-                "835": {temp: "claims_835.temp", target: "claims_835.target", createIndexes: true},
-                "837": {temp: "claims_837.temp", target: "claims_837.target", createIndexes: true}
+                "835": {name: "claims_835", createIndexes: true},
+                "837": {name: "claims_837", createIndexes: true}
             },
             archive: {
-                "835a": {temp: "claims_835a.temp", target: "claims_835a.target", createIndexes: true},
-                "837a": {temp: "claims_837a.temp", target: "claims_837a.target", createIndexes: true}
+                "835a": {name: "claims_835a", createIndexes: true},
+                "837a": {name: "claims_837a", createIndexes: true}
             },
             build835c: {
-                "835c": {temp: "claims_835c.temp", target: "claims_835c.target", createIndexes: true},
+                "835c": {name: "claims_835c", createIndexes: true},
                 clients: "clientid"
             }
         }

@@ -17,14 +17,14 @@ import kotlin.text.Charsets.UTF_8
 fun main(args: Array<String>) {
     ImportJob.open(args)
     info("starting job", detailsJson = ImportJob.jobDoc)
-    if (ImportJob.options.build835c._835c.temp.isBlank()) {
+    if (ImportJob.options.build835c._835c.name.isBlank()) {
         info("SKIP build835c")
         exitProcess(0)
     }
 
-    val docs835 = ImportJob.options.claimTypes["835"].targetCollection
-    val docs837 = ImportJob.options.claimTypes["837"].targetCollection
-    val docs835c = ImportJob.options.build835c._835c.tempCollection
+    val docs835 = ImportJob.options.claimTypes["835"].collection
+    val docs837 = ImportJob.options.claimTypes["837"].collection
+    val docs835c = ImportJob.options.build835c._835c.collection
 
     class Client(doc: Document) {
         val doc = Document(doc).apply { remove("_id") }
@@ -124,7 +124,6 @@ fun main(args: Array<String>) {
 
     with(ImportJob.options.build835c._835c) {
         createIndexes()
-        renameToTarget()
     }
 
     info("DONE", detailsJson = ImportJob.jobDoc)
