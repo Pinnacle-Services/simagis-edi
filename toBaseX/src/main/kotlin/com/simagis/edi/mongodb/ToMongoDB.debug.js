@@ -4,7 +4,37 @@ db.apiJobs.insertOne({
     type: 'Import',
     status: 'NEW',
     options: {
-        sourceDir: '/claim-db/sourceFiles',
-        after: ISODate('2014-01-01')
+        "sourceDir": "E:/DATA/source_files",
+        "scanMode": "R",
+        "xqDir": "isa-claims-xq",
+        "parallel": 8,
+        "after": "2016-04-28",
+        "claimTypes": {
+            "835": {
+                "name": "DEBUG_claims_835",
+                "createIndexes": true
+            },
+            "837": {
+                "name": "DEBUG_claims_837",
+                "createIndexes": true
+            }
+        },
+        "archive": {
+            "835a": {
+                "name": "DEBUG_claims_835a",
+                "createIndexes": true
+            },
+            "837a": {
+                "name": "DEBUG_claims_837a",
+                "createIndexes": true
+            }
+        },
+        "build835c": {
+            "835c": {
+                "name": "DEBUG_claims_835c",
+                "createIndexes": true
+            },
+            "clients": "clientid"
+        }
     }
 });

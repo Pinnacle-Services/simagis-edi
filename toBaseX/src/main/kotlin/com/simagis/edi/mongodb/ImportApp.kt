@@ -233,16 +233,8 @@ fun main(args: Array<String>) {
                             val collection = tempCollection
                             val document = Document.parse(json.toString()).prepare()
                             try {
-                                fun Document.inRange(start: Date?) = archiveMode || when (isa.type) {
-                                    "835" -> getDate("procDate")?.after(start) ?: false
-                                    "837" -> getDate("sendDate")?.after(start) ?: false
-                                    else -> true
-                                }
-
-                                if (document.inRange(ImportJob.options.after)) {
-                                    collection.insertOne(document)
-                                    claimCount.incrementAndGet()
-                                }
+                                collection.insertOne(document)
+                                claimCount.incrementAndGet()
                             } catch(e: Throwable) {
                                 if (e is MongoWriteException && ErrorCategory.fromErrorCode(e.code)
                                         == ErrorCategory.DUPLICATE_KEY) {
@@ -257,7 +249,6 @@ fun main(args: Array<String>) {
                         }
                         if (json is JsonObject) {
                             ImportJob.options.claimTypes[isa.type].insert(false)
-                            ImportJob.options.archive["${isa.type}a"].insert(true)
                         }
                     }
                 } else {

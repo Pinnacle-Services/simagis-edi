@@ -161,7 +161,7 @@ class ISA private constructor(text: String, private val start: Int, private val 
                                 doc.time = attributes["Time"]
                             }
                             "transaction" -> {
-                                doc.type = attributes["DocType"]
+                                doc.type = "835_plb"
                             }
                             "segment" -> {
                                 if (attributes["Id"] == "CLP") {
@@ -175,7 +175,7 @@ class ISA private constructor(text: String, private val start: Int, private val 
                 }
                 parser.parse(code.inputSource)
                 status = when (doc.type) {
-                    "835", "837" -> Status.VALID
+                    "835_plb" -> Status.VALID
                     else -> Status.INVALID
                 }
             } catch(e: EDISyntaxException) {
