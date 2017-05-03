@@ -88,7 +88,7 @@ internal object ImportJob : AbstractJob() {
 internal fun ImportJob.options.ClaimType.createIndexes() {
     if (!createIndexes) return
     info("createIndexes for $this")
-    if (temp.isNotBlank()) {
+    if (temp.isNotBlank() && tempCollection.isExists) {
         (Document.parse(ImportJob::class.java
                 .getResourceAsStream("$type.createIndexes.json")
                 ?.use { it.reader().readText() }
@@ -105,7 +105,7 @@ internal fun ImportJob.options.ClaimType.createIndexes() {
 
 internal fun ImportJob.options.ClaimType.renameToTarget() {
     info("renameToTarget for $this")
-    if (target.isNotBlank()) {
+    if (target.isNotBlank() && tempCollection.isExists) {
         if (targetCollection.isExists) {
             targetCollection.renameCollection(
                     MongoNamespace(ImportJob.claims.name, target
