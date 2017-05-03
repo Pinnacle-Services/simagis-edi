@@ -138,7 +138,9 @@ fun main(args: Array<String>) {
             val DT6 by lazy { SimpleDateFormat("yyyyMM") }
             val DT4 by lazy { SimpleDateFormat("yyyy") }
             val _id = remove("id")
-            append("_id", _id)
+            if (_id != null) {
+                append("_id", _id)
+            }
             fun Document.fixTypes() {
                 fun String.isTyped() = contains('-')
                 fun String.type() = substringAfter('-')
