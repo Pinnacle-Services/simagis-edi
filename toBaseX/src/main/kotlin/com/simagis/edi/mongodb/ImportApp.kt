@@ -1,8 +1,6 @@
 package com.simagis.edi.mongodb
 
 import com.berryworks.edireader.EDISyntaxException
-import com.mongodb.ErrorCategory
-import com.mongodb.MongoWriteException
 import com.simagis.edi.basex.ISA
 import com.simagis.edi.mdb._id
 import com.simagis.edi.mdb.`+$set`
@@ -30,7 +28,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import javax.json.Json
 import javax.json.JsonArray
-import javax.json.JsonObject
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.xpath.XPathConstants
+import javax.xml.xpath.XPathFactory
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
@@ -209,7 +209,14 @@ fun main(args: Array<String>) {
             return this
         }
 
+        val prnMap = mutableMapOf<String, MutableSet<String>>()
+
         fun import(file: File) {
+            val xDocFactory = DocumentBuilderFactory.newInstance()
+            val xPathFactory = XPathFactory.newInstance()
+            val xPLB04 = xPathFactory.newXPath().compile("""//element[@Id="PLB04"]/text()""")
+            val xPrn = xPathFactory.newXPath().compile("""//loop[@Id = "1000"]/segment[@Id = "N1" and element = "PR"]/element[@Id = "N102"]/text()""")
+
             if (!digests.add(file.digest())) {
                 fileCountDuplicate.incrementAndGet()
                 info("Duplicate file $file")
@@ -226,35 +233,18 @@ fun main(args: Array<String>) {
                 return
             }
             isaList.forEach { isa ->
-                val claims = isa.toClaimsJsonArray(file)
-                if (claims != null) {
-                    isaCount.incrementAndGet()
-                    claims.forEach { json ->
-                        fun ImportJob.options.ClaimType.insert(archiveMode: Boolean) {
-                            if (temp.isBlank()) return
-                            val collection = tempCollection
-                            val document = Document.parse(json.toString()).prepare()
-                            try {
-                                collection.insertOne(document)
-                                claimCount.incrementAndGet()
-                            } catch(e: Throwable) {
-                                if (e is MongoWriteException && ErrorCategory.fromErrorCode(e.code)
-                                        == ErrorCategory.DUPLICATE_KEY) {
-                                    claimCountDuplicate.incrementAndGet()
-                                } else {
-                                    claimCountInvalid.incrementAndGet()
-                                    warning("insertOne error: ${e.message}", e,
-                                            detailsJson = document)
-                                }
-
+                isa.stat.doc.date?.take(6)?.let { date ->
+                    if (isa.type == "835") {
+                        val builder = xDocFactory.newDocumentBuilder()
+                        val xDoc = builder.parse(isa.toXML().inputStream())
+                        val plb04 = xPLB04.evaluate(xDoc, XPathConstants.STRING) as? String
+                        if (plb04 != null && plb04.isNotBlank()) {
+                            val prn = xPrn.evaluate(xDoc, XPathConstants.STRING) as? String
+                            if (prn != null && prn.isNotBlank()) {
+                                prnMap.computeIfAbsent(prn, { mutableSetOf() }) += date
                             }
                         }
-                        if (json is JsonObject) {
-                            ImportJob.options.claimTypes[isa.type].insert(false)
-                        }
                     }
-                } else {
-                    isaCountInvalid.incrementAndGet()
                 }
             }
         }
@@ -276,18 +266,9 @@ fun main(args: Array<String>) {
         val done = importing.upload()
         threads.forEach(Thread::join)
         if (done) {
-            val claimTypes: List<ImportJob.options.ClaimType> = ImportJob.options.archive.types
-                    .map { ImportJob.options.archive[it] } + ImportJob.options.claimTypes.types
-                    .map { ImportJob.options.claimTypes[it] }
-
-            claimTypes
-                    .filter { it.createIndexes }
-                    .forEach { it.createIndexes() }
-
-            claimTypes
-                    .filter { it.target.isNotEmpty() }
-                    .forEach { it.renameToTarget() }
-
+            prnMap.keys.sorted().forEach { key ->
+                println(key + " -> " +  prnMap[key]?.sorted()?.joinToString())
+            }
             info("DONE for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
         } else {
             warning("RESTARTING for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
@@ -327,7 +308,7 @@ private class MFiles {
         var count = sourceFiles.count()
         ImportJob.updateProcessing("filesLeft", count)
         var restartRequired = false
-        while (sourceFiles.isNotEmpty()) {
+        while (sourceFiles.isNotEmpty() && !isFinishing) {
             val mFile = sourceFiles.removeAt(0)
             trace("queue.put($mFile)")
             if (--count % 10 == 0) {
