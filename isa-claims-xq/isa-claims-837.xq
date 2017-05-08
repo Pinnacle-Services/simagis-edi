@@ -11,6 +11,10 @@ let $rec_name := $trn/loop[@Id="1000"]/segment[@Id="NM1" and *:element="40"]/ele
 let $rec_id := $trn/loop[@Id="1000"]/segment[@Id="NM1" and *:element="40"]/element[@Id="NM109"]/text()
 for $bl in $trn/loop[@Id="2000"]
 
+(: Demographics:)
+let $ptn_bd := $bl/loop[@Id="2010"]//segment[@Id="DMG"]/element[@Id="DMG02"]/text()
+let $ptn_g := $bl/loop[@Id="2010"]//segment[@Id="DMG"]/element[@Id="DMG03"]/text()
+
 (: Payer:)
 let $payer_name := $bl/loop[@Id="2010"]//segment[@Id="NM1" and *:element="PR"]/element[@Id="NM103"]/text()
 let $payer_id := $bl/loop[@Id="2010"]//segment[@Id="NM1" and *:element="PR"]/element[@Id="NM109"]/text()
@@ -56,6 +60,10 @@ else <sys>{"U"}</sys>,
 <npi>{$dr_npi}</npi>,
 <drLastN-CC>{$dr_last}</drLastN-CC>,
 <drFirsN-CC>{ $dr_first}</drFirsN-CC>,
+
+(: Demographics:)
+<ptnBd-DT8>{$ptn_bd}</ptnBd-DT8>,
+<ptnG>{$ptn_g}</ptnG>,
 
 (: DX Data:)
 <dx type = 'array'>{
