@@ -52,6 +52,8 @@ fun main(args: Array<String>) {
                     `+`("npi", 1)
                     `+`("drFirsN", 1)
                     `+`("drLastN", 1)
+                    `+`("ptnBd", 1)
+                    `+`("ptnG", 1)
                     `+`("acn", 1)
                     `+`("sendDate", 1)
                 })
