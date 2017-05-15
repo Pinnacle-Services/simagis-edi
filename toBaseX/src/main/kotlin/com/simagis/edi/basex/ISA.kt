@@ -45,6 +45,12 @@ class ISA private constructor(text: String, private val start: Int, private val 
         return result.toByteArray()
     }
 
+    fun toXmlCode(): String? = try {
+        toXML().toString(ISA.CHARSET)
+    } catch(e: Exception) {
+        null
+    }
+
     override fun toString(): String = code
 
     companion object {

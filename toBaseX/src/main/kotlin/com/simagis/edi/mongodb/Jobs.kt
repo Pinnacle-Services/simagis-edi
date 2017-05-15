@@ -9,10 +9,15 @@ import org.bson.BsonSerializationException
 import org.bson.Document
 import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import javax.json.Json
+import javax.json.JsonObject
+import javax.json.JsonWriterFactory
+import javax.json.stream.JsonGenerator
 import kotlin.concurrent.withLock
 
 /**
@@ -33,6 +38,10 @@ internal abstract class AbstractJob {
     val apiJobsLog: DocumentCollection by lazy { claimsAPI.getCollection("apiJobsLog") }
     val jobFilter get() = doc(jobId)
     val jobDoc: Document? get() = apiJobs.find(jobFilter).first()
+    val jobLogDir: File by lazy { File(".").resolve("logs").also { it.mkdir() }.resolve(jobId).also { it.mkdir() } }
+    val jobLogTxtDir: File by lazy { jobLogDir.resolve("txt").also { it.mkdir() } }
+    val jobLogXmlDir: File by lazy { jobLogDir.resolve("xml").also { it.mkdir() } }
+    val jobLogJsonDir: File by lazy { jobLogDir.resolve("json").also { it.mkdir() } }
 
     internal fun open(args: Array<String>) {
         val commandLine = com.berryworks.edireader.util.CommandLine(args)
@@ -46,6 +55,20 @@ internal abstract class AbstractJob {
     }
 
     override fun toString(): String = "${host}/${claims.name}"
+
+    private val jsonWriterSettingsPPM by lazy { JsonWriterSettings(JsonMode.SHELL, true) }
+    private fun Document?.toStringPPM(): String = when {
+        this == null -> "{}"
+        else -> toJson(jsonWriterSettingsPPM)
+    }
+
+    private val jsonPP: JsonWriterFactory = Json.createWriterFactory(mapOf(
+            JsonGenerator.PRETTY_PRINTING to true))
+
+    private fun JsonObject?.toStringPP(): String = when {
+        this == null -> "{}"
+        else -> StringWriter().use { jsonPP.createWriter(it).write(this); it.toString().trim() }
+    }
 
     private val printLogLock = ReentrantLock()
     private fun log(
@@ -63,6 +86,8 @@ internal abstract class AbstractJob {
                     null
                 printLogLock.withLock {
                     System.err.println(it)
+                    if (details != null)
+                        System.err.println(details)
                     if (detailsPP != null)
                         System.err.println(detailsPP)
                     error?.printStackTrace()
@@ -85,6 +110,7 @@ internal abstract class AbstractJob {
                 printLog(message, null)
             else
                 doc {
+                    `+`("job", jobId)
                     `+`("level", level.value)
                     `+`("msg", message)
                     `+`("time", now)
@@ -92,17 +118,30 @@ internal abstract class AbstractJob {
                         appendError(error)
                     }
                     if (details != null) {
-                        `+`("details", details)
+                        `+`("details", true)
                     }
                     if (detailsJson != null) {
-                        `+`("detailsJson", detailsJson)
+                        `+`("detailsJson", true)
                     }
                     if (detailsXml != null) {
-                        `+`("detailsXml", detailsXml)
+                        `+`("detailsXml", true)
                     }
                 }.let {
                     apiJobsLog.insertOne(it)
                     printLog(message, it._id)
+                    if (details != null) {
+                        jobLogTxtDir.resolve("${it._id}.txt").writeText(details)
+                    }
+                    if (detailsJson != null) {
+                        jobLogJsonDir.resolve("${it._id}.json").writeText(when (detailsJson) {
+                            is JsonObject -> detailsJson.toStringPP()
+                            is Document -> detailsJson.toStringPPM()
+                            else -> detailsJson.toString()
+                        })
+                    }
+                    if (detailsXml != null) {
+                        jobLogXmlDir.resolve("${it._id}.xml").writeText(detailsXml)
+                    }
                 }
         } catch(e: Throwable) {
             e.printStackTrace()

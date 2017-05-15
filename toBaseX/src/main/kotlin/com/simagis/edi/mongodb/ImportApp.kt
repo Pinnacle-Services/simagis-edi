@@ -133,7 +133,7 @@ fun main(args: Array<String>) {
             claim invalid: ${claimCountInvalid.get()}
 """
     try {
-        fun Document.prepare(): Document {
+        fun Document.prepare(logger: LocalLogger): Document {
             val DT8 by lazy { SimpleDateFormat("yyyyMMdd") }
             val DT6 by lazy { SimpleDateFormat("yyyyMM") }
             val DT4 by lazy { SimpleDateFormat("yyyy") }
@@ -182,15 +182,15 @@ fun main(args: Array<String>) {
                                     4 -> append(key.name(), DT4.parse(value))
                                     0 -> Unit
                                     else -> {
-                                        warning("Invalid DT8 value at $_id $key: '${getString(key)}'", detailsJson = this)
+                                        logger.warn("Invalid DT8 value at $_id $key: '${getString(key)}'")
                                     }
                                 }
                             }
                         }
                     } catch(e: Exception) {
                         when (e) {
-                            is ParseException -> warning("Invalid date format at $_id $key: '${getString(key)}'", detailsJson = this)
-                            is NumberFormatException -> warning("Invalid number format at $_id $key: '${getString(key)}'", detailsJson = this)
+                            is ParseException -> logger.warn("Invalid date format at $_id $key: '${getString(key)}'")
+                            is NumberFormatException -> logger.warn("Invalid number format at $_id $key: '${getString(key)}'")
                             else -> throw e
                         }
                     }
@@ -230,8 +230,9 @@ fun main(args: Array<String>) {
                     claims.forEach { json ->
                         fun ImportJob.options.ClaimType.insert(archiveMode: Boolean) {
                             if (temp.isBlank()) return
+                            val logger = LocalLogger(file, isa, json)
                             val collection = tempCollection
-                            val document = Document.parse(json.toString()).prepare()
+                            val document = Document.parse(json.toString()).prepare(logger)
                             try {
                                 fun Document.inRange(start: Date?) = archiveMode || when (isa.type) {
                                     "835" -> getDate("procDate")?.after(start) ?: false
@@ -249,8 +250,7 @@ fun main(args: Array<String>) {
                                     claimCountDuplicate.incrementAndGet()
                                 } else {
                                     claimCountInvalid.incrementAndGet()
-                                    warning("insertOne error: ${e.message}", e,
-                                            detailsJson = document)
+                                    logger.warn("insertOne error: ${e.message}", e)
                                 }
 
                             }
@@ -303,6 +303,12 @@ fun main(args: Array<String>) {
     } catch(e: Throwable) {
         error("ERROR: ${e.message} ${details()}", e)
         exitProcess(2)
+    }
+}
+
+private class LocalLogger(val file: File, val isa: ISA, val json: Any?) {
+    fun warn(message: String, error: Throwable? = null, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) {
+        warning(message + " file: $file", error, details, detailsJson ?: json, detailsXml ?: isa.toXmlCode())
     }
 }
 
