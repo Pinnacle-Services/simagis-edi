@@ -27,29 +27,32 @@
             xhr.send(JSON.stringify(json));
         }
 
-        var defaultStartImportOptions = {
-            sourceDir: "/DATA/source_files",
-            scanMode: "R",
-            xqDir: "isa-claims-xq",
-            parallel: 8,
-            after: "2014-01-01",
-            claimTypes: {
-                "835": {temp: "claims_835.temp", target: "claims_835.target", createIndexes: true},
-                "837": {temp: "claims_837.temp", target: "claims_837.target", createIndexes: true}
-            },
-            archive: {
-                "835a": {temp: "claims_835a.temp", target: "claims_835a.target", createIndexes: true},
-                "837a": {temp: "claims_837a.temp", target: "claims_837a.target", createIndexes: true}
-            },
-            build835c: {
-                "835c": {temp: "claims_835c.temp", target: "claims_835c.target", createIndexes: true},
-                clients: "clientid"
+        var defaultStartContent = {
+            type: 'Import',
+            options: {
+                sourceDir: "/DATA/source_files",
+                scanMode: "R",
+                xqDir: "isa-claims-xq",
+                parallel: 8,
+                after: "2014-01-01",
+                claimTypes: {
+                    "835": {temp: "claims_835.temp", target: "claims_835.target", createIndexes: true},
+                    "837": {temp: "claims_837.temp", target: "claims_837.target", createIndexes: true}
+                },
+                archive: {
+                    "835a": {temp: "claims_835a.temp", target: "claims_835a.target", createIndexes: true},
+                    "837a": {temp: "claims_837a.temp", target: "claims_837a.target", createIndexes: true}
+                },
+                build835c: {
+                    "835c": {temp: "claims_835c.temp", target: "claims_835c.target", createIndexes: true},
+                    clients: "clientid"
+                }
             }
         }
     </script>
 </head>
 <body style="font-family:monospace"
-      onload="e('startImportOptions').value = JSON.stringify(defaultStartImportOptions, undefined, 4)">
+      onload="e('startContent').value = JSON.stringify(defaultStartContent, undefined, 4)">
 <table width="100%">
     <tr>
         <td nowrap valign="top">
@@ -70,9 +73,9 @@
         </td>
         <td width="100%" valign="top">
             <a href="#"
-               onclick="POST('/api/start', {type: 'Import', options:JSON.parse(e('startImportOptions').value)})"
-            >api/start</a> {type: 'Import', options:<br>
-                <textarea cols="64" rows="20" id="startImportOptions" title="json">{}</textarea>}
+               onclick="POST('/api/start', JSON.parse(e('startContent').value))"
+            >api/start</a><br>
+            <textarea cols="64" rows="20" id="startContent" title="json">{}</textarea>
         </td>
     </tr>
 </table>
