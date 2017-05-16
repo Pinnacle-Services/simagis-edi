@@ -1,6 +1,7 @@
 package com.simagis.claims.rest.api.jobs
 
 import com.simagis.claims.rest.api.*
+import com.simagis.edi.mdb._id
 import com.simagis.edi.mdb.doc
 import org.bson.Document
 import java.util.*
@@ -121,5 +122,10 @@ class Import private constructor(
                 options = document["options"] as? Document ?: doc {},
                 error = document["error"] as? Document
         )
+
+        fun isRunning(document: Document): Boolean {
+            val id: String? = document._id as? String
+            return id != null && lock.withLock { running[id] }?.isAlive ?: false
+        }
     }
 }

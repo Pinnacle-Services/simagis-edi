@@ -54,10 +54,15 @@
     <tr>
         <td nowrap valign="top">
             <a href="#" onclick="POST('/api/jobs', {})">api/jobs</a> {}<br>
+            <a href="#" onclick="POST('/api/jobs', {type: 'Import'})">api/jobs</a> {type: 'Import'}<br>
             <a href="#" onclick="POST('/api/jobs', {status: 'NEW'})">api/jobs</a> {status: 'NEW'}<br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'NEW', type: 'Import'})">api/jobs</a> {status: 'NEW', type: 'Import'}<br>
             <a href="#" onclick="POST('/api/jobs', {status: 'RUNNING'})">api/jobs</a> {status: 'RUNNING'}<br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'RUNNING', type: 'Import'})">api/jobs</a> {status: 'RUNNING', type: 'Import'}<br>
             <a href="#" onclick="POST('/api/jobs', {status: 'DONE'})">api/jobs</a> {status: 'DONE'}<br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'DONE', type: 'Import'})">api/jobs</a> {status: 'DONE', type: 'Import'}<br>
             <a href="#" onclick="POST('/api/jobs', {status: 'ERROR'})">api/jobs</a> {status: 'ERROR'}<br>
+            <a href="#" onclick="POST('/api/jobs', {status: 'ERROR', type: 'Import'})">api/jobs</a> {status: 'ERROR', type: 'Import'}<br>
             <hr>
             <a href="#" onclick="POST('/api/job', {id: e('jobId').value})">api/job</a> {id: "<input id="jobId"
                                                                                                     style="width: 32em"
