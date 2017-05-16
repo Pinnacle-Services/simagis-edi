@@ -69,7 +69,13 @@ class ClaimDbApiServlet : HttpServlet() {
 
     private fun Context.doGetJob() = doJsonRequest {
         val id = get("id")
-        val job = ClaimDb.apiJobs.find(doc(id)).first()
+        val job = ClaimDb.apiJobs.find(doc(id)).first()?.also {
+            if (it["status"] == RJobStatus.RUNNING.name && it["type"] == Import.TYPE) {
+                if (!Import.isRunning(it)) {
+                    it["status"] = RJobStatus.INVALID.name
+                }
+            }
+        }
         jsonOut.apply { `+`("job", job) }
     }
 
