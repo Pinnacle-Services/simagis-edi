@@ -503,7 +503,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                         }
                     }
                     parameters.forEach { parameter ->
-                        TextField(parameter.name, parameter.default).apply {
+                        TextField(parameter.name, parameter.default ?: "").apply {
                             parametersLayout.addComponent(VerticalLayout(this).apply {
                                 margin = margins()
                                 setSizeUndefined()
