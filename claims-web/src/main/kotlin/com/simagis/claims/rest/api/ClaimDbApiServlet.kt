@@ -46,18 +46,36 @@ class ClaimDbApiServlet : HttpServlet() {
 
     private fun Context.doGetJobList() = doJsonRequest {
         val status = opt("status")?.let { RJobStatus.valueOf(it) }
-        val filter = status?.let { doc { `+`("status", status.name) } } ?: doc {}
+        val filter = status?.let {
+            doc {
+                `+`("status", status.name)
+                opt("type")?.let { `+`("type", it) }
+            }
+        } ?: doc {}
         jsonOut.apply {
             `+`("jobs", ClaimDb.apiJobs
                     .find(filter)
                     .sort(doc { `+`("created", -1) })
-                    .toList())
+                    .toList()
+                    .filter {
+                        it.remove("options")
+                        when {
+                            RJobStatus.RUNNING == status && Import.TYPE == it["type"] -> Import.isRunning(it)
+                            else -> true
+                        }
+                    })
         }
     }
 
     private fun Context.doGetJob() = doJsonRequest {
         val id = get("id")
-        val job = ClaimDb.apiJobs.find(doc(id)).first()
+        val job = ClaimDb.apiJobs.find(doc(id)).first()?.also {
+            if (it["status"] == RJobStatus.RUNNING.name && it["type"] == Import.TYPE) {
+                if (!Import.isRunning(it)) {
+                    it["status"] = RJobStatus.INVALID.name
+                }
+            }
+        }
         jsonOut.apply { `+`("job", job) }
     }
 
