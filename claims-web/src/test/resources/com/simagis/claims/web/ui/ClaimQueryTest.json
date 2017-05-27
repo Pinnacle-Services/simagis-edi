@@ -20,6 +20,10 @@
     "date1": "#date1:date=2016-03-21",
     "date2": "#date2:date",
     "date3": "#date3:date",
+    "in0": "#in0:in",
+    "in1": "#in1:in=a,b",
+    "in2": "#in2:in=a",
+    "in3": "#in3:in",
     "arr": [
       {
         "arrDate0": "#aDate0:date=2016-04-20",
@@ -60,6 +64,9 @@
     "int2": "222",
     "date1": "2015-03-21",
     "date2": "2015-03-22",
+    "in1": "",
+    "in2": "a,b,c",
+    "in3": ",,2,2",
     "containsText1": "contains1tt",
     "containsText2": "contains2tt",
     "sw1": "sw1tt",

@@ -2,10 +2,7 @@ package com.simagis.claims.web.ui
 
 import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.claims.rest.api.toJsonObject
-import com.simagis.edi.mdb.`+$options`
-import com.simagis.edi.mdb.`+$regex`
-import com.simagis.edi.mdb.`+`
-import com.simagis.edi.mdb.doc
+import com.simagis.edi.mdb.*
 import com.vaadin.data.provider.QuerySortOrder
 import com.vaadin.shared.data.sort.SortDirection
 import com.vaadin.ui.Grid
@@ -191,12 +188,18 @@ internal fun Document.applyParameters(request: (String) -> String?): Document = 
                     else -> null
                 }
 
+                fun String.toIN(): Document = doc {
+                    val list = split(",").map { it.trim() }.toList().distinct()
+                    `+`(`$`("in"), list)
+                }
+
                 when (operator) {
                     "" -> apply { it }
                     "int" -> apply { it?.toLongOrNull() }
                     "num" -> apply { it?.toDoubleOrNull() }
                     "cur" -> apply { it?.toDoubleOrNull() }
                     "date" -> apply { it?.toDate() }
+                    "in" -> apply { it?.toIN() }
                     "contains" -> apply { it?.let { ".*$it.*".toRegex("i") } }
                     "contains/" -> apply { it?.let { ".*$it.*".toRegex("") } }
                     "startsWith" -> apply { it?.let { "^$it.*".toRegex("i") } }
