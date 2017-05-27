@@ -1,5 +1,7 @@
 {
   "indexes": [
-    {"acn": 1}
+    {"acn": 1},
+    {"prn": 1},
+    {"sendDate": 1}    
   ]
 }

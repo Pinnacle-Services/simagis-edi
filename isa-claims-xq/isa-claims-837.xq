@@ -1,3 +1,13 @@
+declare namespace functx = "http://www.functx.com";
+declare function functx:if-empty
+  ( $arg as item()? ,
+    $value as item()* )  as item()* {
+
+  if (string($arg) != '')
+  then data($arg)
+  else $value
+ } ;
+
 declare option output:method "json" ;
 <json type='array'>{
 for $grp in collection()//group
@@ -43,8 +53,8 @@ return
 <sendDate-DT8>{$date_tr}</sendDate-DT8>,
 <recN-CC>{ $rec_name}</recN-CC>,
 <recId>{ $rec_id}</recId>,
-<prn-CC>{$payer_name}</prn-CC>,
-<prid>{$payer_id}</prid>,
+<prn-CC>{functx:if-empty($payer_name,"Empty")}</prn-CC>,
+<prid>{functx:if-empty($payer_id,"Empty")}</prid>,
 <clmAsk-C0>{ $ask_amt}</clmAsk-C0>,
 
 (:billing system:)
