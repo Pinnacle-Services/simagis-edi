@@ -31,8 +31,10 @@ private var job: AbstractJob? = null
 internal abstract class AbstractJob {
     lateinit var host: String
     lateinit var jobId: String
+    lateinit var dbs: JobDBS
     lateinit var claimsAPI: MongoDatabase
     lateinit var claims: MongoDatabase
+    lateinit var claimsA: MongoDatabase
 
     val apiJobs: DocumentCollection by lazy { claimsAPI.getCollection("apiJobs") }
     val apiJobsLog: DocumentCollection by lazy { claimsAPI.getCollection("apiJobsLog") }
@@ -47,9 +49,10 @@ internal abstract class AbstractJob {
         val commandLine = com.berryworks.edireader.util.CommandLine(args)
         host = commandLine["host"] ?: "localhost"
         jobId = commandLine["job"] ?: throw IllegalArgumentException("argument -job required")
-        val mongoClient = MDBCredentials.mongoClient(host)
-        claimsAPI = mongoClient.getDatabase("claimsAPI")
-        claims = mongoClient.getDatabase(commandLine["db"] ?: "claims")
+        dbs = JobDBS(host)
+        claimsAPI = dbs["claimsAPI"]
+        claims = dbs[commandLine["db"] ?: "claims"]
+        claimsA = dbs[commandLine["dbA"] ?: "claimsA"]
         job = this
         logger = this::log
     }
@@ -157,11 +160,19 @@ internal fun AbstractJob.updateProcessing(field: String, value: Any?) {
     apiJobs.updateOne(jobFilter, doc { `+$set` { `+`("processing.$field", value) } })
 }
 
+internal class JobDBS(host: String) {
+    private val mongoClient = MDBCredentials.mongoClient(host)
+    private val cache = mutableMapOf<String, MongoDatabase>()
+
+    operator fun get(name: String): MongoDatabase = cache.getOrPut(name) {
+        mongoClient.getDatabase(name)
+    }
+}
+
 val DocumentCollection.isExists: Boolean get() = namespace.let {
     job.let { job ->
         if (job == null) throw AssertionError("Invalid job")
-        if (it.databaseName != job.claims.name) throw AssertionError("Invalid collection: $it")
-        job.claims.listCollectionNames().contains(it.collectionName)
+        job.dbs[it.databaseName].listCollectionNames().contains(it.collectionName)
     }
 }
 
@@ -181,8 +192,7 @@ inline fun log(
         level: LogLevel, message: String, error: Throwable? = null,
         details: String? = null,
         detailsJson: Any? = null,
-        detailsXml: String? = null): Unit
-{
+        detailsXml: String? = null): Unit {
     logger?.let { it(level, message, error, details, detailsJson, detailsXml) }
 }
 

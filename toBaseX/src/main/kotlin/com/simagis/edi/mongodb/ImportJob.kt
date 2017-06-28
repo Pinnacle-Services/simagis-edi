@@ -1,6 +1,7 @@
 package com.simagis.edi.mongodb
 
 import com.mongodb.MongoNamespace
+import com.mongodb.client.MongoDatabase
 import org.bson.Document
 import java.io.File
 import java.text.SimpleDateFormat
@@ -65,19 +66,31 @@ internal object ImportJob : AbstractJob() {
             }
         }
 
+        object build835ac {
+            private val build835ac: Document by lazy { options["build835ac"] as? Document ?: Document() }
+            val _835ac: ClaimType by lazy {
+                ClaimType.of("835ac", build835ac["835ac"] as? Document ?: Document(), claimsA)
+            }
+            val clients: DocumentCollection by lazy {
+                claims.getCollection(build835ac["clients"] as? String ?: "clientid" )
+            }
+        }
+
         data class ClaimType(
                 val type: String,
                 val temp: String,
                 val target: String,
-                val createIndexes: Boolean) {
-            val tempCollection: DocumentCollection by lazy { claims.getCollection(temp) }
-            val targetCollection: DocumentCollection by lazy { claims.getCollection(target) }
+                val createIndexes: Boolean,
+                val db: MongoDatabase) {
+            val tempCollection: DocumentCollection by lazy { db.getCollection(temp) }
+            val targetCollection: DocumentCollection by lazy { db.getCollection(target) }
             companion object {
-                internal fun of(type: String, claimType: Document) = ClaimType(
+                internal fun of(type: String, claimType: Document, db: MongoDatabase = claims) = ClaimType(
                         type = type,
                         temp = claimType["temp"] as? String ?: "claims_$type.temp",
                         target = claimType["target"] as? String ?: "claims_$type.target",
-                        createIndexes = claimType["createIndexes"] as? Boolean ?: true
+                        createIndexes = claimType["createIndexes"] as? Boolean ?: true,
+                        db = db
                 )
             }
         }
