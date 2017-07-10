@@ -81,9 +81,9 @@ fun main(args: Array<String>) {
         if (valid) try {
             val xqText = stat.doc.type?.let { type ->
                 xqTypes.getOrPut(type) {
-                    ImportJob.options.xqDir.resolve("isa-claims-$type.xq").let { file ->
-                        if (file.isFile) file.readText() else {
-                            warning("$file not found")
+                    ImportJob.options.xqDir.resolve("isa-claims-$type.xq").let { xqFile ->
+                        if (xqFile.isFile) xqFile.readText() else {
+                            warning("$xqFile not found")
                             ""
                         }
                     }
@@ -199,11 +199,14 @@ fun main(args: Array<String>) {
                 values.forEach {
                     when (it) {
                         is Document -> it.fixTypes()
-                        is List<*> -> it.forEach { if (it is Document) it.fixTypes() }
+                        is List<*> -> it.forEach { (it as? Document)?.fixTypes() }
                     }
                 }
             }
             fixTypes()
+            when(logger.isa.type) {
+                "835" -> augment835()
+            }
             return this
         }
 
@@ -303,6 +306,27 @@ fun main(args: Array<String>) {
     } catch(e: Throwable) {
         error("ERROR: ${e.message} ${details()}", e)
         exitProcess(2)
+    }
+}
+
+fun Document.augment835() {
+    // https://github.com/vylegzhanin/simagis-edi/issues/2
+    (this["svc"] as? List<*>)?.forEach {
+        (it as? Document)?.let { cpt ->
+            var cptPr = 0.0
+            (cpt["adj"] as? List<*>)?.forEach {
+                (it as? Document)?.let { adj ->
+                    if (adj["adjGrp"] == "PR") {
+                        (adj["adjAmt"] as? Number)?.let { adjAmt ->
+                            cptPr += adjAmt.toDouble()
+                        }
+                    }
+                }
+            }
+            val cptPay = (cpt["cptPay"] as? Number)?.toDouble() ?: 0.0
+            cpt["cptPr"] = cptPr
+            cpt["cptAll"] = cptPr + cptPay
+        }
     }
 }
 
