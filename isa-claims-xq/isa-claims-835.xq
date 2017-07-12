@@ -1,3 +1,4 @@
+
 (: process 835 EDI ERA docs:)
 declare namespace functx = "http://www.functx.com";
 declare function functx:if-empty
@@ -41,20 +42,28 @@ declare option output:method "json";
     let $filing := $clp/segment[@Id = "CLP"]/element[@Id = "CLP06"]/text()
     let $ptnId := $clp/segment[@Id = "NM1" and *:element = "QC"]/element[@Id = "NM109"]/text()
     let $insId := $clp/segment[@Id = "NM1" and *:element = "IL"]/element[@Id = "NM109"]/text()
+    let $sys := 
+        if (matches($acn_id, "^\D{3}\d{9}"))
+        then "V"
+        else if (matches($acn_id,"^\d{9}-\d{4}\D"))
+        then "X"
+        else if (matches($acn_id,"^GN\d{5}"))
+        then "Q"
+        else "U"
+    (: get original accession number :)
+    let $org:=
+      if ($sys="V")
+      then substring($acn_id, 4,9)
+      else if ($sys="X")
+      then  substring($acn_id, 1,9)
+      else $acn_id
+    
     return
         <_ type='object'> {
             <id>{concat($acn_id, "-R-", $ref)}</id>,
             <acn>{$acn_id}</acn>,
-            
-            (:billing system:)
-            if (matches($acn_id, "^\D{3}\d{9}"))
-            then <sys>{"V"}</sys>
-            else if (matches($acn_id,"^\d{9}-\d{4}\D"))
-            then <sys>{"X"}</sys>
-            else if (matches($acn_id,"^GN\d{5}"))
-            then <sys>{"Q"}</sys>
-            else <sys>{"U"}</sys>,                  
-            
+            <org>{$org}</org>,
+            <sys>{$sys}</sys>,       
             <ref>{$ref}</ref>,
             <status>{$status}</status>,
             <procDate-DT8>{$date_tr}</procDate-DT8>,
