@@ -15,11 +15,7 @@ class DictionaryBuilder_dxV(options: Document) : DictionaryBuilderAbstractCollec
     override fun collect(claim: Document) {
         claim.opt<List<*>>("dx")?.forEach {
             it.doc?.opt<String>("dxV")?.let {
-                collectByValue(it) { id ->
-                    codes[id]?.let { dsc ->
-                        DictionaryItem(id, dsc, "$id-$dsc", true)
-                    } ?: id.toDictionaryItem(true)
-                }
+                collectByValue(it, codes.toItemBuilder())
             }
         }
     }

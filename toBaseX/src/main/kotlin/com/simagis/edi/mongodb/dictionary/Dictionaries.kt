@@ -55,6 +55,16 @@ fun Class<*>.readCodesMap(name: String, map: (JsonObject) -> Pair<String, String
     }
 }
 
+fun CodesMap.toItemBuilder(): (String) -> DictionaryItem {
+    return { id ->
+        val dsc = this[id]
+        when {
+            dsc != null -> DictionaryItem(id, dsc, "$id-$dsc", true)
+            else -> id.toDictionaryItem(true)
+        }
+    }
+}
+
 fun MongoCollection<Document>.insertAll(items: ItemList) = items.forEach { item ->
     insertOne(item.toDocument())
 }
