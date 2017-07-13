@@ -2,6 +2,7 @@ package com.simagis.edi.mongodb
 
 import com.mongodb.MongoNamespace
 import com.mongodb.client.MongoDatabase
+import com.simagis.edi.mongodb.dictionary.*
 import org.bson.Document
 import java.io.File
 import java.text.SimpleDateFormat
@@ -62,7 +63,7 @@ internal object ImportJob : AbstractJob() {
                 ClaimType.of("835c", build835c["835c"] as? Document ?: Document())
             }
             val clients: DocumentCollection by lazy {
-                claims.getCollection(build835c["clients"] as? String ?: "clientid" )
+                claims.getCollection(build835c["clients"] as? String ?: "clientid")
             }
         }
 
@@ -72,7 +73,7 @@ internal object ImportJob : AbstractJob() {
                 ClaimType.of("835ac", build835ac["835ac"] as? Document ?: Document(), claimsA)
             }
             val clients: DocumentCollection by lazy {
-                claims.getCollection(build835ac["clients"] as? String ?: "clientid" )
+                claims.getCollection(build835ac["clients"] as? String ?: "clientid")
             }
         }
 
@@ -84,6 +85,7 @@ internal object ImportJob : AbstractJob() {
                 val db: MongoDatabase) {
             val tempCollection: DocumentCollection by lazy { db.getCollection(temp) }
             val targetCollection: DocumentCollection by lazy { db.getCollection(target) }
+
             companion object {
                 internal fun of(type: String, claimType: Document, db: MongoDatabase = claims) = ClaimType(
                         type = type,
@@ -95,6 +97,65 @@ internal object ImportJob : AbstractJob() {
             }
         }
 
+        object rebuildDicts {
+            private val rebuildDicts: Document by lazy { options["rebuildDicts"] as? Document ?: Document() }
+            val adjGrp: Dictionary by lazy {
+                Dictionary.of<DictionaryBuilder_adjGrp>(dictionary, "dic_adjGrp", rebuildDicts["adjGrp"])
+            }
+            val adjReason: Dictionary by lazy {
+                Dictionary.of<DictionaryBuilder_adjReason>(dictionary, "dic_adjReason", rebuildDicts["adjReason"])
+            }
+            val cpt: Dictionary by lazy {
+                Dictionary.of<DictionaryBuilder_cpt>(dictionary, "dic_cpt", rebuildDicts["cpt"])
+            }
+            val dxT: Dictionary by lazy {
+                Dictionary.of<DictionaryBuilder_dxT>(dictionary, "dic_dxT", rebuildDicts["dxT"])
+            }
+            val dxV: Dictionary by lazy {
+                Dictionary.of<DictionaryBuilder_dxV>(dictionary, "dic_dxV", rebuildDicts["dxV"])
+            }
+            val frmn: Dictionary by lazy {
+                Dictionary.of<DictionaryBuilder_frmn>(dictionary, "dic_frmn", rebuildDicts["frmn"])
+            }
+            val prn: Dictionary by lazy {
+                Dictionary.of<DictionaryBuilder_prn>(dictionary, "dic_prn", rebuildDicts["prn"])
+            }
+            val rem: Dictionary by lazy {
+                Dictionary.of<DictionaryBuilder_rem>(dictionary, "dic_rem", rebuildDicts["rem"])
+            }
+            val status: Dictionary by lazy {
+                Dictionary.of<DictionaryBuilder_status>(dictionary, "dic_status", rebuildDicts["status"])
+            }
+            val dictionaries = listOf<Dictionary>(
+                    adjGrp,
+                    adjReason,
+                    cpt,
+                    dxT,
+                    dxV,
+                    frmn,
+                    prn,
+                    rem,
+                    status
+            )
+        }
+
+        data class Dictionary(
+                override val db: MongoDatabase,
+                override val name: String,
+                override val builder: DictionaryBuilder) : DictionaryContext {
+            companion object {
+                inline fun <reified T : DictionaryBuilder> of(
+                        db: MongoDatabase,
+                        name: String,
+                        options: Any?): Dictionary = Dictionary(
+                            db = db,
+                            name = name,
+                            builder = T::class.java.getDeclaredConstructor(
+                                    Document::class.java)
+                                    .newInstance(options as? Document ?: Document())
+                    )
+            }
+        }
     }
 }
 

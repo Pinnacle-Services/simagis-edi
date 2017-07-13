@@ -35,6 +35,7 @@ internal abstract class AbstractJob {
     lateinit var claimsAPI: MongoDatabase
     lateinit var claims: MongoDatabase
     lateinit var claimsA: MongoDatabase
+    lateinit var dictionary: MongoDatabase
 
     val apiJobs: DocumentCollection by lazy { claimsAPI.getCollection("apiJobs") }
     val apiJobsLog: DocumentCollection by lazy { claimsAPI.getCollection("apiJobsLog") }
@@ -53,11 +54,12 @@ internal abstract class AbstractJob {
         claimsAPI = dbs["claimsAPI"]
         claims = dbs[commandLine["db"] ?: "claims"]
         claimsA = dbs[commandLine["dbA"] ?: "claimsA"]
+        dictionary = dbs[commandLine["dbD"] ?: "dictionary"]
         job = this
         logger = this::log
     }
 
-    override fun toString(): String = "${host}/${claims.name}"
+    override fun toString(): String = "$host/${claims.name}"
 
     private val jsonWriterSettingsPPM by lazy { JsonWriterSettings(JsonMode.SHELL, true) }
     private fun Document?.toStringPPM(): String = when {
@@ -82,8 +84,8 @@ internal abstract class AbstractJob {
             detailsJson: Any? = null,
             detailsXml: String? = null) {
         val now = Date()
-        fun printLog(message: String, _id: Any?) {
-            "${level.toString().padEnd(7)} $message at $now${_id?.let { """ log: ObjectId("$_id")""" } ?: ""}".also {
+        fun printLog(msg: String, _id: Any?) {
+            "${level.toString().padEnd(7)} $msg at $now${_id?.let { """ log: ObjectId("$_id")""" } ?: ""}".also {
                 val detailsPP = if (detailsJson is Document)
                     detailsJson.toJson(JsonWriterSettings(JsonMode.SHELL, true)) else
                     null

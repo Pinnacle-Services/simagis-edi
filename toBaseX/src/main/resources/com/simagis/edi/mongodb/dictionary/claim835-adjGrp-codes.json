@@ -1,0 +1,14 @@
+[
+  {
+    "id": "CO",
+    "caption": "Contractual Adjustment"
+  },
+  {
+    "id": "PR",
+    "caption": "Patient Responsibility"
+  },
+  {
+    "id": "OA",
+    "caption": "Other Adjustments"
+  }
+]
