@@ -1,5 +1,6 @@
 [
-  {"key": "acn", "name": "Accession"},
+  {"key": "acn", "name": "Claim ID"},
+  {"key": "org", "name": "Accession"},
   {"key": "prid", "name": "Payer ID"},
   {"key": "prn", "name": "Payer Name"},
   {"key": "ref", "name": "Processing Reference"},
