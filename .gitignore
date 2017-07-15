@@ -12,6 +12,7 @@ target/
 
 #logs
 *.log      
+/logs/
 
 #builders apps logs
 /builders/src/apps/*/logs/
