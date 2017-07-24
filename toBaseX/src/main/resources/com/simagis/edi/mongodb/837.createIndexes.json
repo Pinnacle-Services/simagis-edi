@@ -2,7 +2,19 @@
   "indexes": [
     {"acn": 1},
     {"sendDate": -1},
-    {"dx": 1},
-    {"npi": 1}
+    {"clmAsk": 1},
+    {"freq": 1},
+    {"drFirsN": 1},
+    {"drLastN": 1},
+    {"prid": 1},
+    {"prn": 1},
+    {"npi": 1},
+    {"dx.dxT": 1},
+    {"dx.dxV": 1},
+    {"svc.cpt": 1},
+    {"svc.cptAsk": 1},
+    {"svc.cptMod1": 1},
+    {"svc.qty": 1},
+    {"svc.srvDate": 1}
   ]
 }
