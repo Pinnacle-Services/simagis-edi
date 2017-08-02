@@ -4,7 +4,6 @@ import com.mongodb.client.MongoDatabase
 import com.simagis.claims.web.ui.ClaimQuery
 import com.simagis.edi.mdb.*
 import org.bson.Document
-import java.lang.Long.max
 import java.lang.Long.min
 import java.text.SimpleDateFormat
 import java.util.*
@@ -175,24 +174,42 @@ class Claims835ToHtml(val db: MongoDatabase,
             val value = doc[key]
             when (value) {
                 is Document -> addDocBody(key, value)
-                is List<*> -> {
-                    addArrayHeader(key, value.size)
-                    addArrayBody(value)
-                    addArrayFooter(key, value.size)
-                }
+                is List<*> -> addArray(key, value)
                 else -> addProperty(maxKeyLength, key, value)
             }
         }
+    }
+
+    private fun addArray(key: String, value: List<*>) {
+        addArrayHeader(key, value.size)
+        addArrayBody(key, value)
+        addArrayFooter(key, value.size)
     }
 
     private fun addArrayHeader(key: String, size: Int) {
         addIndentedText(keyToHTML(formatKey(key, size)) + ":[")
     }
 
-    private fun addArrayBody(value: List<*>) {
+    private fun addArrayBody(key: String, value: List<*>) {
         indent++
-        value.filterIsInstance<Document>().forEach { addDocBody("", it) }
+        value.forEach {
+            when (it) {
+                is Document -> addDocBody("", it)
+                is List<*> -> addArray(key, value)
+                else -> addScalar(key, it)
+            }
+        }
         indent--
+    }
+
+    private fun addScalar(key: String, value: Any?) {
+        val str = when (key) {
+            "eob" -> value.toString().let {
+                "<a href=/claim/835/$it target=_blank>$it</a>"
+            }
+            else -> value.toString().esc
+        }
+        addIndentedText(str)
     }
 
     private fun addArrayFooter(key: String, size: Int) {
@@ -257,9 +274,9 @@ class Claims835ToHtml(val db: MongoDatabase,
         if (paging.isPageable) {
             if (paging.pn > 0) addLink(href(paging.ps, paging.pn - 1), "<- Previous ${paging.ps}".esc)
             html.append(" Records ${paging.pn * paging.ps + 1}-${min(paging.found, (paging.pn + 1) * paging.ps)} of ${paging.found} ")
-            if (paging.pn + 1 < paging.pageCount) addLink(href(paging.ps, paging.pn + 1), "Next ${paging.ps} ->".esc )
+            if (paging.pn + 1 < paging.pageCount) addLink(href(paging.ps, paging.pn + 1), "Next ${paging.ps} ->".esc)
         } else {
-            if (count != 1) {
+            if (count != 1 && cq != null) {
                 if (count == maxCount) {
                     addIndentedText("found $count claims (or more)")
                 } else {

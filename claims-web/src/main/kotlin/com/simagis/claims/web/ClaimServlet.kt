@@ -39,6 +39,8 @@ class ClaimServlet : HttpServlet() {
     private val decoder: Base64.Decoder = Base64.getUrlDecoder()
     private val mongoClient: MongoClient by lazy { MDBCredentials.mongoClient(mongoHost) }
     private val db = mongoClient.getDatabase(mongoDB)
+    private val dbClaimsPrefix = System.getProperty("claims.mongo.db.claimsPrefix", "claims_")
+
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         val servletPath = request.servletPath
@@ -48,7 +50,7 @@ class ClaimServlet : HttpServlet() {
 
         var cq: ClaimQuery? = null
         val documents: FindIterable<Document>? = (if (servletPath == "/query")
-            query(request, paging, errors) { cq = this} else
+            query(request, paging, errors) { cq = this } else
             find(request, paging))
 
         if (documents == null) {
@@ -85,7 +87,7 @@ class ClaimServlet : HttpServlet() {
         if (path.size != 3) {
             return null
         }
-        val collection = db.getCollection("claims_${path[1]}")
+        val collection = getClaimsCollection(path[1])
         val id = path[2]
 
         fun find(json: JsonArray): FindIterable<Document> {
@@ -141,7 +143,7 @@ class ClaimServlet : HttpServlet() {
             }
         } ?: return null
 
-        val collection = db.getCollection("claims_${cq.type}")
+        val collection = getClaimsCollection(cq.type)
         val filter = Document.parse(cq.find).applyParameters { name -> request.getParameter(name) }
         paging.found = queryCountCache.computeIfAbsent(filter) { collection.count(it) }
         return collection
@@ -158,5 +160,7 @@ class ClaimServlet : HttpServlet() {
                     }
                 }
     }
+
+    private fun getClaimsCollection(type: String) = db.getCollection("$dbClaimsPrefix$type")
 }
 
