@@ -3,6 +3,7 @@
     {"acn": 1},
     {"prn": 1},
     {"procDate": 1},
+    {"svc.cpt": 1},
     {"fCode": 1}
   ]
 }
