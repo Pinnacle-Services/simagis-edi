@@ -1,10 +1,13 @@
 package com.simagis.edi.mongodb
 
+import com.simagis.edi.mdb._id
+import com.simagis.edi.mdb.`+$set`
 import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
 import org.bson.Document
 import java.util.*
-import java.util.concurrent.*
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
@@ -38,11 +41,30 @@ fun main(args: Array<String>) {
         }
     }
 
+
+    class EOB837(
+            doc: Document,
+            private val set: MutableSet<String> = mutableSetOf<String>()) : Set<String> by set {
+        init {
+            (doc["eob"] as? List<*>)?.forEach { if (it is String) set += it }
+        }
+        val _id = doc._id
+        var modified: Boolean = false
+            private set(value) {
+                field = value
+            }
+
+        operator fun plusAssign(element: String) {
+            if (set.add(element)) modified = true
+        }
+    }
+
     class Doc837(doc: Document) {
         val json = doc.toJson().toByteArray(UTF_8)
         val doc get() = Document.parse(json.toString(UTF_8))
         val acn = doc["acn"] as? String?
         val sendDate = doc["sendDate"] as? Date?
+        val eob = EOB837(doc)
     }
 
     val acnMap837 = mutableMapOf<String, MutableList<Doc837>>().apply {
@@ -56,6 +78,7 @@ fun main(args: Array<String>) {
                     `+`("ptnG", 1)
                     `+`("acn", 1)
                     `+`("sendDate", 1)
+                    `+`("eob", 1)
                 })
                 .sort(doc {
                     `+`("sendDate", -1)
@@ -80,7 +103,7 @@ fun main(args: Array<String>) {
             ImportJob.updateProcessing("claimsLeft", claimsLeft.addAndGet(-list.size.toLong()))
         } while (true)
     }
-    val skipKeys = setOf("_id", "acn")
+    val skipKeys = setOf("_id", "acn", "eob")
     docs835.find().forEach { c835 ->
         val procDate = c835["procDate"] as? Date
         val acn = c835["acn"] as? String
@@ -88,6 +111,7 @@ fun main(args: Array<String>) {
             acnMap837[acn]?.let { list ->
                 for (doc837 in list) {
                     if (doc837.sendDate!! < procDate) {
+                        doc837.eob += c835["_id"].toString()
                         doc837.doc.forEach { key, value ->
                             when (key) {
                                 "npi" -> {
@@ -123,6 +147,18 @@ fun main(args: Array<String>) {
         docs835cList = mutableListOf<Document>()
     }
     ImportJob.updateProcessing("claimsLeft", 0L)
+
+    info("updating docs837.eob")
+    acnMap837.values.forEach {
+        it.forEach {
+            if (it.eob.modified) {
+                docs837.updateOne(doc(it.eob._id), doc {
+                    `+$set` { `+`("eob", it.eob.toList()) }
+                })
+            }
+        }
+    }
+    info("updating docs837.eob DONE")
 
     with(ImportJob.options.build835c._835c) {
         createIndexes()
