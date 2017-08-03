@@ -192,17 +192,51 @@ class Claims835ToHtml(val db: MongoDatabase,
 
     private fun addArrayBody(key: String, value: List<*>) {
         indent++
-        value.forEach {
-            when (it) {
-                is Document -> addDocBody("", it)
-                is List<*> -> addArray(key, value)
-                else -> addScalar(key, it)
-            }
+        when (key) {
+            "eob" -> addArrayBody837eob(key, value)
+            else -> addArrayBodyAny(key, value)
         }
         indent--
     }
 
-    private fun addScalar(key: String, value: Any?) {
+    private fun addArrayBodyAny(key: String, value: List<*>) {
+        value.forEach {
+            when (it) {
+                is Document -> addArrayDocBody(key, it)
+                is List<*> -> addArray(key, it)
+                else -> addArrayScalar(key, it)
+            }
+        }
+    }
+
+    private fun addArrayBody837eob(key: String, value: List<*>) {
+        if (value.all { it is Document }) {
+            addIndentedText(StringBuilder().apply {
+                append("<table>")
+                value.forEach {
+                    val doc = it as Document
+                    val id835 = doc["id835"] as? String
+                    val procDate = doc["procDate"] as? Date
+                    if (id835 != null && procDate != null) {
+                        append("<tr><td>")
+                        append("<a href=/claim/835/$id835 target=_blank>$id835</a>")
+                        append("</td><td>")
+                        append(formatValue("procDate", procDate))
+                        append("</td></tr>\n")
+                    }
+                }
+                append("</table>")
+            }.toString())
+        } else {
+            addArrayBodyAny(key, value)
+        }
+    }
+
+    private fun addArrayDocBody(key: String, value: Document) {
+        addDocBody("", value)
+    }
+
+    private fun addArrayScalar(key: String, value: Any?) {
         val str = when (key) {
             "eob" -> value.toString().let {
                 "<a href=/claim/835/$it target=_blank>$it</a>"

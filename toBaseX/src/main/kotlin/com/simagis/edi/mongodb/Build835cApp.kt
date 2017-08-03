@@ -42,11 +42,20 @@ fun main(args: Array<String>) {
     }
 
 
-    class EOB837(
-            doc: Document,
-            private val set: MutableSet<String> = mutableSetOf<String>()) : Set<String> by set {
-        init {
-            (doc["eob"] as? List<*>)?.forEach { if (it is String) set += it }
+    class Ref835(val id: String, val procDate: Date) {
+        fun toDoc(): Document = Document().apply {
+            this["id385"] = id
+            this["procDate"] = procDate
+        }
+    }
+
+    class EOB837(doc: Document) {
+        private val map = mutableMapOf<String, Ref835>().apply {
+            (doc["eob"] as? List<*>)?.forEach {
+                if (it is Document) {
+                    it.toRef835("id835")?.let { this[it.id] = it }
+                }
+            }
         }
         val _id = doc._id
         var modified: Boolean = false
@@ -54,9 +63,25 @@ fun main(args: Array<String>) {
                 field = value
             }
 
-        operator fun plusAssign(element: String) {
-            if (set.add(element)) modified = true
+        private fun Document?.toRef835(_id: String = "_id"): Ref835? {
+            if (this == null) return null
+            val id = this[_id] as? String
+            val procDate = this["procDate"] as? Date
+            return when {
+                id != null && procDate != null -> Ref835(id, procDate)
+                else -> null
+            }
         }
+
+        operator fun plusAssign(doc835: Document) {
+            doc835.toRef835()?.let { it ->
+                if (map.put(it.id, it) == null) {
+                    modified = true
+                }
+            }
+        }
+
+        fun toList(): List<Document> = map.values.sortedBy { it.procDate }.map { it.toDoc() }
     }
 
     class Doc837(doc: Document) {
@@ -111,7 +136,7 @@ fun main(args: Array<String>) {
             acnMap837[acn]?.let { list ->
                 for (doc837 in list) {
                     if (doc837.sendDate!! < procDate) {
-                        doc837.eob += c835["_id"].toString()
+                        doc837.eob += c835
                         doc837.doc.forEach { key, value ->
                             when (key) {
                                 "npi" -> {
