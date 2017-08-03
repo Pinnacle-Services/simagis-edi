@@ -1,0 +1,11 @@
+{
+  "indexes": [
+    {"client.clientId" : 1},
+    {"client.npi" : 1},
+    {"fCode" : 1},
+    {"org" : 1},
+    {"prn" : 1},
+    {"procDate" : -1},
+    {"sendDate" : -1}
+  ]
+}
