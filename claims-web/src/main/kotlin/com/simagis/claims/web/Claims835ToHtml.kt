@@ -219,9 +219,9 @@ class Claims835ToHtml(val db: MongoDatabase,
                     val procDate = doc["procDate"] as? Date
                     if (id835 != null && procDate != null) {
                         append("<tr><td>")
-                        append("<a href=/claim/835/$id835 target=_blank>$id835</a>")
-                        append("</td><td>")
                         append(formatValue("procDate", procDate))
+                        append("</td><td>")
+                        append("<a href=/claim/835/$id835 target=_blank>$id835</a>")
                         append("</td></tr>\n")
                     }
                 }
