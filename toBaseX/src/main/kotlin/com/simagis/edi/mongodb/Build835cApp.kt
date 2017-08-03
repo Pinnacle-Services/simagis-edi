@@ -44,7 +44,7 @@ fun main(args: Array<String>) {
 
     class Ref835(val id: String, val procDate: Date) {
         fun toDoc(): Document = Document().apply {
-            this["id385"] = id
+            this["id835"] = id
             this["procDate"] = procDate
         }
     }
