@@ -41,6 +41,15 @@ fun main(args: Array<String>) {
         }
     }
 
+    val dic_prid = mutableMapOf<String, String>().apply {
+        ImportJob.options.build835c.dic_prid.find().forEach {
+            val _id = it["_id"] as? String
+            val dsc = it["dsc"] as? String
+            if (_id != null && dsc != null) {
+                this[_id] = dsc
+            }
+        }
+    }
 
     class Ref835(val id: String, val procDate: Date) {
         fun toDoc(): Document = Document().apply {
@@ -150,6 +159,7 @@ fun main(args: Array<String>) {
                     }
                 }
             }
+            (c835["prid"] as? String)?.let { dic_prid[it]?.let { c835["prn"] = it } }
             docs835cList.add(c835)
             if (docs835cList.size >= 100) {
                 docs835cList.let { list ->

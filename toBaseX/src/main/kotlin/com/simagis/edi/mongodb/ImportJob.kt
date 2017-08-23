@@ -64,6 +64,9 @@ internal object ImportJob : AbstractJob() {
             val clients: DocumentCollection by lazy {
                 claims.getCollection(build835c["clients"] as? String ?: "clientid" )
             }
+            val dic_prid: DocumentCollection by lazy {
+                dictionary.getCollection(build835c["dic_prid"] as? String ?: "dic_prid" )
+            }
         }
 
         object build835ac {
