@@ -64,9 +64,6 @@ internal object ImportJob : AbstractJob() {
             val clients: DocumentCollection by lazy {
                 claims.getCollection(build835c["clients"] as? String ?: "clientid" )
             }
-            val dic_prid: DocumentCollection by lazy {
-                dictionary.getCollection(build835c["dic_prid"] as? String ?: "dic_prid" )
-            }
         }
 
         object build835ac {
@@ -98,6 +95,26 @@ internal object ImportJob : AbstractJob() {
             }
         }
 
+    }
+
+    object billed_acn {
+        class doc(val _id: String, val prid: String, val prg: String)
+        val map: Map<String, doc> by lazy {
+            mutableMapOf<String, doc>().apply {
+                dbs["xifin"]
+                        .getCollection("billed_acn")
+                        .find()
+                        .forEach {
+                            val _id = it["_id"] as String
+                            val prid = it["prid"] as? String
+                            val prg = it["prg"] as? String
+                            if (prid != null && prg != null) {
+                                val doc = doc(_id, prid, prg)
+                                this[doc._id] = doc
+                            }
+                        }
+            }
+        }
     }
 }
 

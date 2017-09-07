@@ -35,7 +35,6 @@ internal abstract class AbstractJob {
     lateinit var claimsAPI: MongoDatabase
     lateinit var claims: MongoDatabase
     lateinit var claimsA: MongoDatabase
-    lateinit var dictionary: MongoDatabase
 
     val apiJobs: DocumentCollection by lazy { claimsAPI.getCollection("apiJobs") }
     val apiJobsLog: DocumentCollection by lazy { claimsAPI.getCollection("apiJobsLog") }
@@ -54,12 +53,11 @@ internal abstract class AbstractJob {
         claimsAPI = dbs["claimsAPI"]
         claims = dbs[commandLine["db"] ?: "claims"]
         claimsA = dbs[commandLine["dbA"] ?: "claimsA"]
-        dictionary = dbs[commandLine["dbDictionary"] ?: "dictionary"]
         job = this
         logger = this::log
     }
 
-    override fun toString(): String = "${host}/${claims.name}"
+    override fun toString(): String = "$host/${claims.name}"
 
     private val jsonWriterSettingsPPM by lazy { JsonWriterSettings(JsonMode.SHELL, true) }
     private fun Document?.toStringPPM(): String = when {
@@ -194,7 +192,7 @@ inline fun log(
         level: LogLevel, message: String, error: Throwable? = null,
         details: String? = null,
         detailsJson: Any? = null,
-        detailsXml: String? = null): Unit {
+        detailsXml: String? = null) {
     logger?.let { it(level, message, error, details, detailsJson, detailsXml) }
 }
 
