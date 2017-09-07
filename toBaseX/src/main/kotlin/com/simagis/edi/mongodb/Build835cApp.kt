@@ -149,12 +149,10 @@ fun main(args: Array<String>) {
                     }
                 }
             }
-            acn.replace("Z\\d{2}$".toRegex(), "").let { _id ->
-                val doc = ImportJob.billed_acn.map[_id]
-                if (doc != null) {
-                    c835["prid"] = doc.prid
-                    c835["prg"] = doc.prg
-                }
+
+            ImportJob.billed_acn[acn]?.let {
+                c835["prid"] = it.prid
+                c835["prg"] = it.prg
             }
 
             docs835cList.add(c835)

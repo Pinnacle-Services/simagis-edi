@@ -115,6 +115,14 @@ internal object ImportJob : AbstractJob() {
                         }
             }
         }
+
+        operator fun get(acn: String): doc? = acn_to_id(acn)?.let { map[it] }
+
+        private val ZDD = "Z\\d{2}$".toRegex()
+        internal fun acn_to_id(acn: String): String? = when {
+            acn.length > 3 && ZDD.containsMatchIn(acn) -> acn.replace(ZDD, "")
+            else -> null
+        }
     }
 }
 
