@@ -40,7 +40,7 @@ internal class JavaProcess private constructor(val command: Command) : Closeable
 
         companion object {
             fun load(name: String): Command {
-                val file = rootDir.resolve("apps").let {
+                val file = claimDbRootDir.resolve("apps").let {
                     val local = it.resolve("$name.local.json")
                     if (local.isFile) local else it.resolve("$name.json")
                 }
@@ -55,10 +55,8 @@ internal class JavaProcess private constructor(val command: Command) : Closeable
     }
 
     companion object {
-        private val rootDir: File = File("/claim-db").absoluteFile
-        private val tempDir: File = rootDir.resolve("temp").apply { mkdir() }
         private val javaExe: File by lazy {
-            rootDir.resolve("jre").let {
+            claimDbRootDir.resolve("jre").let {
                 if (it.isDirectory) it.absoluteFile
                 else File(System.getProperty("java.home"))
             }.resolve("bin").resolve("java.exe").absoluteFile
@@ -71,7 +69,7 @@ internal class JavaProcess private constructor(val command: Command) : Closeable
         try {
             process = ProcessBuilder()
                     .command(listOf(javaExe.absolutePath, "-cp", "lib/*", *command.toArray()))
-                    .directory(rootDir)
+                    .directory(claimDbRootDir)
                     .redirectOutput(outFile)
                     .redirectError(errFile)
                     .start()
@@ -82,8 +80,8 @@ internal class JavaProcess private constructor(val command: Command) : Closeable
         return this
     }
 
-    private val outFile = File.createTempFile("${command.className}.", ".out.txt", tempDir)
-    private val errFile = File.createTempFile("${command.className}.", ".err.txt", tempDir)
+    private val outFile = File.createTempFile("${command.className}.", ".out.txt", claimDbTempDir)
+    private val errFile = File.createTempFile("${command.className}.", ".err.txt", claimDbTempDir)
 
     override fun close() {
         if (!isAlive && exitValue() == 0) {

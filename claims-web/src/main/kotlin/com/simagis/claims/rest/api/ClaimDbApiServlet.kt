@@ -4,6 +4,7 @@ import com.simagis.claims.rest.api.jobs.Import
 import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
 import org.bson.Document
+import java.io.File
 import java.net.HttpURLConnection
 import java.net.HttpURLConnection.HTTP_BAD_REQUEST
 import java.net.HttpURLConnection.HTTP_OK
@@ -21,21 +22,14 @@ import javax.servlet.http.HttpServletResponse
 class ClaimDbApiServlet : HttpServlet() {
 
     override fun doPost(request: HttpServletRequest, response: HttpServletResponse) {
-        val action = request.pathInfo.split('/').let { path ->
-            when (path.size) {
-                2 -> path[1]
-                else -> {
-                    response.status = HttpURLConnection.HTTP_NOT_FOUND
-                    return
-                }
-            }
-        }
+        val action = request.pathInfo.split('/').elementAtOrNull(1)
 
         when (action) {
             "jobs" -> Context(request, response).doGetJobList()
             "job" -> Context(request, response).doGetJob()
             "start" -> Context(request, response).doStartJob()
             "kill" -> Context(request, response).doKillJob()
+            "file" -> doFileJob(request, response)
             else -> response.status = HttpURLConnection.HTTP_NOT_FOUND
         }
     }
@@ -125,14 +119,14 @@ class ClaimDbApiServlet : HttpServlet() {
             try {
                 body()
                 response.status = HTTP_OK
-            } catch(e: Throwable) {
+            } catch (e: Throwable) {
                 response.status = HTTP_BAD_REQUEST
                 val uuid = UUID.randomUUID().toString()
                 jsonOut.appendError(e, uuid)
                 request.servletContext.log("${e.javaClass.name}: ${e.message} ($uuid)", e)
             }
 
-            val content = when(requestContentType) {
+            val content = when (requestContentType) {
                 "application/mongo-json" -> jsonOut.toStringPPM().toByteArray()
                 else -> jsonOut.toStringPP().toByteArray()
             }
@@ -143,4 +137,25 @@ class ClaimDbApiServlet : HttpServlet() {
             response.outputStream.write(content)
         }
     }
+
+    private fun doFileJob(request: HttpServletRequest, response: HttpServletResponse) {
+        val path = request.pathInfo.split('/')
+        val command = path.elementAtOrNull(2)
+        val name = path.elementAtOrNull(3) ?: throw ClaimDbApiException("invalid file name")
+        if (!"^[\\da-zA-Z]+.*".toRegex().matches(name)) throw ClaimDbApiException("invalid file name: $name")
+        when(command) {
+            "put" -> File.createTempFile("file.put.", ".$name.temp", claimDbTempDir).apply {
+                try {
+                    outputStream().use { request.inputStream.copyTo(it) }
+                } catch (e: Exception) {
+                    delete()
+                    throw e
+                }
+                renameTo(claimDbRootDir.resolve("files").apply { mkdir() }.resolve(name))
+                response.status = HTTP_OK
+            }
+            else ->  throw ClaimDbApiException("invalid file command: $command")
+        }
+    }
+
 }

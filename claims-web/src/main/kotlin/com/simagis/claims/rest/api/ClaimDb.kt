@@ -9,6 +9,7 @@ import com.simagis.edi.mdb.doc
 import org.bson.Document
 import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.concurrent.ExecutorService
@@ -22,6 +23,9 @@ import javax.json.stream.JsonGenerator
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/17/2017.
  */
+
+val claimDbRootDir: File = File("/claim-db").absoluteFile
+val claimDbTempDir: File by lazy { claimDbRootDir.resolve("temp").apply { mkdir() } }
 
 internal object ClaimDb {
     val mongoHost: String = System.getProperty("claims.mongo.host", "127.0.0.1")
