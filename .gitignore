@@ -15,3 +15,5 @@ target/
 
 #builders apps logs
 /builders/src/apps/*/logs/
+
+/claim-db/

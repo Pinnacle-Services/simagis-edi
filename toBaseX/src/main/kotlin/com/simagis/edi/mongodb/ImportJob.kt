@@ -7,6 +7,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.zip.GZIPInputStream
 
 /**
  * <p>
@@ -98,21 +99,36 @@ internal object ImportJob : AbstractJob() {
     }
 
     object billed_acn {
-        class doc(val _id: String, val prid: String, val prg: String)
+        class doc(val id: String, val prid: String, val prg: String)
+
         val map: Map<String, doc> by lazy {
             mutableMapOf<String, doc>().apply {
-                dbs["xifin"]
-                        .getCollection("billed_acn")
-                        .find()
-                        .forEach {
-                            val _id = it["_id"] as String
-                            val prid = it["prid"] as? String
-                            val prg = it["prg"] as? String
-                            if (prid != null && prg != null) {
-                                val doc = doc(_id, prid, prg)
-                                this[doc._id] = doc
+                File("files").resolve("xifin_billed_acn.gzip").let { gzipFile ->
+                    if (gzipFile.isFile) {
+                        GZIPInputStream(gzipFile.inputStream()).bufferedReader().use {
+                            val header = mutableMapOf<String, Int>()
+                            it.forEachLine { line ->
+                                val record: List<String> = line.split('\t')
+                                if (header.isEmpty()) {
+                                    record.forEachIndexed { index, name ->
+                                        header[name.removeSurrounding("\"")] = index
+                                    }
+                                }
+                                else {
+                                    operator fun List<String>.get(name: String): String? = header[name]?.let {
+                                        elementAtOrNull(it)?.removeSurrounding("\"")
+                                    }
+                                    val id = record["id"]
+                                    val prid = record["prid"]
+                                    val prg = record["prg"]
+                                    if (id != null && prid != null && prg != null) {
+                                        this[id] = doc(id, prid, prg)
+                                    }
+                                }
                             }
                         }
+                    }
+                }
             }
         }
 
