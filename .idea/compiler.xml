@@ -9,14 +9,16 @@
         <module name="claims-web" />
         <module name="edireader" />
         <module name="mdb" />
+        <module name="rJavaJDBC" />
         <module name="toBaseX" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="claims-web" target="1.5" />
       <module name="edi" target="1.5" />
-      <module name="edireader" target="1.6" />
+      <module name="edireader" target="1.5" />
       <module name="mdb" target="1.5" />
+      <module name="rJavaJDBC" target="1.8" />
       <module name="toBaseX" target="1.5" />
       <module name="toMongoDB" target="1.5" />
     </bytecodeTargetLevel>
