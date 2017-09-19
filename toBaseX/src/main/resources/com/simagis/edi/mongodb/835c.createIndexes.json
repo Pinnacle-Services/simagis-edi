@@ -18,6 +18,7 @@
     {"dx.dxT": 1},
     {"dx.dxV": 1},
     {"npi": 1},
+    {"prid": 1},
     {"client.clientId":1},
     {"svc.cptAsk": 1},
     {"svc.srvDate": 1},    

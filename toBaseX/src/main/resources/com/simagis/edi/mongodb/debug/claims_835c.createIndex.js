@@ -20,5 +20,5 @@
     {"sendDate": -1},
     {"dx": 1},
     {"npi": 1},
-    {"prn": 1, "svc.cpt": 1},
+    {"prn": 1, "svc.cpt": 1}
 ]);
