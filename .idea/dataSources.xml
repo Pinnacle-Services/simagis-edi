@@ -19,5 +19,12 @@
       <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
       <jdbc-url>jdbc:sqlserver://localhost\MSSQLSERVER:1433;databaseName=webapp_db</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="InterSystems Cache Driver - jdbc:Cache://172.17.246.136:56774/DEEPSEE" uuid="beb16af4-5dfc-4570-8900-b7bfd42303d3">
+      <driver-ref>java.sql.Driver</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>com.intersys.jdbc.CacheDriver</jdbc-driver>
+      <jdbc-url>jdbc:Cache://172.17.246.136:56774/DEEPSEE</jdbc-url>
+    </data-source>
   </component>
 </project>

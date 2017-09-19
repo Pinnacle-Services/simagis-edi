@@ -14,5 +14,6 @@
         <module>toBaseX</module>
         <module>mdb</module>
         <module>claims-web</module>
+        <module>rJavaJDBC</module>
     </modules>
 </project>

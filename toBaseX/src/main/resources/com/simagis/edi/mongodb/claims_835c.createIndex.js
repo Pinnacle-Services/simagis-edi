@@ -6,6 +6,7 @@
     {"ref": 1},
     {"procDate": -1},
     {"prn": 1},
+    {"prid": 1},
     {"status": 1},
     {"clmAsk": 1},
     {"svc.cpt": 1},
