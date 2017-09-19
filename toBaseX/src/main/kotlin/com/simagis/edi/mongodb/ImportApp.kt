@@ -206,6 +206,7 @@ fun main(args: Array<String>) {
             fixTypes()
             when(logger.isa.type) {
                 "835" -> augment835()
+                "837" -> augment837()
             }
             return this
         }
@@ -326,6 +327,15 @@ fun Document.augment835() {
             val cptPay = (cpt["cptPay"] as? Number)?.toDouble() ?: 0.0
             cpt["cptPr"] = cptPr
             cpt["cptAll"] = cptPr + cptPay
+        }
+    }
+}
+
+fun Document.augment837() {
+    val acn = this["acn"] as? String
+    if (acn != null) {
+        ImportJob.billed_acn[acn]?.let {
+            this["prid"] = it.prid
         }
     }
 }
