@@ -21,7 +21,8 @@
     {"prid": 1},
     {"client.clientId":1},
     {"svc.cptAsk": 1},
-    {"svc.srvDate": 1},    
+    {"svc.srvDate": 1},
+    {"org": 1},
     {"svc.cptPay": 1}
   ]
 }
