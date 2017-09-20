@@ -60,9 +60,9 @@ fun main(args: Array<String>) {
 
         val _id = doc._id
         val eobSize0 = doc["eobSize"] as? Number
-        val eobSize = map.size
+        val eobSize get() = map.size
         val noEob0 = doc["noEob"] as? Boolean
-        val noEob = map.isEmpty()
+        val noEob get() = map.isEmpty()
 
         val modified: Boolean get() {
             if (eobSize0 != eobSize) return true
