@@ -6,12 +6,11 @@ package com.simagis.r.jdbc;
  */
 public interface RJavaMapAsync extends RJavaMap {
 
-    boolean isReady();
+    String status();
 
-    boolean isError();
+    String errorMessage();
 
     void cancel();
 
     void join();
-
 }

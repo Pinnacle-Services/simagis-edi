@@ -9,19 +9,24 @@ import java.util.Map;
  * Created by alexei.vylegzhanin@gmail.com on 9/26/2017.
  */
 class RJavaMapAsyncImpl extends RJavaMapImpl implements RJavaMapAsync {
+    private static final String RUNNING = "RUNNING";
+    private static final String DONE = "DONE";
+    private static final String ERROR = "ERROR";
 
     private final Thread thread;
     private volatile Map<String, List<String>> map = Collections.emptyMap();
-    private volatile boolean error;
-    private volatile boolean ready;
+    private volatile String status = RUNNING;
+    private volatile String errorMessage = "";
 
     RJavaMapAsyncImpl(RDriver rDriver, String sql) {
         thread = new Thread(() -> {
             try (RConnection connection = rDriver.open()) {
                 map = connection.call(sql).map();
-                ready = true;
+                status = DONE;
             } catch (Throwable e) {
-                error = true;
+                errorMessage = e.getMessage();
+                if (errorMessage == null || errorMessage.isEmpty()) errorMessage = e.getClass().getName();
+                status = ERROR;
                 e.printStackTrace();
             }
         }, "RJavaMapAsyncImpl");
@@ -34,18 +39,18 @@ class RJavaMapAsyncImpl extends RJavaMapImpl implements RJavaMapAsync {
     }
 
     @Override
-    public boolean isReady() {
-        return ready;
+    public String status() {
+        return status;
     }
 
     @Override
-    public boolean isError() {
-        return error;
+    public String errorMessage() {
+        return errorMessage;
     }
 
     @Override
     public void cancel() {
-        if (!isReady()) {
+        if (thread.isAlive()) {
             thread.interrupt();
         }
     }
