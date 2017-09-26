@@ -7,13 +7,13 @@ import java.util.List;
 public class RJavaTest {
 
     public static RJavaMap query(String date) {
-        final LinkedHashMap<String, List<String>> result = new LinkedHashMap<String, List<String>>();
+        final LinkedHashMap<String, List<String>> result = new LinkedHashMap<>();
         for (int i = 0; i < 1000000; i++) {
             result.computeIfAbsent("A", s -> new ArrayList<>()).add("A=" + i);
             result.computeIfAbsent("B", s -> new ArrayList<>()).add("B=" + (i * 2));
             result.computeIfAbsent("C", s -> new ArrayList<>()).add("C=" + (i * 3));
         }
-        return new RJavaMap(result);
+        return new RJavaMapImpl(result);
     }
 
     public static void main(String[] args) {

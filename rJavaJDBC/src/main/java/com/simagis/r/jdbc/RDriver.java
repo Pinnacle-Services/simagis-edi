@@ -51,4 +51,10 @@ public class RDriver {
             return connection.call(sql);
         }
     }
+
+    public RJavaMapAsync asyncCall(String sql) throws SQLException, ClassNotFoundException {
+        return new RJavaMapAsyncImpl(this, sql);
+    }
+
+
 }

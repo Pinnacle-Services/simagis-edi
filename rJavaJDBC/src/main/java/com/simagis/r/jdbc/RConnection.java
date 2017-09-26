@@ -22,15 +22,18 @@ public class RConnection implements AutoCloseable {
     }
 
     public RJavaMap call(String sql) throws SQLException {
+        final Thread currentThread = Thread.currentThread();
         final LinkedHashMap<String, List<String>> result = new LinkedHashMap<>();
         try (CallableStatement statement = connection.prepareCall(sql)) {
             boolean hadResults = statement.execute();
+            if (currentThread.isInterrupted()) throw new SQLException("SQL call is canceled");
             if (hadResults) {
                 try (ResultSet resultSet = statement.getResultSet()) {
                     final ResultSetMetaData metaData = resultSet.getMetaData();
                     final int columnCount = metaData.getColumnCount();
 
                     while (resultSet.next()) {
+                        if (currentThread.isInterrupted()) throw new SQLException("SQL call is canceled");
                         for (int i = 1; i <= columnCount; i++) {
                             final String columnName = metaData.getColumnLabel(i);
                             final Object object = resultSet.getObject(i);
@@ -43,7 +46,7 @@ public class RConnection implements AutoCloseable {
                 }
             }
         }
-        return new RJavaMap(result);
+        return new RJavaMapImpl(result);
     }
 
     @Override
