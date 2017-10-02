@@ -49,18 +49,29 @@ fun main(args: Array<String>) {
     }
 
     class EOB837(doc: Document) {
-        private val map = mutableMapOf<String, Ref835>().apply {
+        private val map0: Map<String, Ref835> = mutableMapOf<String, Ref835>().apply {
             (doc["eob"] as? List<*>)?.forEach {
                 if (it is Document) {
                     it.toRef835("id835")?.let { this[it.id] = it }
                 }
             }
         }
+        private val map = map0.toMutableMap()
+
         val _id = doc._id
-        var modified: Boolean = false
-            private set(value) {
-                field = value
-            }
+        val eobSize0 = doc["eobSize"] as? Number
+        val eobSize get() = map.size
+        val noEob0 = doc["noEob"] as? Boolean
+        val noEob get() = map.isEmpty()
+
+        val modified: Boolean get() {
+            if (eobSize0 != eobSize) return true
+            if (noEob0 != noEob) return true
+            fun Map<String, Ref835>.toStr() = values
+                    .sortedBy { it.procDate }
+                    .joinToString { "[${it.id},${it.procDate.time}]" }
+            return map.toStr() != map0.toStr()
+        }
 
         private fun Document?.toRef835(_id: String = "_id"): Ref835? {
             if (this == null) return null
@@ -74,9 +85,7 @@ fun main(args: Array<String>) {
 
         operator fun plusAssign(doc835: Document) {
             doc835.toRef835()?.let { it ->
-                if (map.put(it.id, it) == null) {
-                    modified = true
-                }
+                map.put(it.id, it)
             }
         }
 
@@ -183,7 +192,11 @@ fun main(args: Array<String>) {
         it.forEach {
             if (it.eob.modified) {
                 docs837.updateOne(doc(it.eob._id), doc {
-                    `+$set` { `+`("eob", it.eob.toList()) }
+                    `+$set` {
+                        `+`("eob", it.eob.toList())
+                        `+`("eobSize", it.eob.eobSize)
+                        `+`("noEob", it.eob.noEob)
+                    }
                 })
             }
         }
