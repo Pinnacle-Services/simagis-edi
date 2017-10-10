@@ -53,7 +53,7 @@ internal object ImportJob : AbstractJob() {
             val types: Set<String> get() = archive.keys
 
             operator fun get(type: String): ClaimType = cache.computeIfAbsent(type) {
-                ClaimType.of(type, (archive[type] as? Document) ?: Document())
+                ClaimType.of(type, (archive[type] as? Document) ?: Document(), db = claimsA)
             }
         }
 
