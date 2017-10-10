@@ -2,6 +2,7 @@ package com.simagis.claims.web
 
 import com.mongodb.MongoClient
 import com.mongodb.client.FindIterable
+import com.mongodb.client.MongoCollection
 import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.claims.web.ui.ClaimQuery
 import com.simagis.claims.web.ui.applyParameters
@@ -35,11 +36,13 @@ class ClaimServlet : HttpServlet() {
     }
 
     private val mongoHost = System.getProperty("claims.mongo.host", "127.0.0.1")
-    private val mongoDB = System.getProperty("claims.mongo.db", "claims")
+    private val claimsDbName = System.getProperty("claims.mongo.db", "claims")
+    private val claimsADbName = System.getProperty("claims.mongo.adb", "claimsA")
     private val decoder: Base64.Decoder = Base64.getUrlDecoder()
     private val mongoClient: MongoClient by lazy { MDBCredentials.mongoClient(mongoHost) }
-    private val db = mongoClient.getDatabase(mongoDB)
-    private val dbClaimsPrefix = System.getProperty("claims.mongo.db.claimsPrefix", "claims_")
+    private val claimsDb = mongoClient.getDatabase(claimsDbName)
+    private val claimsADb = mongoClient.getDatabase(claimsADbName)
+    private val claimsCollectionPrefix = System.getProperty("claims.mongo.db.claimsPrefix", "claims_")
 
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
@@ -59,7 +62,7 @@ class ClaimServlet : HttpServlet() {
         }
 
         val html = Claims835ToHtml(
-                db = db,
+                db = claimsDb,
                 cq = cq,
                 paging = paging,
                 root = servletPath + request.pathInfo,
@@ -161,6 +164,9 @@ class ClaimServlet : HttpServlet() {
                 }
     }
 
-    private fun getClaimsCollection(type: String) = db.getCollection("$dbClaimsPrefix$type")
+    private fun getClaimsCollection(type: String): MongoCollection<Document> = when(type.lastOrNull()?.toUpperCase()) {
+        'A' -> claimsADb.getCollection("$claimsCollectionPrefix$type")
+        else -> claimsDb.getCollection("$claimsCollectionPrefix$type")
+    }
 }
 
