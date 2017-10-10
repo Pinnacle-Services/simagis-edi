@@ -23,6 +23,7 @@
     {"svc.cptAsk": 1},
     {"svc.srvDate": 1},
     {"org": 1},
+    {"fCode": 1},
     {"svc.cptPay": 1}
   ]
 }
