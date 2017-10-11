@@ -4,6 +4,7 @@ import com.mongodb.MongoNamespace
 import com.mongodb.client.MongoDatabase
 import org.bson.Document
 import java.io.File
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -164,10 +165,26 @@ internal fun ImportJob.options.ClaimType.renameToTarget() {
     info("renameToTarget for $this")
     if (target.isNotBlank()) {
         if (targetCollection.isExists) {
-            targetCollection.renameCollection(
-                    MongoNamespace(ImportJob.claims.name, target
-                            + ".backup." + SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSSS").format(Date()))
-            )
+            val now = Date()
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSSS")
+            val backupNamePrefix = "$target.backup."
+            fun String.parseAsBackupDate(): Date = try {
+                dateFormat.parse(removePrefix(backupNamePrefix))
+            } catch (e: ParseException) {
+                Date(Long.MAX_VALUE)
+            }
+            val newBackupName = backupNamePrefix + dateFormat.format(now)
+            val databaseName = targetCollection.namespace.databaseName
+            targetCollection.renameCollection(MongoNamespace(databaseName, newBackupName))
+            ImportJob.dbs[databaseName]
+                    .listCollectionNames()
+                    .filter { it.startsWith(backupNamePrefix) }
+                    .filter { it.parseAsBackupDate() < now }
+                    .filter { it != newBackupName }
+                    .forEach {
+                        info("drop old backup $databaseName.$it")
+                        ImportJob.dbs[databaseName].getCollection(it).drop()
+                    }
         }
         tempCollection.renameCollection(targetCollection.namespace)
     }
