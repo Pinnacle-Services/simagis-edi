@@ -176,14 +176,14 @@ internal fun ImportJob.options.ClaimType.renameToTarget() {
             val newBackupName = backupNamePrefix + dateFormat.format(now)
             val databaseName = targetCollection.namespace.databaseName
             targetCollection.renameCollection(MongoNamespace(databaseName, newBackupName))
-            ImportJob.dbs[databaseName]
-                    .listCollectionNames()
+            val database = ImportJob.dbs[databaseName]
+            database.listCollectionNames()
                     .filter { it.startsWith(backupNamePrefix) }
                     .filter { it.parseAsBackupDate() < now }
                     .filter { it != newBackupName }
                     .forEach {
                         info("drop old backup $databaseName.$it")
-                        ImportJob.dbs[databaseName].getCollection(it).drop()
+                        database.getCollection(it).drop()
                     }
         }
         tempCollection.renameCollection(targetCollection.namespace)
