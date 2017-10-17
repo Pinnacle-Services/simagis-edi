@@ -4,11 +4,15 @@ import com.mongodb.MongoNamespace
 import com.mongodb.client.MongoDatabase
 import org.bson.Document
 import java.io.File
+import java.io.FileNotFoundException
+import java.net.URI
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.GZIPInputStream
+import kotlin.concurrent.withLock
 
 /**
  * <p>
@@ -64,7 +68,7 @@ internal object ImportJob : AbstractJob() {
                 ClaimType.of("835c", build835c["835c"] as? Document ?: Document())
             }
             val clients: DocumentCollection by lazy {
-                claims.getCollection(build835c["clients"] as? String ?: "clientid" )
+                claims.getCollection(build835c["clients"] as? String ?: "clientid")
             }
         }
 
@@ -74,7 +78,7 @@ internal object ImportJob : AbstractJob() {
                 ClaimType.of("835ac", build835ac["835ac"] as? Document ?: Document(), claimsA)
             }
             val clients: DocumentCollection by lazy {
-                claims.getCollection(build835ac["clients"] as? String ?: "clientid" )
+                claims.getCollection(build835ac["clients"] as? String ?: "clientid")
             }
         }
 
@@ -86,6 +90,7 @@ internal object ImportJob : AbstractJob() {
                 val db: MongoDatabase) {
             val tempCollection: DocumentCollection by lazy { db.getCollection(temp) }
             val targetCollection: DocumentCollection by lazy { db.getCollection(target) }
+
             companion object {
                 internal fun of(type: String, claimType: Document, db: MongoDatabase = claims) = ClaimType(
                         type = type,
@@ -114,11 +119,11 @@ internal object ImportJob : AbstractJob() {
                                     record.forEachIndexed { index, name ->
                                         header[name.removeSurrounding("\"")] = index
                                     }
-                                }
-                                else {
+                                } else {
                                     operator fun List<String>.get(name: String): String? = header[name]?.let {
                                         elementAtOrNull(it)?.removeSurrounding("\"")
                                     }
+
                                     val id = record["id"]
                                     val prid = record["prid"]
                                     val prg = record["prg"]
@@ -147,17 +152,57 @@ internal fun ImportJob.options.ClaimType.createIndexes() {
     if (!createIndexes) return
     info("createIndexes for $this")
     if (temp.isNotBlank()) {
-        (Document.parse(ImportJob::class.java
-                .getResourceAsStream("$type.createIndexes.json")
-                ?.use { it.reader().readText() }
-                ?: "{}")
-                ["indexes"] as? List<*>)
-                ?.forEach {
-                    if (it is Document) {
-                        info("$temp.createIndex(${it.toJson()})")
-                        tempCollection.createIndex(it)
+        (Document.parse(CreateIndexesJson[this])["indexes"] as? List<*>)?.forEach {
+            if (it is Document) {
+                info("$temp.createIndex(${it.toJson()})")
+                tempCollection.createIndex(it)
+            }
+        }
+    }
+}
+
+/**
+ * set CREATE_INDEXES_JSON_URL = https://raw.githubusercontent.com/vylegzhanin/simagis-edi/master/toBaseX/src/main/resources/com/simagis/edi/mongodb/
+ */
+internal object CreateIndexesJson {
+    private val url: String? = System.getenv("CREATE_INDEXES_JSON_URL")
+    private val lock = ReentrantLock()
+    private val cache = mutableMapOf<String, String>()
+
+    private fun ImportJob.options.ClaimType.download(): String = URI(url).let { uri ->
+        uri.resolve("$type.createIndexes.json")
+                .toURL()
+                .openConnection()
+                .let { connection ->
+                    connection.connect()
+                    try {
+                        connection
+                                .getInputStream()
+                                .reader()
+                                .readText()
+                    } catch (e: Throwable) {
+                        if (e !is FileNotFoundException) throw e
+                        warning("$uri not found", e)
+                        read()
                     }
                 }
+    }
+
+    private fun ImportJob.options.ClaimType.read(): String = CreateIndexesJson::class.java
+            .getResourceAsStream("$type.createIndexes.json")
+            ?.use { it.reader().readText() }
+            ?: "{}"
+
+    operator fun get(claimType: ImportJob.options.ClaimType): String = when (claimType.createIndexes) {
+        true -> lock.withLock {
+            cache.getOrPut(claimType.type) {
+                when (url) {
+                    null -> claimType.read()
+                    else -> claimType.download()
+                }
+            }
+        }
+        false -> "{}"
     }
 }
 
@@ -173,6 +218,7 @@ internal fun ImportJob.options.ClaimType.renameToTarget() {
             } catch (e: ParseException) {
                 Date(Long.MAX_VALUE)
             }
+
             val newBackupName = backupNamePrefix + dateFormat.format(now)
             val databaseName = targetCollection.namespace.databaseName
             targetCollection.renameCollection(MongoNamespace(databaseName, newBackupName))
