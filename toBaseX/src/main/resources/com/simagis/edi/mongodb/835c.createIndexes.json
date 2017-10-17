@@ -24,6 +24,7 @@
     {"svc.srvDate": 1},
     {"org": 1},
     {"fCode": 1},
-    {"svc.cptPay": 1}
+    {"svc.cptPay": 1},
+    {"prid": 1}
   ]
 }
