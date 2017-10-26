@@ -15,5 +15,6 @@
         <module>mdb</module>
         <module>claims-web</module>
         <module>rJavaJDBC</module>
+        <module>RServe</module>
     </modules>
 </project>
