@@ -10,13 +10,13 @@
     {"prn": 1},
     {"npi": 1},
     {"noEob": 1},
-    {"eobSize": 1},
     {"dx.dxT": 1},
     {"dx.dxV": 1},
     {"svc.cpt": 1},
     {"svc.cptAsk": 1},
     {"svc.cptMod1": 1},
     {"svc.qty": 1},
-    {"svc.srvDate": 1}
+    {"svc.srvDate": 1},
+    {"noEob": 1, "sendDate": -1 }
   ]
 }
