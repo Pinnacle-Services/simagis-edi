@@ -64,6 +64,14 @@ inline fun Document.`+$set`(build: Document.() -> Unit): Document {
 }
 
 @Suppress("unused")
+inline fun Document.`+$setOnInsert`(build: Document.() -> Unit): Document {
+    append(`$` + "setOnInsert", Document().apply {
+        build()
+    })
+    return this
+}
+
+@Suppress("unused")
 inline fun Document.`+$addToSet`(build: Document.() -> Unit): Document {
     append(`$` + "addToSet", Document().apply {
         build()
