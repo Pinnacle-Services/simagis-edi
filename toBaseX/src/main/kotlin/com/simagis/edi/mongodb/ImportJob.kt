@@ -109,32 +109,28 @@ internal object ImportJob : AbstractJob() {
 
         val map: Map<String, doc> by lazy {
             mutableMapOf<String, doc>().apply {
-                File("files").resolve("xifin_billed_acn.gzip").let { gzipFile ->
-                    if (gzipFile.isFile) {
-                        GZIPInputStream(gzipFile.inputStream()).bufferedReader().use {
-                            val header = mutableMapOf<String, Int>()
-                            it.forEachLine { line ->
-                                val record: List<String> = line.split('\t')
-                                if (header.isEmpty()) {
-                                    record.forEachIndexed { index, name ->
-                                        header[name.removeSurrounding("\"")] = index
+                var id: Int = -1
+                var prid: Int = -1
+                var prg: Int = -1
+                File("files")
+                        .resolve("xifin_billed_acn.gzip")
+                        .parseAsGzCsv(
+                                { index, name ->
+                                    when (name) {
+                                        "id" -> id = index
+                                        "prid" -> prid = index
+                                        "prg" -> prg = index
                                     }
-                                } else {
-                                    operator fun List<String>.get(name: String): String? = header[name]?.let {
-                                        elementAtOrNull(it)?.removeSurrounding("\"")
+                                },
+                                { record ->
+                                    doc(
+                                            id = record[id],
+                                            prid = record[prid],
+                                            prg = record[prg]
+                                    ).also {
+                                        this[it.id] = it
                                     }
-
-                                    val id = record["id"]
-                                    val prid = record["prid"]
-                                    val prg = record["prg"]
-                                    if (id != null && prid != null && prg != null) {
-                                        this[id] = doc(id, prid, prg)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                })
             }
         }
 
@@ -144,6 +140,72 @@ internal object ImportJob : AbstractJob() {
         internal fun acn_to_id(acn: String): String? = when {
             acn.length > 3 && ZDD.containsMatchIn(acn) -> acn.replace(ZDD, "")
             else -> null
+        }
+    }
+
+    object acn_log {
+        interface file {
+            val name: String
+            val accnSet: Set<accn>
+        }
+
+        interface accn {
+            val id: String
+            val payor: String
+            val file: file
+        }
+
+        interface Tree {
+            val files: Map<String, file>
+            val acns: Map<String, accn>
+        }
+
+        val tree: Tree by lazy {
+            class fileImpl(override val name: String, override val accnSet: MutableSet<accn> = mutableSetOf()) : file
+            class accnImpl(override val id: String, override val payor: String, override val file: fileImpl) : accn
+
+            val files = mutableMapOf<String, fileImpl>()
+            val accns = mutableMapOf<String, accn>()
+
+            var ACCN_ID = -1
+            var PAYOR_ID = -1
+            var FILENAME = -1
+            File("files")
+                    .resolve("xifin_acn_log.gzip")
+                    .parseAsGzCsv(
+                            { index, name ->
+                                when (name) {
+                                    "ACCN_ID" -> ACCN_ID = index
+                                    "PAYOR_ID" -> PAYOR_ID = index
+                                    "FILENAME" -> FILENAME = index
+                                }
+                            },
+                            { record ->
+                                val accnId = record[ACCN_ID]
+                                val payorId = record[PAYOR_ID]
+                                val fileName = record[FILENAME]
+                                val file = files.getOrPut(fileName) { fileImpl(fileName) }
+                                val accn = accns.getOrPut(accnId) { accnImpl(accnId, payorId, file) }
+                                file.accnSet += accn
+                            })
+
+            object : Tree {
+                override val files: Map<String, file> = files
+                override val acns: Map<String, accn> = accns
+            }
+        }
+    }
+}
+private typealias CsvRecord = List<String>
+private fun File.parseAsGzCsv(onHeader: (Int, String) -> Unit, onRecord: (CsvRecord) -> Unit) {
+    if (isFile) GZIPInputStream(inputStream()).bufferedReader().use {
+        var count = 0
+        it.forEachLine { line ->
+            val record: CsvRecord = line.split('\t')
+            if (count == 0)
+                record.forEachIndexed(onHeader) else
+                onRecord(record)
+            count++
         }
     }
 }
