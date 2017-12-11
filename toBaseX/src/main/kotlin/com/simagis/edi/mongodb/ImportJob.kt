@@ -155,12 +155,12 @@ internal object ImportJob : AbstractJob() {
             val file: file
         }
 
-        interface Tree {
+        interface DB {
             val files: Map<String, file>
-            val acns: Map<String, accn>
+            val accns: Map<String, accn>
         }
 
-        val tree: Tree by lazy {
+        val db: DB by lazy {
             class fileImpl(override val name: String, override val accnSet: MutableSet<accn> = mutableSetOf()) : file
             class accnImpl(override val id: String, override val payor: String, override val file: fileImpl) : accn
 
@@ -189,9 +189,9 @@ internal object ImportJob : AbstractJob() {
                                 file.accnSet += accn
                             })
 
-            object : Tree {
+            object : DB {
                 override val files: Map<String, file> = files
-                override val acns: Map<String, accn> = accns
+                override val accns: Map<String, accn> = accns
             }
         }
     }
@@ -201,7 +201,7 @@ private fun File.parseAsGzCsv(onHeader: (Int, String) -> Unit, onRecord: (CsvRec
     if (isFile) GZIPInputStream(inputStream()).bufferedReader().use {
         var count = 0
         it.forEachLine { line ->
-            val record: CsvRecord = line.split('\t')
+            val record: CsvRecord = line.split('\t').map { it.removeSurrounding("\"") }
             if (count == 0)
                 record.forEachIndexed(onHeader) else
                 onRecord(record)
