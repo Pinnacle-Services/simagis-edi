@@ -255,8 +255,10 @@ internal object ImportJob : AbstractJob() {
 
                         acnByFile.newZipFs().use { fs ->
                             acnByFileWriters.values.forEach { buffer ->
-                                Files.newOutputStream(fs.getPath(buffer.name)).use {
-                                    it.write(buffer.byteArray)
+                                Files.newOutputStream(fs.getPath(buffer.name)).writer().use { writer ->
+                                    buffer.byteArray.inputStream().reader().readLines().toSortedSet().forEach {
+                                        writer.append("$it\n")
+                                    }
                                 }
                             }
                         }
