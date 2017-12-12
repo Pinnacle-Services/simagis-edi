@@ -271,9 +271,15 @@ fun main(args: Array<String>) {
                                                     throw e
                                                 claimCountDuplicate.incrementAndGet()
                                                 val oldDoc: Document = collection.find(doc(document._id)).first()
-                                                if (oldDoc.claimDate()!! < document.claimDate()!!) {
+                                                val oldClaimDate = oldDoc.claimDate()
+                                                val newClaimDate = document.claimDate()
+                                                logger.info("duplicate: oldClaimDate = $oldClaimDate; newClaimDate = $newClaimDate")
+                                                if (oldClaimDate!! < newClaimDate!!) {
                                                     collection.findOneAndReplace(doc(document._id), document)
                                                     claimCountReplaced.incrementAndGet()
+                                                    logger.info("duplicate: replaced")
+                                                } else {
+                                                    logger.info("duplicate: ignored")
                                                 }
                                             }
                                         }
@@ -415,6 +421,10 @@ private class AcnLogImpl(val file: ImportJob.acn_log.file) : AcnLog {
 private class LocalLogger(val file: File, val isa: ISA, val json: Any?) {
     fun warn(message: String, error: Throwable? = null, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) {
         warning(message + " file: $file", error, details, detailsJson ?: json, detailsXml ?: isa.toXmlCode())
+    }
+
+    fun info(message: String) {
+        info(message, details = file.name)
     }
 }
 
