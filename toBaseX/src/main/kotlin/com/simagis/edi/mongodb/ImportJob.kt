@@ -3,9 +3,15 @@ package com.simagis.edi.mongodb
 import com.mongodb.MongoNamespace
 import com.mongodb.client.MongoDatabase
 import org.bson.Document
+import java.io.BufferedWriter
+import java.io.Closeable
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.URI
+import java.nio.file.FileSystem
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.security.MessageDigest
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -13,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.GZIPInputStream
 import kotlin.concurrent.withLock
+
 
 /**
  * <p>
@@ -194,8 +201,89 @@ internal object ImportJob : AbstractJob() {
                 override val accns: Map<String, accn> = accns
             }
         }
+
+        interface FS {}
+
+        val fs: FS by lazy {
+            val src = File("files").resolve("xifin_acn_log.gzip")
+            if (src.isFile) {
+                val md5 = src.md5()
+                val acnByFile = src.parentFile.resolve("${src.name}.$md5.acnByFile.zip")
+                val acnToPrid = src.parentFile.resolve("${src.name}.$md5.acnToPrid.zip")
+                if (!(acnByFile.isFile && acnToPrid.isFile)) {
+                    acnByFile.delete()
+                    acnToPrid.delete()
+                    fun File.newZipFs(): FileSystem = FileSystems
+                            .newFileSystem(URI.create("jar:" + toURI()), mapOf("create" to "true"))
+
+                    val acnByFileFs = acnByFile.newZipFs()
+                    val acnToPridFs = acnToPrid.newZipFs()
+
+                    val closeables = mutableListOf<Closeable>()
+                    try {
+                        fun <T : Closeable> T.autoClose(): T = apply { closeables += this }
+                        val acnToPridCsv = Files.newOutputStream(acnToPridFs.getPath("acnToPrid.csv"))
+                                .bufferedWriter()
+                                .autoClose()
+                        acnToPridCsv.append("acn\tprid\n")
+
+                        val acnByFileWriters = mutableMapOf<String, BufferedWriter>()
+                        var ACCN_ID = -1
+                        var PAYOR_ID = -1
+                        var FILENAME = -1
+                        src.parseAsGzCsv(
+                                { index, name ->
+                                    when (name) {
+                                        "ACCN_ID" -> ACCN_ID = index
+                                        "PAYOR_ID" -> PAYOR_ID = index
+                                        "FILENAME" -> FILENAME = index
+                                    }
+                                },
+                                { record ->
+                                    val accnId = record[ACCN_ID]
+                                    val payorId = record[PAYOR_ID]
+                                    val fileName = record[FILENAME]
+                                    acnByFileWriters
+                                            .getOrPut(fileName) {
+                                                Files.newOutputStream(acnByFileFs.getPath(fileName))
+                                                        .bufferedWriter()
+                                                        .autoClose()
+                                            }
+                                            .append("$accnId\n")
+
+                                    acnToPridCsv.append("$accnId\t$payorId\n")
+
+                                })
+                    } finally {
+                        closeables.forEach {
+                            it.close()
+                        }
+                        acnByFileFs.close()
+                        acnToPridFs.close()
+                    }
+                }
+            }
+            object : FS {}
+        }
+
+        val log: DocumentCollection by lazy {
+            claims.getCollection("acn_log_" + jobId)
+        }
     }
 }
+
+
+private fun File.md5() = MessageDigest.getInstance("MD5").let { md5 ->
+    fun ByteArray.toHexString(): String = joinToString(separator = "") {
+        Integer.toHexString(it.toInt() and 0xff).let {
+            if (it.length == 2) it else "0$it"
+        }
+    }
+    md5.update(inputStream()
+            .use { stream -> ByteArray(length().toInt()).also { stream.read(it) } })
+    md5.digest().toHexString()
+}
+
 private typealias CsvRecord = List<String>
 private fun File.parseAsGzCsv(onHeader: (Int, String) -> Unit, onRecord: (CsvRecord) -> Unit) {
     if (isFile) GZIPInputStream(inputStream()).bufferedReader().use {
