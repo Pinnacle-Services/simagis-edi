@@ -15,6 +15,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 import kotlin.concurrent.withLock
 
 
@@ -206,7 +207,7 @@ internal object ImportJob : AbstractJob() {
             if (src.isFile) {
                 val md5 = src.md5()
                 val acnByFile = src.parentFile.resolve("${src.name}.$md5.acnByFile.zip")
-                val acnToPrid = src.parentFile.resolve("${src.name}.$md5.acnToPrid.zip")
+                val acnToPrid = src.parentFile.resolve("${src.name}.$md5.acnToPrid.gzip")
                 if (!(acnByFile.isFile && acnToPrid.isFile)) {
                     acnByFile.delete()
                     acnToPrid.delete()
@@ -227,12 +228,8 @@ internal object ImportJob : AbstractJob() {
                     val closeables = mutableListOf<Closeable>()
                     try {
                         fun <T : Closeable> T.autoClose(): T = apply { closeables += this }
-                        val acnToPridCsv = Files.newOutputStream(acnToPridFs.getPath("acnToPrid.csv"))
-                                .bufferedWriter()
-                                .autoClose()
-                        acnToPridCsv.append("acn\tprid\n")
-
                         val acnByFileWriters = mutableMapOf<String, NamedBuffer>()
+                        val prid2acns = mutableMapOf<String, MutableSet<String>>()
                         var ACCN_ID = -1
                         var PAYOR_ID = -1
                         var FILENAME = -1
@@ -248,10 +245,10 @@ internal object ImportJob : AbstractJob() {
                                     val accnId = record[ACCN_ID]
                                     val payorId = record[PAYOR_ID]
                                     val fileName = record[FILENAME]
-                                    acnToPridCsv.append("$accnId\t$payorId\n")
                                     acnByFileWriters
                                             .getOrPut(fileName) { NamedBuffer(fileName).autoClose() }
                                             .append("$accnId\n")
+                                    prid2acns.getOrPut(payorId) { mutableSetOf() } += accnId
                                 })
 
                         acnByFile.newZipFs().use { fs ->
@@ -261,6 +258,16 @@ internal object ImportJob : AbstractJob() {
                                 }
                             }
                         }
+
+                        GZIPOutputStream(FileOutputStream(acnToPrid)).bufferedWriter().use { csv ->
+                            csv.append("acn\tprid\n")
+                            prid2acns.forEach { prid, acns ->
+                                acns.forEach { acn ->
+                                    csv.append("$acn\t$prid\n")
+                                }
+                            }
+                        }
+
                     } finally {
                         closeables.forEach {
                             it.close()

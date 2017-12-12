@@ -9,7 +9,7 @@ import java.util.logging.Logger
  */
 fun main(args: Array<String>) {
     val log = Logger.getGlobal()
-    log.info("ImportJob.acn_log.fs: loading...")
+    log.info("ImportJob.acn_log.fs: building...")
     with(ImportJob.acn_log.fs) {
         log.info("with(ImportJob.acn_log.fs):")
     }
