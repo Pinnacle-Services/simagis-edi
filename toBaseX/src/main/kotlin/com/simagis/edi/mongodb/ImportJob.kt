@@ -200,7 +200,9 @@ internal object ImportJob : AbstractJob() {
             }
         }
 
-        interface FS {}
+        interface FS {
+            fun generalize(fileName: String): String = fileName.generalizeFileName()
+        }
 
         val fs: FS by lazy {
             val src = File("files").resolve("xifin_acn_log.gzip")
@@ -244,7 +246,7 @@ internal object ImportJob : AbstractJob() {
                                 { record ->
                                     val accnId = record[ACCN_ID]
                                     val payorId = record[PAYOR_ID]
-                                    val fileName = record[FILENAME]
+                                    val fileName = record[FILENAME].generalizeFileName()
                                     acnByFileWriters
                                             .getOrPut(fileName) { NamedBuffer(fileName).autoClose() }
                                             .append("$accnId\n")
@@ -285,6 +287,10 @@ internal object ImportJob : AbstractJob() {
     }
 }
 
+
+private fun String.generalizeFileName(): String = toLowerCase()
+        .removeSuffix(".gz")
+        .removeSuffix(".txt")
 
 private fun File.md5() = MessageDigest.getInstance("MD5").let { md5 ->
     fun ByteArray.toHexString(): String = joinToString(separator = "") {
