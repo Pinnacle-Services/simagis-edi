@@ -28,10 +28,12 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.locks.ReentrantLock
 import javax.json.Json
 import javax.json.JsonArray
 import javax.json.JsonObject
 import kotlin.concurrent.thread
+import kotlin.concurrent.withLock
 import kotlin.system.exitProcess
 
 
@@ -66,17 +68,20 @@ fun main(args: Array<String>) {
     }
 
 
-    fun ISA.toClaimsJsonArray(file: File): JsonArray? {
-        fun invalidISA(isa: ISA, e: Throwable? = null) = warning(
-                "Invalid ISA: ${isa.stat} from $file",
-                e,
-                details = isa.code,
-                detailsXml = if (e !is EDISyntaxException) try {
-                    isa.toXML().toString(ISA.CHARSET)
-                } catch(e: Exception) {
-                    null
-                } else null
-        )
+    fun ISA.toClaimsJsonArray(file: File, onError: (Throwable?) -> Unit = {}): JsonArray? {
+        fun invalidISA(isa: ISA, e: Throwable? = null) {
+            onError(e)
+            warning(
+                    "Invalid ISA: ${isa.stat} from $file",
+                    e,
+                    details = isa.code,
+                    detailsXml = if (e !is EDISyntaxException) try {
+                        isa.toXML().toString(ISA.CHARSET)
+                    } catch (e: Exception) {
+                        null
+                    } else null
+            )
+        }
 
         if (valid) try {
             val xqText = stat.doc.type?.let { type ->
@@ -105,7 +110,7 @@ fun main(args: Array<String>) {
                 val json = execute(context)
                 Json.createReader(json.reader()).readArray()
             }
-        } catch(e: Throwable) {
+        } catch (e: Throwable) {
             invalidISA(this, e)
         } else {
             invalidISA(this, null)
@@ -121,16 +126,18 @@ fun main(args: Array<String>) {
     val claimCount = AtomicLong()
     val claimCountInvalid = AtomicLong()
     val claimCountDuplicate = AtomicLong()
+    val claimCountReplaced = AtomicLong()
     fun details() = """
         DETAILS:
-            file: ${fileCount.get()}
-            file duplicate: ${fileCountDuplicate.get()}
-            file invalid: ${fileCountInvalid.get()}
-            isa: ${isaCount.get()}
-            isa invalid: ${isaCountInvalid.get()}
-            claim: ${claimCount.get()}
-            claim duplicate: ${claimCountDuplicate.get()}
-            claim invalid: ${claimCountInvalid.get()}
+            files: ${fileCount.get()}
+            files duplicate: ${fileCountDuplicate.get()}
+            files invalid: ${fileCountInvalid.get()}
+            ISAs: ${isaCount.get()}
+            ISAs invalid: ${isaCountInvalid.get()}
+            claims: ${claimCount.get()}
+            claims duplicate: ${claimCountDuplicate.get()}
+            claims replaced: ${claimCountReplaced.get()}
+            claims invalid: ${claimCountInvalid.get()}
 """
     try {
         fun Document.prepare(logger: LocalLogger): Document {
@@ -187,7 +194,7 @@ fun main(args: Array<String>) {
                                 }
                             }
                         }
-                    } catch(e: Exception) {
+                    } catch (e: Exception) {
                         when (e) {
                             is ParseException -> logger.warn("Invalid date format at $_id $key: '${getString(key)}'")
                             is NumberFormatException -> logger.warn("Invalid number format at $_id $key: '${getString(key)}'")
@@ -204,12 +211,14 @@ fun main(args: Array<String>) {
                 }
             }
             fixTypes()
-            when(logger.isa.type) {
+            when (logger.isa.type) {
                 "835" -> augment835()
                 "837" -> augment837()
             }
             return this
         }
+
+        val insertLock = ReentrantLock()
 
         fun import(file: File) {
             if (!digests.add(file.digest())) {
@@ -218,55 +227,78 @@ fun main(args: Array<String>) {
                 return
             }
 
-            val isaList: List<ISA>
+            val acnLog = ImportJob.acn_log.db.files[file.name].toAcnLog()
             try {
-                isaList = ISA.read(file)
-                fileCount.incrementAndGet()
-            } catch(e: Exception) {
-                fileCountInvalid.incrementAndGet()
-                warning("Invalid file $file", e)
-                return
-            }
-            isaList.forEach { isa ->
-                val claims = isa.toClaimsJsonArray(file)
-                if (claims != null) {
-                    isaCount.incrementAndGet()
-                    claims.forEach { json ->
-                        fun ImportJob.options.ClaimType.insert(archiveMode: Boolean) {
-                            if (temp.isBlank()) return
-                            val logger = LocalLogger(file, isa, json)
-                            val collection = tempCollection
-                            val document = Document.parse(json.toString()).prepare(logger)
-                            try {
-                                fun Document.inRange(start: Date?) = archiveMode || when (isa.type) {
-                                    "835" -> getDate("procDate")?.after(start) ?: false
-                                    "837" -> getDate("sendDate")?.after(start) ?: false
-                                    else -> true
-                                }
+                val isaList: List<ISA>
+                try {
+                    isaList = ISA.read(file)
+                    fileCount.incrementAndGet()
+                } catch (e: Throwable) {
+                    fileCountInvalid.incrementAndGet()
+                    warning("Invalid file $file", e)
+                    acnLog.onFileError(e)
+                    return
+                }
+                isaList.forEach { isa ->
+                    val claims = isa.toClaimsJsonArray(file, onError = { acnLog.onIsaError(it, isa) })
+                    if (claims != null) {
+                        isaCount.incrementAndGet()
+                        claims.forEach { json ->
+                            fun ImportJob.options.ClaimType.insert(archiveMode: Boolean) {
+                                if (temp.isBlank()) return
+                                val logger = LocalLogger(file, isa, json)
+                                val collection = tempCollection
+                                val document = Document.parse(json.toString()).prepare(logger)
+                                try {
+                                    fun Document.claimDate(): Date? = when (isa.type) {
+                                        "835" -> getDate("procDate")
+                                        "837" -> getDate("sendDate")
+                                        else -> null
+                                    }
 
-                                if (document.inRange(ImportJob.options.after)) {
-                                    collection.insertOne(document)
-                                    claimCount.incrementAndGet()
-                                }
-                            } catch(e: Throwable) {
-                                if (e is MongoWriteException && ErrorCategory.fromErrorCode(e.code)
-                                        == ErrorCategory.DUPLICATE_KEY) {
-                                    claimCountDuplicate.incrementAndGet()
-                                } else {
+                                    fun Document.inRange(start: Date?) = archiveMode || when (isa.type) {
+                                        "835" -> claimDate()?.after(start) ?: false
+                                        "837" -> claimDate()?.after(start) ?: false
+                                        else -> true
+                                    }
+
+                                    if (document.inRange(ImportJob.options.after)) {
+                                        insertLock.withLock {
+                                            try {
+                                                collection.insertOne(document)
+                                            } catch (e: MongoWriteException) {
+                                                if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY)
+                                                    throw e
+                                                claimCountDuplicate.incrementAndGet()
+                                                val oldDoc: Document = collection.find(doc(document._id)).first()
+                                                if (oldDoc.claimDate()!! < document.claimDate()!!) {
+                                                    collection.findOneAndReplace(doc(document._id), document)
+                                                    claimCountReplaced.incrementAndGet()
+                                                }
+                                            }
+                                        }
+                                        claimCount.incrementAndGet()
+                                        acnLog.onClaimInserted(isa, document)
+                                    } else {
+                                        acnLog.onClaimOutOfRange(isa, document)
+                                    }
+                                } catch (e: Throwable) {
+                                    acnLog.onClaimError(e, isa, document)
                                     claimCountInvalid.incrementAndGet()
                                     logger.warn("insertOne error: ${e.message}", e)
                                 }
-
+                            }
+                            if (json is JsonObject) {
+                                ImportJob.options.claimTypes[isa.type].insert(false)
+                                ImportJob.options.archive["${isa.type}a"].insert(true)
                             }
                         }
-                        if (json is JsonObject) {
-                            ImportJob.options.claimTypes[isa.type].insert(false)
-                            ImportJob.options.archive["${isa.type}a"].insert(true)
-                        }
+                    } else {
+                        isaCountInvalid.incrementAndGet()
                     }
-                } else {
-                    isaCountInvalid.incrementAndGet()
                 }
+            } finally {
+                acnLog.onFileProcessed()
             }
         }
 
@@ -304,7 +336,7 @@ fun main(args: Array<String>) {
             warning("RESTARTING for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
             exitProcess(302)
         }
-    } catch(e: Throwable) {
+    } catch (e: Throwable) {
         error("ERROR: ${e.message} ${details()}", e)
         exitProcess(2)
     }
@@ -337,6 +369,46 @@ fun Document.augment837() {
         ImportJob.billed_acn[acn]?.let {
             this["prid"] = it.prid
         }
+    }
+}
+
+private fun ImportJob.acn_log.file?.toAcnLog(): AcnLog = if (this != null) AcnLogImpl(this) else object : AcnLog {}
+
+private interface AcnLog {
+    fun onFileError(e: Throwable) {}
+    fun onIsaError(e: Throwable?, isa: ISA) {}
+    fun onClaimError(e: Throwable, isa: ISA, document: Document) {}
+    fun onClaimOutOfRange(isa: ISA, document: Document) {}
+    fun onClaimInserted(isa: ISA, document: Document) {}
+    fun onFileProcessed() {}
+}
+
+private class AcnLogImpl(val file: ImportJob.acn_log.file) : AcnLog {
+    private val claimsProcessed = mutableListOf<String>()
+    private val claimsInserted = mutableListOf<String>()
+
+    override fun onFileError(e: Throwable) {
+    }
+
+    override fun onIsaError(e: Throwable?, isa: ISA) {
+    }
+
+    override fun onClaimError(e: Throwable, isa: ISA, document: Document) {
+    }
+
+    override fun onClaimOutOfRange(isa: ISA, document: Document) {
+        claimsProcessed += document._id as String
+    }
+
+    override fun onClaimInserted(isa: ISA, document: Document) {
+        val id = document._id as String
+        claimsProcessed += id
+        claimsInserted += id
+    }
+
+    override fun onFileProcessed() {
+        claimsProcessed.clear()
+        claimsInserted.clear()
     }
 }
 
