@@ -3,10 +3,7 @@ package com.simagis.edi.mongodb
 import com.mongodb.MongoNamespace
 import com.mongodb.client.MongoDatabase
 import org.bson.Document
-import java.io.BufferedWriter
-import java.io.Closeable
-import java.io.File
-import java.io.FileNotFoundException
+import java.io.*
 import java.net.URI
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
@@ -216,8 +213,16 @@ internal object ImportJob : AbstractJob() {
                     fun File.newZipFs(): FileSystem = FileSystems
                             .newFileSystem(URI.create("jar:" + toURI()), mapOf("create" to "true"))
 
-                    val acnByFileFs = acnByFile.newZipFs()
                     val acnToPridFs = acnToPrid.newZipFs()
+
+                    class NamedBuffer(
+                            val name: String,
+                            private val array: ByteArrayOutputStream = ByteArrayOutputStream()) : BufferedWriter(OutputStreamWriter(array)) {
+                        val byteArray: ByteArray get() {
+                            flush()
+                            return array.toByteArray()
+                        }
+                    }
 
                     val closeables = mutableListOf<Closeable>()
                     try {
@@ -227,7 +232,7 @@ internal object ImportJob : AbstractJob() {
                                 .autoClose()
                         acnToPridCsv.append("acn\tprid\n")
 
-                        val acnByFileWriters = mutableMapOf<String, BufferedWriter>()
+                        val acnByFileWriters = mutableMapOf<String, NamedBuffer>()
                         var ACCN_ID = -1
                         var PAYOR_ID = -1
                         var FILENAME = -1
@@ -243,22 +248,23 @@ internal object ImportJob : AbstractJob() {
                                     val accnId = record[ACCN_ID]
                                     val payorId = record[PAYOR_ID]
                                     val fileName = record[FILENAME]
-                                    acnByFileWriters
-                                            .getOrPut(fileName) {
-                                                Files.newOutputStream(acnByFileFs.getPath(fileName))
-                                                        .bufferedWriter()
-                                                        .autoClose()
-                                            }
-                                            .append("$accnId\n")
-
                                     acnToPridCsv.append("$accnId\t$payorId\n")
-
+                                    acnByFileWriters
+                                            .getOrPut(fileName) { NamedBuffer(fileName).autoClose() }
+                                            .append("$accnId\n")
                                 })
+
+                        acnByFile.newZipFs().use { fs ->
+                            acnByFileWriters.values.forEach { buffer ->
+                                Files.newOutputStream(fs.getPath(buffer.name)).use {
+                                    it.write(buffer.byteArray)
+                                }
+                            }
+                        }
                     } finally {
                         closeables.forEach {
                             it.close()
                         }
-                        acnByFileFs.close()
                         acnToPridFs.close()
                     }
                 }
