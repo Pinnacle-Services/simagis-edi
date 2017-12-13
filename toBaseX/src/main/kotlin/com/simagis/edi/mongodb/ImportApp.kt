@@ -218,7 +218,8 @@ fun main(args: Array<String>) {
             return this
         }
 
-        val insertLock = ReentrantLock()
+        val duplicates = mutableMapOf<String, Date>()
+        val duplicatesLock = ReentrantLock()
 
         fun import(file: File) {
             if (!digests.add(file.digest())) {
@@ -256,32 +257,46 @@ fun main(args: Array<String>) {
                                         else -> null
                                     }
 
-                                    fun Document.inRange(start: Date?) = archiveMode || when (isa.type) {
-                                        "835" -> claimDate()?.after(start) ?: false
-                                        "837" -> claimDate()?.after(start) ?: false
-                                        else -> true
+                                    fun Date?.inRange(start: Date?) = archiveMode || when (isa.type) {
+                                        "835" -> this?.after(start) ?: false
+                                        "837" -> this?.after(start) ?: false
+                                        else -> false
                                     }
 
-                                    if (document.inRange(ImportJob.options.after)) {
-                                        insertLock.withLock {
-                                            try {
-                                                collection.insertOne(document)
-                                            } catch (e: MongoWriteException) {
-                                                if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY)
-                                                    throw e
-                                                claimCountDuplicate.incrementAndGet()
-                                                val oldDoc: Document = collection.find(doc(document._id)).first()
-                                                val oldClaimDate = oldDoc.claimDate()
-                                                val newClaimDate = document.claimDate()
-                                                logger.info("duplicate: oldClaimDate = $oldClaimDate; newClaimDate = $newClaimDate")
-                                                if (oldClaimDate!! < newClaimDate!!) {
-                                                    collection.findOneAndReplace(doc(document._id), document)
-                                                    claimCountReplaced.incrementAndGet()
-                                                    logger.info("duplicate: replaced")
-                                                } else {
-                                                    logger.info("duplicate: ignored")
-                                                }
+                                    val claimDate = document.claimDate() ?: throw AssertionError("Invalid claim date")
+                                    if (claimDate.inRange(ImportJob.options.after)) {
+                                        document["file"] = file.name
+                                        val claimId = document._id.toString()
+                                        fun tryReplace() {
+                                            assert(duplicatesLock.isHeldByCurrentThread)
+                                            claimCountDuplicate.incrementAndGet()
+                                            val oldClaimDate = collection.find(doc(document._id)).first().claimDate()!!
+                                            return if (oldClaimDate < claimDate) {
+                                                collection.findOneAndReplace(doc(document._id), document)
+                                                claimCountReplaced.incrementAndGet()
+                                                logger.trace("duplicate: old = $oldClaimDate; new = $claimDate -> REPLACED")
+                                                duplicates[claimId] = claimDate
+                                            } else {
+                                                logger.trace("duplicate: old = $oldClaimDate; new = $claimDate -> IGNORED")
                                             }
+                                        }
+
+                                        val insertMode = duplicatesLock.withLock {
+                                            val oldClaimDate = duplicates[claimId]
+                                            when {
+                                                oldClaimDate == null -> true.also { duplicates[claimId] = claimDate }
+                                                oldClaimDate >= claimDate -> false.also { logger.trace("duplicate: old = $oldClaimDate; new = $claimDate -> IGNORED LOCALLY") }
+                                                oldClaimDate < claimDate -> false.also { tryReplace() }
+                                                else -> throw AssertionError("Invalid claim date logic")
+                                            }
+                                        }
+
+                                        if (insertMode) try {
+                                            collection.insertOne(document)
+                                        } catch (e: MongoWriteException) {
+                                            if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY)
+                                                throw e
+                                            duplicatesLock.withLock { tryReplace() }
                                         }
                                         claimCount.incrementAndGet()
                                         acnLog.onClaimInserted(isa, document)
@@ -423,12 +438,12 @@ private class LocalLogger(val file: File, val isa: ISA, val json: Any?) {
         warning(message + " file: $file", error, details, detailsJson ?: json, detailsXml ?: isa.toXmlCode())
     }
 
-    fun info(message: String) {
-        info(message, details = file.name)
+    fun trace(message: String) {
+        trace(message + " file: ${file.name}", details = null)
     }
 }
 
-private data class MFile(val id: ObjectId?, val file: File)
+private data class MFile(val id: ObjectId?, val file: File, val fileTime: Long)
 
 private class MFiles {
     private val queue = LinkedBlockingQueue<MFile>(1)
@@ -531,7 +546,7 @@ private class MFiles {
     }
 
     private val sourceFiles: MutableList<MFile> by lazy {
-        mutableListOf<MFile>().also {
+        mutableListOf<MFile>().also { list ->
             fun File.walk(mode: String): List<File> {
                 return when (mode) {
                     "R" -> walk().toList()
@@ -546,22 +561,32 @@ private class MFiles {
                 with(ImportJob.options) {
                     info("scanning $sourceDir in $scanMode mode")
                     sourceDir.walk(scanMode).forEach { file ->
+                        val fileTime = file.lastModified()
                         val fileDoc = doc {
                             `+`("job", ImportJob.jobId)
                             `+`("file", file.absolutePath)
+                            `+`("fileTime", fileTime)
                         }
                         ImportJob.importFiles.insertOne(fileDoc)
-                        it += MFile(fileDoc._id as? ObjectId, file)
+                        list += MFile(fileDoc._id as? ObjectId, file, fileTime)
                     }
                     info("scanning done")
                 }
             } else {
                 info("loading importFiles")
-                ImportJob.importFiles.find(doc { `+`("job", ImportJob.jobId) }).forEach { document ->
-                    it += MFile(document._id as? ObjectId, File(document.getString("file")))
-                }
+
+                ImportJob.importFiles
+                        .find(doc { `+`("job", ImportJob.jobId) })
+                        .sort(doc { `+`("fileTime", -1) })
+                        .forEach { document ->
+                            list += MFile(
+                                    id = document._id as? ObjectId,
+                                    file = File(document.getString("file")),
+                                    fileTime = document.getLong("fileTime"))
+                        }
                 info("loading done")
             }
+            list.sortByDescending { it.fileTime }
         }
     }
 }
