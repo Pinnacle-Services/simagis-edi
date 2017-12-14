@@ -221,6 +221,26 @@ fun main(args: Array<String>) {
         val duplicates = mutableMapOf<String, Date>()
         val duplicatesLock = ReentrantLock()
 
+        fun Document.claimDate(isa: ISA): Date? = when (isa.type) {
+            "835" -> getDate("procDate")
+            "837" -> getDate("sendDate")
+            else -> null
+        }
+
+        fun tryReplace(collection: DocumentCollection, newClaimDocument: Document, newClaimDate: Date, isa: ISA, logger: LocalLogger) {
+            claimCountDuplicate.incrementAndGet()
+            val claimId = newClaimDocument._id.toString()
+            val oldClaimDate = collection.find(doc(claimId)).first().claimDate(isa)!!
+            return if (oldClaimDate < newClaimDate) {
+                collection.findOneAndReplace(doc(claimId), newClaimDocument)
+                claimCountReplaced.incrementAndGet()
+                logger.trace("duplicate $claimId: old = $oldClaimDate; new = $newClaimDate -> REPLACED")
+                duplicates[claimId] = newClaimDate
+            } else {
+                logger.trace("duplicate $claimId: old = $oldClaimDate; new = $newClaimDate -> IGNORED")
+            }
+        }
+
         fun import(file: File) {
             if (!digests.add(file.digest())) {
                 fileCountDuplicate.incrementAndGet()
@@ -251,42 +271,31 @@ fun main(args: Array<String>) {
                                 val collection = tempCollection
                                 val document = Document.parse(json.toString()).prepare(logger)
                                 try {
-                                    fun Document.claimDate(): Date? = when (isa.type) {
-                                        "835" -> getDate("procDate")
-                                        "837" -> getDate("sendDate")
-                                        else -> null
-                                    }
-
                                     fun Date?.inRange(start: Date?) = archiveMode || when (isa.type) {
                                         "835" -> this?.after(start) ?: false
                                         "837" -> this?.after(start) ?: false
                                         else -> false
                                     }
 
-                                    val claimDate = document.claimDate() ?: throw AssertionError("Invalid claim date")
+                                    val claimDate = document.claimDate(isa) ?: throw AssertionError("Invalid claim date")
                                     if (claimDate.inRange(ImportJob.options.after)) {
                                         document["file"] = file.name
                                         val claimId = document._id.toString()
-                                        fun tryReplace() {
-                                            assert(duplicatesLock.isHeldByCurrentThread)
-                                            claimCountDuplicate.incrementAndGet()
-                                            val oldClaimDate = collection.find(doc(document._id)).first().claimDate()!!
-                                            return if (oldClaimDate < claimDate) {
-                                                collection.findOneAndReplace(doc(document._id), document)
-                                                claimCountReplaced.incrementAndGet()
-                                                logger.trace("duplicate: old = $oldClaimDate; new = $claimDate -> REPLACED")
-                                                duplicates[claimId] = claimDate
-                                            } else {
-                                                logger.trace("duplicate: old = $oldClaimDate; new = $claimDate -> IGNORED")
-                                            }
-                                        }
-
-                                        val insertMode = duplicatesLock.withLock {
+                                        val insertMode: Boolean = duplicatesLock.withLock {
                                             val oldClaimDate = duplicates[claimId]
                                             when {
-                                                oldClaimDate == null -> true.also { duplicates[claimId] = claimDate }
-                                                oldClaimDate >= claimDate -> false.also { logger.trace("duplicate: old = $oldClaimDate; new = $claimDate -> IGNORED LOCALLY") }
-                                                oldClaimDate < claimDate -> false.also { tryReplace() }
+                                                oldClaimDate == null -> {
+                                                    duplicates[claimId] = claimDate
+                                                    true
+                                                }
+                                                oldClaimDate >= claimDate -> {
+                                                    logger.trace("duplicate $claimId: old = $oldClaimDate; new = $claimDate -> IGNORED LOCALLY")
+                                                    false
+                                                }
+                                                oldClaimDate < claimDate -> {
+                                                    tryReplace(collection, document, claimDate, isa, logger)
+                                                    false
+                                                }
                                                 else -> throw AssertionError("Invalid claim date logic")
                                             }
                                         }
@@ -296,7 +305,7 @@ fun main(args: Array<String>) {
                                         } catch (e: MongoWriteException) {
                                             if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY)
                                                 throw e
-                                            duplicatesLock.withLock { tryReplace() }
+                                            duplicatesLock.withLock { tryReplace(collection, document, claimDate, isa, logger) }
                                         }
                                         claimCount.incrementAndGet()
                                         acnLog.onClaimInserted(isa, document)
