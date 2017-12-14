@@ -586,7 +586,6 @@ private class MFiles {
 
                 ImportJob.importFiles
                         .find(doc { `+`("job", ImportJob.jobId) })
-                        .sort(doc { `+`("fileTime", -1) })
                         .forEach { document ->
                             list += MFile(
                                     id = document._id as? ObjectId,
