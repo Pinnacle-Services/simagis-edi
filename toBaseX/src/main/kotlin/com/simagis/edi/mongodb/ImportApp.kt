@@ -208,7 +208,8 @@ fun main(args: Array<String>) {
             return this
         }
 
-        val duplicates = mutableMapOf<String, Date>()
+        data class DuplicatesKey(val claimType: String, val claimId: String)
+        val duplicates = mutableMapOf<DuplicatesKey, Date>()
         val duplicatesLock = ReentrantLock()
 
         fun Document.claimDate(isa: ISA): Date? = when (isa.type) {
@@ -217,7 +218,9 @@ fun main(args: Array<String>) {
             else -> null
         }
 
-        fun tryReplace(collection: DocumentCollection, newClaimDocument: Document, newClaimDate: Date, isa: ISA, logger: LocalLogger) {
+        fun ImportJob.options.ClaimType.key(claimId: String): DuplicatesKey = DuplicatesKey(type, claimId)
+
+        fun ImportJob.options.ClaimType.tryReplace(collection: DocumentCollection, newClaimDocument: Document, newClaimDate: Date, isa: ISA, logger: LocalLogger) {
             claimCountDuplicate.incrementAndGet()
             val claimId = newClaimDocument._id.toString()
             val oldClaimDate = collection.find(doc(claimId)).first().claimDate(isa)!!
@@ -225,7 +228,7 @@ fun main(args: Array<String>) {
                 collection.findOneAndReplace(doc(claimId), newClaimDocument)
                 claimCountReplaced.incrementAndGet()
                 logger.trace("duplicate $claimId: old = $oldClaimDate; new = $newClaimDate -> REPLACED")
-                duplicates[claimId] = newClaimDate
+                duplicates[key(claimId)] = newClaimDate
             } else {
                 logger.trace("duplicate $claimId: old = $oldClaimDate; new = $newClaimDate -> IGNORED")
             }
@@ -272,10 +275,11 @@ fun main(args: Array<String>) {
                                         document["file"] = file.name
                                         val claimId = document._id.toString()
                                         val insertMode: Boolean = duplicatesLock.withLock {
-                                            val oldClaimDate = duplicates[claimId]
+                                            val duplicatesKey = key(claimId)
+                                            val oldClaimDate = duplicates[duplicatesKey]
                                             when {
                                                 oldClaimDate == null -> {
-                                                    duplicates[claimId] = claimDate
+                                                    duplicates[duplicatesKey] = claimDate
                                                     true
                                                 }
                                                 oldClaimDate >= claimDate -> {
