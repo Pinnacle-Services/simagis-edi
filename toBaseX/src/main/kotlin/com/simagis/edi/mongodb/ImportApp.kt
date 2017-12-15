@@ -18,7 +18,6 @@ import org.bson.types.ObjectId
 import java.io.File
 import java.security.MessageDigest
 import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -141,9 +140,6 @@ fun main(args: Array<String>) {
 """
     try {
         fun Document.prepare(logger: LocalLogger): Document {
-            val DT8 by lazy { SimpleDateFormat("yyyyMMdd") }
-            val DT6 by lazy { SimpleDateFormat("yyyyMM") }
-            val DT4 by lazy { SimpleDateFormat("yyyy") }
             val _id = remove("id")
             append("_id", _id)
             fun Document.fixTypes() {
@@ -183,14 +179,8 @@ fun main(args: Array<String>) {
                                         .joinToString(separator = " ")
                             }
                             "DT8" -> getString(key)?.also { value ->
-                                when (value.length) {
-                                    8 -> append(key.name(), DT8.parse(value))
-                                    6 -> append(key.name(), DT6.parse(value))
-                                    4 -> append(key.name(), DT4.parse(value))
-                                    0 -> Unit
-                                    else -> {
-                                        logger.warn("Invalid DT8 value at $_id $key: '${getString(key)}'")
-                                    }
+                                parseDT8(value)?.also { append(key.name(), it) } ?: if (value.isNotEmpty()) {
+                                    logger.warn("Invalid DT8 value at $_id $key: '$value'")
                                 }
                             }
                         }
@@ -370,6 +360,16 @@ fun main(args: Array<String>) {
         error("ERROR: ${e.message} ${details()}", e)
         exitProcess(2)
     }
+}
+
+fun parseDT8(text: String): Date? {
+    val iso = when (text.length) {
+        4 -> "$text-01-01T12:00:00.000Z"
+        6 -> "${text.substring(0, 4)}-${text.substring(4, 6)}-01T12:00:00.000Z"
+        8 -> "${text.substring(0, 4)}-${text.substring(4, 6)}-${text.substring(6, 8)}T12:00:00.000Z"
+        else -> return null
+    }
+    return Date.from(Instant.parse(iso))
 }
 
 fun Document.augment835() {
