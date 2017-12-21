@@ -5,7 +5,7 @@
       <element id="archive" name="rJavaJDBC.jar">
         <element id="module-output" name="rJavaJDBC" />
       </element>
-      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.1.51" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.2.10" />
     </root>
   </artifact>
 </component>

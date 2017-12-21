@@ -10,7 +10,7 @@
       <element id="library" level="project" name="Maven: org.mongodb:bson:3.4.2" />
       <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver:3.4.2" />
       <element id="library" level="project" name="Maven: javax.json:javax.json-api:1.0" />
-      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.1.51" />
+      <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.2.10" />
     </root>
   </artifact>
 </component>
