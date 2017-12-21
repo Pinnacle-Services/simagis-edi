@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.berryworks:edireader:4.7.3.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/berryworks/edireader/4.7.3.1/edireader-4.7.3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/berryworks/edireader/4.7.3.1/edireader-4.7.3.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/berryworks/edireader/4.7.3.1/edireader-4.7.3.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

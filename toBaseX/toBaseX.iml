@@ -38,7 +38,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" name="Maven: javax.json:javax.json-api:1.0" level="project" />
-    <orderEntry type="module" module-name="edireader" />
+    <orderEntry type="library" name="Maven: com.berryworks:edireader:4.7.3.1" level="project" />
+    <orderEntry type="library" name="Maven: com.berryworks:jquantify:4.1.3" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.sqlserver:mssql-jdbc:6.1.0.jre8" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-keyvault:0.9.3" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.azure:azure-core:0.9.3" level="project" />
