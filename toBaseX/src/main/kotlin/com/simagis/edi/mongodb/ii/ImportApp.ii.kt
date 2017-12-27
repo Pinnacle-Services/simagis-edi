@@ -122,6 +122,7 @@ private class ResourceManager(private val sharedMemory: Long = 16.gb) : Closeabl
             while (!thread.isInterrupted) {
                 val task: Task? = taskQueue.poll(5, TimeUnit.SECONDS)
                 if (task == null) {
+                    executor.free()
                     if (closing) break
                     continue
                 }
@@ -173,6 +174,13 @@ private class CommandExecutor(var memory: Long = 16.gb) : Closeable {
         var result = call(command)
         if (result is ExecutorError) result = call(command)
         onResult(result)
+    }
+
+    fun free() {
+        process?.let {
+            process = null
+            it.close()
+        }
     }
 
     private fun call(command: Command): CommandResult = process
