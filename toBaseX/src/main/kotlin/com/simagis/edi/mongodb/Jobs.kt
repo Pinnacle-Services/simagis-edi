@@ -29,6 +29,7 @@ typealias DocumentCollection = MongoCollection<Document>
 private var job: AbstractJob? = null
 
 internal abstract class AbstractJob {
+    lateinit var commandLine: com.berryworks.edireader.util.CommandLine
     lateinit var host: String
     lateinit var jobId: String
     lateinit var dbs: JobDBS
@@ -46,7 +47,7 @@ internal abstract class AbstractJob {
     val jobLogJsonDir: File by lazy { jobLogDir.resolve("json").also { it.mkdir() } }
 
     internal fun open(args: Array<String>) {
-        val commandLine = com.berryworks.edireader.util.CommandLine(args)
+        commandLine = com.berryworks.edireader.util.CommandLine(args)
         host = commandLine["host"] ?: "localhost"
         jobId = commandLine["job"] ?: throw IllegalArgumentException("argument -job required")
         dbs = JobDBS(host)

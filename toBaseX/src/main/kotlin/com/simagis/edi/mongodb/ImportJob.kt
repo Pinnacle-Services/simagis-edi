@@ -2,20 +2,19 @@ package com.simagis.edi.mongodb
 
 import com.mongodb.MongoNamespace
 import com.mongodb.client.MongoDatabase
+import com.mongodb.client.MongoIterable
+import com.mongodb.client.model.IndexModel
+import com.simagis.edi.mdb.get
 import org.bson.Document
-import java.io.*
+import java.io.File
+import java.io.FileNotFoundException
 import java.net.URI
-import java.nio.file.FileSystem
-import java.nio.file.FileSystems
-import java.nio.file.Files
-import java.security.MessageDigest
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.GZIPInputStream
-import java.util.zip.GZIPOutputStream
 import kotlin.concurrent.withLock
 
 
@@ -109,6 +108,43 @@ internal object ImportJob : AbstractJob() {
 
     }
 
+    object ii {
+        val db: MongoDatabase by lazy { dbs["sourceClaims"] }
+        val sessions: DocumentCollection by lazy { db["sessions"].indexed("status") }
+        val files: DocumentCollection by lazy { db["files"].indexed("session", "status", "size", "names") }
+        val claims: DocumentCollection by lazy { db["claims"].indexed("session", "files", "type") }
+
+        enum class Status { NEW, RUNNING, SUCCESS, FAILURE }
+
+        interface Session {
+            val id: Long
+            var status: Status
+            var error: Throwable?
+            val files: Files
+            var filesFound: Int
+            var filesSucceed: Int
+            var filesFailed: Int
+        }
+
+        interface Files {
+            fun registerFile(file: java.io.File): File
+            fun find(status: Status): MongoIterable<File>
+        }
+
+        interface File {
+            val id: String
+            val sessionId: Long
+            val doc: Document
+            val status: Status
+            val size: Long
+            val info: Document?
+            val error: Document?
+            fun markRunning()
+            fun markSucceed(info: Document?)
+            fun markFailed(error: Document)
+        }
+    }
+
     object billed_acn {
         class doc(val id: String, val prid: String, val prg: String)
 
@@ -147,162 +183,10 @@ internal object ImportJob : AbstractJob() {
             else -> null
         }
     }
-
-    object acn_log {
-        interface file {
-            val name: String
-            val accnSet: Set<accn>
-        }
-
-        interface accn {
-            val id: String
-            val payor: String
-            val file: file
-        }
-
-        interface DB {
-            val files: Map<String, file>
-            val accns: Map<String, accn>
-        }
-
-        val db: DB by lazy {
-            class fileImpl(override val name: String, override val accnSet: MutableSet<accn> = mutableSetOf()) : file
-            class accnImpl(override val id: String, override val payor: String, override val file: fileImpl) : accn
-
-            val files = mutableMapOf<String, fileImpl>()
-            val accns = mutableMapOf<String, accn>()
-
-            var ACCN_ID = -1
-            var PAYOR_ID = -1
-            var FILENAME = -1
-            File("files")
-                    .resolve("xifin_acn_log.gzip")
-                    .parseAsGzCsv(
-                            { index, name ->
-                                when (name) {
-                                    "ACCN_ID" -> ACCN_ID = index
-                                    "PAYOR_ID" -> PAYOR_ID = index
-                                    "FILENAME" -> FILENAME = index
-                                }
-                            },
-                            { record ->
-                                val accnId = record[ACCN_ID]
-                                val payorId = record[PAYOR_ID]
-                                val fileName = record[FILENAME]
-                                val file = files.getOrPut(fileName) { fileImpl(fileName) }
-                                val accn = accns.getOrPut(accnId) { accnImpl(accnId, payorId, file) }
-                                file.accnSet += accn
-                            })
-
-            object : DB {
-                override val files: Map<String, file> = files
-                override val accns: Map<String, accn> = accns
-            }
-        }
-
-        interface FS {
-            fun generalize(fileName: String): String = fileName.generalizeFileName()
-        }
-
-        val fs: FS by lazy {
-            val src = File("files").resolve("xifin_acn_log.gzip")
-            if (src.isFile) {
-                val md5 = src.md5()
-                val acnByFile = src.parentFile.resolve("${src.name}.$md5.acnByFile.zip")
-                val acnToPrid = src.parentFile.resolve("${src.name}.$md5.acnToPrid.gzip")
-                if (!(acnByFile.isFile && acnToPrid.isFile)) {
-                    acnByFile.delete()
-                    acnToPrid.delete()
-                    fun File.newZipFs(): FileSystem = FileSystems
-                            .newFileSystem(URI.create("jar:" + toURI()), mapOf("create" to "true"))
-
-                    val acnToPridFs = acnToPrid.newZipFs()
-
-                    class NamedBuffer(
-                            val name: String,
-                            private val array: ByteArrayOutputStream = ByteArrayOutputStream()) : BufferedWriter(OutputStreamWriter(array)) {
-                        val byteArray: ByteArray get() {
-                            flush()
-                            return array.toByteArray()
-                        }
-                    }
-
-                    val closeables = mutableListOf<Closeable>()
-                    try {
-                        fun <T : Closeable> T.autoClose(): T = apply { closeables += this }
-                        val acnByFileWriters = mutableMapOf<String, NamedBuffer>()
-                        val prid2acns = mutableMapOf<String, MutableSet<String>>()
-                        var ACCN_ID = -1
-                        var PAYOR_ID = -1
-                        var FILENAME = -1
-                        src.parseAsGzCsv(
-                                { index, name ->
-                                    when (name) {
-                                        "ACCN_ID" -> ACCN_ID = index
-                                        "PAYOR_ID" -> PAYOR_ID = index
-                                        "FILENAME" -> FILENAME = index
-                                    }
-                                },
-                                { record ->
-                                    val accnId = record[ACCN_ID]
-                                    val payorId = record[PAYOR_ID]
-                                    val fileName = record[FILENAME].generalizeFileName()
-                                    acnByFileWriters
-                                            .getOrPut(fileName) { NamedBuffer(fileName).autoClose() }
-                                            .append("$accnId\n")
-                                    prid2acns.getOrPut(payorId) { mutableSetOf() } += accnId
-                                })
-
-                        acnByFile.newZipFs().use { fs ->
-                            acnByFileWriters.values.forEach { buffer ->
-                                Files.newOutputStream(fs.getPath(buffer.name)).writer().use { writer ->
-                                    buffer.byteArray.inputStream().reader().readLines().toSortedSet().forEach {
-                                        writer.append("$it\n")
-                                    }
-                                }
-                            }
-                        }
-
-                        GZIPOutputStream(FileOutputStream(acnToPrid)).bufferedWriter().use { csv ->
-                            csv.append("acn\tprid\n")
-                            prid2acns.forEach { prid, acns ->
-                                acns.forEach { acn ->
-                                    csv.append("$acn\t$prid\n")
-                                }
-                            }
-                        }
-
-                    } finally {
-                        closeables.forEach {
-                            it.close()
-                        }
-                        acnToPridFs.close()
-                    }
-                }
-            }
-            object : FS {}
-        }
-
-        val log: DocumentCollection by lazy {
-            claims.getCollection("acn_log_" + jobId)
-        }
-    }
 }
 
-
-private fun String.generalizeFileName(): String = toLowerCase()
-        .removeSuffix(".gz")
-        .removeSuffix(".txt")
-
-private fun File.md5() = MessageDigest.getInstance("MD5").let { md5 ->
-    fun ByteArray.toHexString(): String = joinToString(separator = "") {
-        Integer.toHexString(it.toInt() and 0xff).let {
-            if (it.length == 2) it else "0$it"
-        }
-    }
-    md5.update(inputStream()
-            .use { stream -> ByteArray(length().toInt()).also { stream.read(it) } })
-    md5.digest().toHexString()
+private fun DocumentCollection.indexed(vararg indexes: String): DocumentCollection = apply {
+    createIndexes(indexes.map { IndexModel(Document(it, 1)) })
 }
 
 private typealias CsvRecord = List<String>

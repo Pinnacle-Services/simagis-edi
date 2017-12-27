@@ -64,6 +64,14 @@ inline fun Document.`+$set`(build: Document.() -> Unit): Document {
 }
 
 @Suppress("unused")
+inline fun Document.`+$unset`(build: Document.() -> Unit): Document {
+    append(`$` + "unset", Document().apply {
+        build()
+    })
+    return this
+}
+
+@Suppress("unused")
 inline fun Document.`+$setOnInsert`(build: Document.() -> Unit): Document {
     append(`$` + "setOnInsert", Document().apply {
         build()
@@ -79,15 +87,52 @@ inline fun Document.`+$addToSet`(build: Document.() -> Unit): Document {
     return this
 }
 
+@Suppress("unused")
+inline fun Document.`+$addToSet++`(build: Document.() -> Unit): Document {
+    val addToSet = get(`$` + "addToSet") as? Document
+    if (addToSet != null)
+        addToSet.build()
+    else
+        `+$addToSet`(build)
+    return this
+}
+
+@Suppress("unused")
+inline fun Document.`+$inc`(build: Document.() -> Unit): Document {
+    append(`$` + "inc", Document().apply {
+        build()
+    })
+    return this
+}
+
 fun Document.`+`(pair: Pair<String, Any?>, vararg pairs: Pair<String, Any?>): Document {
     append(pair.first, pair.second)
     pairs.forEach { append(it.first, it.second) }
     return this
 }
 
+fun updater(pairs: Array<out Pair<String, Any?>>): Document {
+    val sets = mutableMapOf<String, Any>()
+    val unsets = mutableSetOf<String>()
+    pairs.forEach { pair ->
+        with(pair) {
+            if (second != null) sets[first] = second!! else unsets += first
+        }
+    }
+    return doc {
+        if (sets.isNotEmpty()) `+$set` {
+            sets.forEach { name, value -> `+`(name, value) }
+        }
+        if (unsets.isNotEmpty()) `+$unset` {
+            unsets.forEach { name -> `+`(name, "") }
+        }
+    }
+}
+
 inline fun doc(build: Document.() -> Unit) = Document().apply { build() }
 @Suppress("NOTHING_TO_INLINE")
 inline fun doc(_id: Any?) = Document("_id", _id)
+
 inline fun doc(_id: Any?, build: Document.() -> Unit) = Document("_id", _id).apply { build() }
 
 val Document._id: Any? get() = this["_id"]
