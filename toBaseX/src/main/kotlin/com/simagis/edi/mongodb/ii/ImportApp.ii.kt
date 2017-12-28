@@ -8,7 +8,6 @@ import com.simagis.edi.mongodb.ImportJob.ii.Status.*
 import com.simagis.edi.mongodb.info
 import org.bson.Document
 import java.io.*
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
@@ -65,7 +64,7 @@ private interface Command {
     val doc: Document?
 }
 
-private interface SessionCommand: Command {
+private interface SessionCommand : Command {
     val sessionId: Long
 }
 
@@ -96,48 +95,93 @@ private class ExecutorError(error: Document) : CommandError(error)
 
 private class ResourceManager(private val sharedMemory: Long = 16.gb) : Closeable {
     private val sharedProcessors = Runtime.getRuntime().availableProcessors()
-    private val threads: List<Thread> by lazy {
-        List(sharedProcessors) {
-            thread(name = "executor thread $it") { run() }
-        }
-    }
-    private val taskQueue: BlockingQueue<Task> = LinkedBlockingQueue(1)
-    private val monitor = java.lang.Object()
+    private val exeMonitor = java.lang.Object()
+    private var exeActive: Executor? = null
+    private val executors: List<Executor> by lazy { List(sharedProcessors) { Executor(it) } }
+    private val resMonitor = java.lang.Object()
     private val res = Res(sharedMemory, sharedProcessors)
     private var closing = false
 
     private class Res(var memory: Long, var processors: Int)
     private class Task(val command: Command, val onResult: (CommandResult) -> Unit)
+    private class Executor(index: Int) : Runnable {
+        private val cx = CommandExecutor()
+        private val thread = Thread(this, "executor thread $index").apply { start() }
+        private val monitor = java.lang.Object()
+        private var isClosing: Boolean = false
+            get() = synchronized(monitor) { field }
+            set(value) = synchronized(monitor) { field = value }
+        private var task: Task? = null
 
+        val isReady: Boolean get() = synchronized(monitor) { task == null }
 
-    fun call(command: Command, onResult: (CommandResult) -> Unit) {
-        threads
-        takeRes(command.memSize)
-        taskQueue.put(Task(command, onResult))
-    }
+        fun putTask(task: Task) = synchronized(monitor) {
+            while (this.task != null) {
+                monitor.wait()
+            }
+            this.task = task
+            monitor.notifyAll()
+        }
 
-    private fun run() {
-        CommandExecutor().use { executor ->
-            val thread = Thread.currentThread()
-            while (!thread.isInterrupted) {
-                val task: Task? = taskQueue.poll(5, TimeUnit.SECONDS)
-                if (task == null) {
-                    executor.free()
-                    if (closing) break
-                    continue
-                }
-                val memSize = task.command.memSize
-                executor.memory = memSize
-                executor.call(task.command) { result ->
-                    freeRes(memSize)
-                    task.onResult(result)
+        private fun takeTask(): Task? = synchronized(monitor) {
+            task?.let { return it }
+            monitor.wait(5000)
+            return this.task
+        }
+
+        private fun freeTask() = synchronized(monitor) {
+            task = null
+            monitor.notifyAll()
+        }
+
+        override fun run() {
+            cx.use { executor ->
+                while (!isClosing) {
+                    takeTask()?.run {
+                        try {
+                            executor.memory = command.memSize
+                            executor.call(command, onResult)
+                        } finally {
+                            freeTask()
+                        }
+                    }
                 }
             }
+        }
+
+        fun shutdown() {
+            isClosing = true
+            thread.join()
         }
     }
 
 
-    private fun takeRes(memSize: Long) = synchronized(monitor) {
+    fun call(command: Command, onResult: (CommandResult) -> Unit) {
+        takeRes(command.memSize)
+        takeExecutor().putTask(Task(command) {
+            onResult(it)
+            freeRes(command.memSize)
+            freeExecutor()
+        })
+    }
+
+
+    private fun takeExecutor(): Executor = synchronized(exeMonitor) {
+        do {
+            exeActive?.let { if (it.isReady) return it }
+            for (executor in executors) {
+                if (executor.isReady) return executor.also { exeActive = it }
+            }
+            exeMonitor.wait()
+        } while (true)
+        throw AssertionError()
+    }
+
+    private fun freeExecutor() = synchronized(exeMonitor) {
+        exeMonitor.notify()
+    }
+
+    private fun takeRes(memSize: Long) = synchronized(resMonitor) {
         do {
             if (res.processors == sharedProcessors) {
                 res.memory -= memSize
@@ -149,19 +193,19 @@ private class ResourceManager(private val sharedMemory: Long = 16.gb) : Closeabl
                 res.processors--
                 break
             }
-            monitor.wait()
+            resMonitor.wait()
         } while (true)
     }
 
-    private fun freeRes(memSize: Long) = synchronized(monitor) {
+    private fun freeRes(memSize: Long) = synchronized(resMonitor) {
         res.memory += memSize
         res.processors++
-        monitor.notify()
+        resMonitor.notify()
     }
 
     override fun close() {
         closing = true
-        threads.forEach { it.join() }
+        executors.forEach { it.shutdown() }
     }
 }
 
@@ -169,11 +213,17 @@ private class CommandExecutor(var memory: Long = 16.gb) : Closeable {
 
     private var process: CommandProcess? = null
     private var processMemory: Long? = null
+    var isCalling = false
 
     fun call(command: Command, onResult: (CommandResult) -> Unit) {
-        var result = call(command)
-        if (result is ExecutorError) result = call(command)
-        onResult(result)
+        isCalling = true
+        try {
+            var result = call(command)
+            if (result is ExecutorError) result = call(command)
+            onResult(result)
+        } finally {
+            isCalling = false
+        }
     }
 
     fun free() {
