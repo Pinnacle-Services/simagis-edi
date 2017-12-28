@@ -177,10 +177,7 @@ private class CommandExecutor(var memory: Long = 16.gb) : Closeable {
     }
 
     fun free() {
-        process?.let {
-            process = null
-            it.close()
-        }
+        closeCommandProcessor()
     }
 
     private fun call(command: Command): CommandResult = process
