@@ -272,6 +272,7 @@ private class CommandExecutor(var memory: Long = 16.gb) : Closeable {
 }
 
 private class CommandProcess(private val memory: Long) : Closeable {
+    private val xmx = "-Xmx${(memory + 1.gb) / 1.mb}m"
     private var process: Process? = null
     private lateinit var processReader: BufferedReader
     private lateinit var processWriter: OutputStream
@@ -300,7 +301,7 @@ private class CommandProcess(private val memory: Long) : Closeable {
                 .apply {
                     val command = command()
                     command += javaFile.absolutePath
-                    command += "-Xmx${memory / (1024 * 1024)}m"
+                    command += xmx
                     command += "-cp"
                     command += classPath
                     command += className
@@ -308,8 +309,7 @@ private class CommandProcess(private val memory: Long) : Closeable {
                     redirectError(ProcessBuilder.Redirect.to(processErr))
                 }
                 .also {
-                    log.info("starting $className $memory")
-                    log.log(Level.FINEST, "starting ${it.command().joinToString(separator = " ") { """"$it"""" }}")
+                    log.info("> java $xmx $className $commandLine")
                 }
                 .start()
                 .also {
