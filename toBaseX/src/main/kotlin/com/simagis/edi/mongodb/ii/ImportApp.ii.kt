@@ -76,7 +76,7 @@ private class ExitCommand : Command {
 
 private class ImportFileCommand(file: ImportJob.ii.File) : SessionCommand {
     override val command: String = "importFile"
-    override val memSize: Long = 128.mb + file.size * 8
+    override val memSize: Long = 128.mb + 1.gb + file.size * 8
     override val doc: Document = file.doc
     override val sessionId: Long = file.sessionId
 }
@@ -209,7 +209,7 @@ private class ResourceManager(sharedMemory: Long = 16.gb) : Closeable {
     }
 }
 
-private class CommandExecutor(var memory: Long = 16.gb) : Closeable {
+private class CommandExecutor(var memory: Long = 2.gb) : Closeable {
 
     private var process: CommandProcess? = null
     private var processMemory: Long? = null
@@ -271,8 +271,8 @@ private class CommandExecutor(var memory: Long = 16.gb) : Closeable {
     }
 }
 
-private class CommandProcess(private val memory: Long) : Closeable {
-    private val xmx = "-Xmx${(memory + 1.gb) / 1.mb}m"
+private class CommandProcess(memory: Long) : Closeable {
+    private val xmx = "-Xmx${memory / 1.mb}m"
     private var process: Process? = null
     private lateinit var processReader: BufferedReader
     private lateinit var processWriter: OutputStream
