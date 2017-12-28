@@ -42,8 +42,9 @@ fun main(args: Array<String>) {
                             file.markSucceed(info)
                         }
                         is CommandError -> {
-                            println(result.error["message"])
-                            file.markFailed(result.error)
+                            val error: Document = result.error
+                            println(": ${error["message"]}")
+                            file.markFailed(error)
                         }
                     }
                 }
