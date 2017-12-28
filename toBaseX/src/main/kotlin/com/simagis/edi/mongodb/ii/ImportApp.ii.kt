@@ -172,7 +172,7 @@ private class ResourceManager(sharedMemory: Long = 16.gb) : Closeable {
             for (executor in executors) {
                 if (executor.isReady) return executor.also { exeActive = it }
             }
-            exeMonitor.wait()
+            exeMonitor.wait(5000)
         } while (true)
         throw AssertionError()
     }
@@ -193,7 +193,7 @@ private class ResourceManager(sharedMemory: Long = 16.gb) : Closeable {
                 res.processors--
                 break
             }
-            resMonitor.wait()
+            resMonitor.wait(5000)
         } while (true)
     }
 
