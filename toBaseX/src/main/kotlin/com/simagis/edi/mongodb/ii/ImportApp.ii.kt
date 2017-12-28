@@ -112,7 +112,7 @@ private class ResourceManager(private val sharedMemory: Long = 16.gb) : Closeabl
 
     fun call(command: Command, onResult: (CommandResult) -> Unit) {
         threads
-        takeMemory(command.memSize)
+        takeRes(command.memSize)
         taskQueue.put(Task(command, onResult))
     }
 
@@ -129,7 +129,7 @@ private class ResourceManager(private val sharedMemory: Long = 16.gb) : Closeabl
                 val memSize = task.command.memSize
                 executor.memory = memSize
                 executor.call(task.command) { result ->
-                    freeMemory(memSize)
+                    freeRes(memSize)
                     task.onResult(result)
                 }
             }
@@ -137,7 +137,7 @@ private class ResourceManager(private val sharedMemory: Long = 16.gb) : Closeabl
     }
 
 
-    private fun takeMemory(memSize: Long) = synchronized(monitor) {
+    private fun takeRes(memSize: Long) = synchronized(monitor) {
         do {
             if (res.processors == sharedProcessors) {
                 res.memory -= memSize
@@ -153,9 +153,9 @@ private class ResourceManager(private val sharedMemory: Long = 16.gb) : Closeabl
         } while (true)
     }
 
-    private fun freeMemory(memSize: Long) = synchronized(monitor) {
+    private fun freeRes(memSize: Long) = synchronized(monitor) {
         res.memory += memSize
-        res.processors--
+        res.processors++
         monitor.notify()
     }
 
