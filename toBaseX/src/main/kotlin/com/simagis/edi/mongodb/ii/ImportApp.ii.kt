@@ -76,7 +76,7 @@ private class ExitCommand : Command {
 
 private class ImportFileCommand(file: ImportJob.ii.File) : SessionCommand {
     override val command: String = "importFile"
-    override val memSize: Long = 128.mb + file.size * 4
+    override val memSize: Long = 128.mb + file.size * 8
     override val doc: Document = file.doc
     override val sessionId: Long = file.sessionId
 }
@@ -110,7 +110,7 @@ private class ResourceManager(sharedMemory: Long = 16.gb) : Closeable {
         private val monitor = java.lang.Object()
         private var isClosing: Boolean = false
             get() = synchronized(monitor) { field }
-            set(value) = synchronized(monitor) { field = value }
+            set(value) = synchronized(monitor) { field = value; monitor.notifyAll() }
         private var task: Task? = null
 
         val isReady: Boolean get() = synchronized(monitor) { task == null }
@@ -300,6 +300,7 @@ private class CommandProcess(private val memory: Long) : Closeable {
                 .apply {
                     val command = command()
                     command += javaFile.absolutePath
+                    command += "-Xmx${memory / (1024 * 1024)}m"
                     command += "-cp"
                     command += classPath
                     command += className
