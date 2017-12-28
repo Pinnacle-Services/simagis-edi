@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
         }
 
         ResourceManager().use { executor ->
-            for (file: ImportJob.ii.File in session.files.find(NEW)) {
+            for (file: ImportJob.ii.File in session.files.find(NEW).toList()) {
                 executor.call(ImportFileCommand(file)) { result ->
                     print(result.javaClass.simpleName)
                     when (result) {
