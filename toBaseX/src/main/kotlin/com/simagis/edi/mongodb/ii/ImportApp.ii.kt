@@ -31,10 +31,12 @@ fun main(args: Array<String>) {
             }
         }
 
+        val files = session.files.find(NEW).toList()
+
         ResourceManager().use { executor ->
-            for (file: ImportJob.ii.File in session.files.find(NEW).toList()) {
+            files.forEachIndexed { index, file ->
                 executor.call(ImportFileCommand(file)) { result ->
-                    print(result.javaClass.simpleName)
+                    print("""${result.javaClass.simpleName} "${file.doc["names"]}" $index [${files.size}] """)
                     when (result) {
                         is CommandSuccess -> {
                             val info: Document? = result.doc["info"] as? Document
@@ -77,7 +79,7 @@ private class ExitCommand : Command {
 
 private class ImportFileCommand(file: ImportJob.ii.File) : SessionCommand {
     override val command: String = "importFile"
-    override val memSize: Long = 128.mb + 1.gb + file.size * 8
+    override val memSize: Long = 128.mb + 1.gb + file.size * 10
     override val doc: Document = file.doc
     override val sessionId: Long = file.sessionId
 }
