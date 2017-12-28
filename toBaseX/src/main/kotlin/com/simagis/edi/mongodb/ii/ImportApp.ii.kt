@@ -93,7 +93,7 @@ private abstract class CommandError(val error: Document) : CommandResult()
 private class CommandFailure(error: Document) : CommandError(error)
 private class ExecutorError(error: Document) : CommandError(error)
 
-private class ResourceManager(private val sharedMemory: Long = 16.gb) : Closeable {
+private class ResourceManager(sharedMemory: Long = 16.gb) : Closeable {
     private val sharedProcessors = Runtime.getRuntime().availableProcessors()
     private val exeMonitor = java.lang.Object()
     private var exeActive: Executor? = null
@@ -183,12 +183,12 @@ private class ResourceManager(private val sharedMemory: Long = 16.gb) : Closeabl
 
     private fun takeRes(memSize: Long) = synchronized(resMonitor) {
         do {
-            if (res.processors == sharedProcessors) {
+            if (res.memory - memSize >= 128.mb && res.processors >= 1) {
                 res.memory -= memSize
                 res.processors--
                 break
             }
-            if (res.memory + memSize >= sharedMemory) {
+            if (res.processors == sharedProcessors) {
                 res.memory -= memSize
                 res.processors--
                 break
