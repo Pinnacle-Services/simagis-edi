@@ -26,6 +26,9 @@ let $rec_id := $trn/loop[@Id="1000"]/segment[@Id="NM1" and *:element="40"]/eleme
 let $bill_name := $trn/loop[@Id="2000" and segment[@Id="HL"]/element[@Id="HL01" and .="1"]]/loop[@Id="2010"]/segment[@Id="NM1" and element[@Id="NM101" and .="85"]]/element[@Id="NM103"]/text()
 let $bill_id := $trn/loop[@Id="2000"  and segment[@Id="HL"]/element[@Id="HL01" and .="1"]]/loop[@Id="2010"]/segment[@Id="NM1" and element[@Id="NM101" and .="85"]] /element[@Id="NM109"]/text()
 
+(:Tax ID:)
+let $ein := $trn//loop[@Id="2010"]/segment[@Id="REF" and element[@Id="REF01" and .="EI"]]/element[@Id="REF02"]/text()
+
 (:Billing Loop:)
 for $bl in $trn/loop[@Id="2000"]
 
@@ -68,6 +71,7 @@ return
 (:Billing Provider:)
 <billN-CC>{functx:if-empty($bill_name[1],"Empty")}</billN-CC>,
 <billId>{functx:if-empty($bill_id[1],"Empty")}</billId>,
+<ein>{functx:if-empty($ein[1],"Empty")}</ein>,
 
 (:billing system:)
 if (matches($acn_id, "^\D{3}\d{9}"))
