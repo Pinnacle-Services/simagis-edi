@@ -14,11 +14,19 @@ for $grp in collection()//group
 (: transmission date:)
 let $date_tr := data($grp/@Date)
 let $control := data($grp/@Control)
+
+(:Transaction loop:)
 for $trn in $grp/transaction
 
 (: Receiver :)
 let $rec_name := $trn/loop[@Id="1000"]/segment[@Id="NM1" and *:element="40"]/element[@Id="NM103"]/text()
 let $rec_id := $trn/loop[@Id="1000"]/segment[@Id="NM1" and *:element="40"]/element[@Id="NM109"]/text()
+
+(: Billing Provider :)
+let $bill_name := $trn/loop[@Id="2000" and segment[@Id="HL"]/element[@Id="HL01" and .="1"]]/loop[@Id="2010"]/segment[@Id="NM1" and element[@Id="NM101" and .="85"]]/element[@Id="NM103"]/text()
+let $bill_id := $trn/loop[@Id="2000"  and segment[@Id="HL"]/element[@Id="HL01" and .="1"]]/loop[@Id="2010"]/segment[@Id="NM1" and element[@Id="NM101" and .="85"]] /element[@Id="NM109"]/text()
+
+(:Billing Loop:)
 for $bl in $trn/loop[@Id="2000"]
 
 (: Demographics:)
@@ -51,11 +59,15 @@ return
 <acn>{$acn_id}</acn>,
 <freq>{$freq}</freq>,
 <sendDate-DT8>{$date_tr}</sendDate-DT8>,
-<recN-CC>{ $rec_name}</recN-CC>,
-<recId>{ $rec_id}</recId>,
+<recN-CC>{functx:if-empty($rec_name,"Empty")}</recN-CC>,
+<recId>{functx:if-empty($rec_id,"Empty")}</recId>,
 <prn-CC>{functx:if-empty($payer_name,"Empty")}</prn-CC>,
 <prid>{functx:if-empty($payer_id,"Empty")}</prid>,
 <clmAsk-C0>{ $ask_amt}</clmAsk-C0>,
+
+(:Billing Provider:)
+<billN-CC>{functx:if-empty($bill_name[1],"Empty")}</billN-CC>,
+<billId>{functx:if-empty($bill_id[1],"Empty")}</billId>,
 
 (:billing system:)
 if (matches($acn_id, "^\D{3}\d{9}"))
