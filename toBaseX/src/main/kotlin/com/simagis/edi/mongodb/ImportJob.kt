@@ -123,6 +123,7 @@ internal object ImportJob : AbstractJob() {
         interface Session {
             val id: Long
             var status: Status
+            var step: String?
             var error: Throwable?
             val files: Files
             var filesFound: Int

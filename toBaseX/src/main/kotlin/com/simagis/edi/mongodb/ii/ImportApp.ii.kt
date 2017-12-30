@@ -26,13 +26,16 @@ fun main(args: Array<String>) {
     try {
         session.status = RUNNING
         if (ImportJob.options.scanMode == "R") {
+            session.step = "Scanning source files"
             ImportJob.options.sourceDir.walk().forEach { file ->
                 if (file.isFile) session.files.registerFile(file)
             }
         }
 
+        session.step = "Finding new files"
         val files = session.files.find(NEW).toList()
 
+        session.step = "Importing new files"
         ResourceManager().use { executor ->
             files.forEachIndexed { index, file ->
                 executor.call(ImportFileCommand(file)) { result ->
@@ -53,6 +56,7 @@ fun main(args: Array<String>) {
             }
         }
 
+        session.step = "Closing session"
         session.status = SUCCESS
     } catch (e: Throwable) {
         session.status = FAILURE

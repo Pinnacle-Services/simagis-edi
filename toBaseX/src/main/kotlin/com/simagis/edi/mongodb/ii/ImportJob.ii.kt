@@ -80,6 +80,13 @@ private class IISession(sessionId: Long? = null) : ImportJob.ii.Session, Updatab
         }
 
     override
+    var step: String? = null
+        set(value) {
+            update("step", value)
+            field = value
+        }
+
+    override
     var error: Throwable? = null
         set(value) {
             update("error", value)
