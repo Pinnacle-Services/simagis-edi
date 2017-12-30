@@ -112,7 +112,11 @@ internal object ImportJob : AbstractJob() {
         val db: MongoDatabase by lazy { dbs["sourceClaims"] }
         val sessions: DocumentCollection by lazy { db["sessions"].indexed("status") }
         val files: DocumentCollection by lazy { db["files"].indexed("session", "status", "size", "names") }
-        val claims: DocumentCollection by lazy { db["claims"].indexed("session", "files", "type") }
+        val claims: DocumentCollection by lazy {
+            db["claims"].indexed(
+                    "session", "files", "type",
+                    "claim._id", "claim.procDate", "claim.sendDate")
+        }
 
         enum class Status { NEW, RUNNING, SUCCESS, FAILURE }
 
