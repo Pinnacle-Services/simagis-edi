@@ -10,9 +10,11 @@ import org.bson.Document
 import java.io.*
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantLock
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.concurrent.thread
+import kotlin.concurrent.withLock
 import kotlin.math.abs
 
 /**
@@ -37,18 +39,20 @@ fun main(args: Array<String>) {
 
         session.step = "Importing new files"
         ResourceManager().use { executor ->
+            val logLock = ReentrantLock()
+            fun log(message: String) = logLock.withLock { println(message) }
             files.forEachIndexed { index, file ->
                 executor.call(ImportFileCommand(file)) { result ->
-                    print("""${result.javaClass.simpleName} "${file.doc["names"]}" $index [${files.size}] """)
+                    val message = """${result.javaClass.simpleName} "${file.doc["names"]}" $index [${files.size}]"""
                     when (result) {
                         is CommandSuccess -> {
                             val info: Document? = result.doc["info"] as? Document
-                            println(": $info")
+                            log("$message: $info")
                             file.markSucceed(info)
                         }
                         is CommandError -> {
                             val error: Document = result.error
-                            println(": ${error["message"]}")
+                            log("$message: ${error["message"]}")
                             file.markFailed(error)
                         }
                     }
@@ -83,7 +87,7 @@ private class ExitCommand : Command {
 
 private class ImportFileCommand(file: ImportJob.ii.File) : SessionCommand {
     override val command: String = "importFile"
-    override val memSize: Long = 128.mb + 1.gb + file.size * 10
+    override val memSize: Long = 128.mb + 1.gb + file.size * 14
     override val doc: Document = file.doc
     override val sessionId: Long = file.sessionId
 }
