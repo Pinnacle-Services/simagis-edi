@@ -20,11 +20,9 @@ import kotlin.math.max
  * Created by alexei.vylegzhanin@gmail.com on 12/22/2017.
  */
 
-@Suppress("unused")
-internal fun ImportJob.ii.newSession(): ImportJob.ii.Session = IISession()
+internal fun ImportJob.ii.newSession(): IISession = this.let { IISessionImpl() }
 
-@Suppress("unused")
-internal fun ImportJob.ii.getClaims(): ImportJob.ii.Claims = IIClaims()
+internal fun ImportJob.ii.getClaims(): IIClaims = this.let { IIClaimsImpl() }
 
 internal fun Throwable.toErrorDoc(): Document = doc {
     `+`("class", this@toErrorDoc.javaClass.name)
@@ -60,12 +58,12 @@ private fun Updatable.update(name: String, value: Any?) {
 
 private fun Updatable.update(name: String, error: Throwable?) = update(name, error?.toErrorDoc())
 
-private class IISession(sessionId: Long? = null) : ImportJob.ii.Session, Updatable {
+private class IISessionImpl(sessionId: Long? = null) : IISession, Updatable {
     override
     val id: Long = sessionId ?: (maxSessionId() + 1).also {
         ImportJob.ii.sourceClaims.sessions.insertOne(doc(it) {
             `+`("createdAt", Date())
-            `+`("status", ImportJob.ii.Status.NEW.name)
+            `+`("status", IIStatus.NEW.name)
         })
     }
 
@@ -79,7 +77,7 @@ private class IISession(sessionId: Long? = null) : ImportJob.ii.Session, Updatab
     }
 
     override
-    var status: ImportJob.ii.Status = ImportJob.ii.Status.NEW
+    var status: IIStatus = IIStatus.NEW
         set(value) {
             update("status", value.name)
             field = value
@@ -100,7 +98,7 @@ private class IISession(sessionId: Long? = null) : ImportJob.ii.Session, Updatab
         }
 
     override
-    val files: ImportJob.ii.Files by lazy { IIFiles(this) }
+    val files: IIFiles by lazy { IIFilesImpl(this) }
 
     override
     var filesFound: Int = 0
@@ -122,11 +120,11 @@ private class IISession(sessionId: Long? = null) : ImportJob.ii.Session, Updatab
         }
 }
 
-private class IIFiles(val session: IISession) : ImportJob.ii.Files {
+private class IIFilesImpl(val session: IISessionImpl) : IIFiles {
     val collection: DocumentCollection
         get() = ImportJob.ii.sourceClaims.files
 
-    override fun registerFile(file: File): ImportJob.ii.File {
+    override fun registerFile(file: File): IIFile {
         val fileName = file.name
         val filePath = file.absolutePath
         val fileSize = file.length()
@@ -159,7 +157,7 @@ private class IIFiles(val session: IISession) : ImportJob.ii.Files {
             else -> {
                 val new: Document = doc(id) {
                     `+`("session", session.id)
-                    `+`("status", ImportJob.ii.Status.NEW.name)
+                    `+`("status", IIStatus.NEW.name)
                     `+`("size", fileSize)
                     `+`("names", listOf(fileName))
                     `+`("paths", listOf(filePath))
@@ -172,25 +170,25 @@ private class IIFiles(val session: IISession) : ImportJob.ii.Files {
     }
 
     override
-    fun find(status: ImportJob.ii.Status): MongoIterable<ImportJob.ii.File> = collection
+    fun find(status: IIStatus): MongoIterable<IIFile> = collection
             .find(doc { `+`("status", status.name) })
             .sort(doc { `+`("size", -1) })
             .map { it.toIIFile() }
 
-    private fun Document.toIIFile(): IIFile = IIFile(
-            files = this@IIFiles,
+    private fun Document.toIIFile(): IIFileImpl = IIFileImpl(
+            files = this@IIFilesImpl,
             id = _id as String,
             doc = this
     )
 }
 
-private class IIFile(
-        val files: IIFiles,
+private class IIFileImpl(
+        val files: IIFilesImpl,
         override val id: String,
-        override val doc: Document) : ImportJob.ii.File, Updatable {
+        override val doc: Document) : IIFile, Updatable {
 
     override val sessionId: Long get() = files.session.id
-    override val status: ImportJob.ii.Status get() = enumValueOf(doc["status"] as String)
+    override val status: IIStatus get() = enumValueOf(doc["status"] as String)
     override val size: Long = doc["size"] as Long
     override val collection: DocumentCollection get() = ImportJob.ii.sourceClaims.files
     override val info: Document? = doc["info"] as? Document
@@ -199,7 +197,7 @@ private class IIFile(
     override fun markRunning() {
         update(doc,
                 "session" to files.session.id,
-                "status" to ImportJob.ii.Status.RUNNING.name,
+                "status" to IIStatus.RUNNING.name,
                 "info" to null,
                 "error" to null
         )
@@ -209,7 +207,7 @@ private class IIFile(
         files.session.filesSucceed++
         update(doc,
                 "session" to files.session.id,
-                "status" to ImportJob.ii.Status.SUCCESS.name,
+                "status" to IIStatus.SUCCESS.name,
                 "info" to info,
                 "error" to null
         )
@@ -219,18 +217,18 @@ private class IIFile(
         files.session.filesFailed++
         update(doc,
                 "session" to files.session.id,
-                "status" to ImportJob.ii.Status.FAILURE.name,
+                "status" to IIStatus.FAILURE.name,
                 "info" to null,
                 "error" to error
         )
     }
 }
 
-private class IIClaims : ImportJob.ii.Claims {
+private class IIClaimsImpl : IIClaims {
     private val iiStatus: DocumentCollection = ImportJob.ii.claims.current.db["iiStatus"]
     private val newMaxSessionId = AtomicLong()
 
-    override fun findNew(): MongoIterable<ImportJob.ii.Claim> {
+    override fun findNew(): MongoIterable<IIClaim> {
         val maxSessionId = iiStatus.find(doc("current")).first()?.get("maxSessionId") as? Long
         newMaxSessionId.set(maxSessionId ?: 0)
         return ImportJob.ii.sourceClaims.claims
@@ -257,24 +255,24 @@ private class IIClaims : ImportJob.ii.Claims {
     }
 }
 
-private sealed class IIClaim(val doc: Document) : ImportJob.ii.Claim {
+private sealed class IIClaimSealed(val doc: Document) : IIClaim {
     override val claim: Document = doc["claim"] as Document
     private val _date: Date? by lazy { date(claim) }
     override val date: Date get() = _date!!
     override val valid: Boolean = _date != null
 }
 
-private class IIClaim835(doc: Document) : IIClaim(doc) {
+private class IIClaim835(doc: Document) : IIClaimSealed(doc) {
     override val type: String = "835"
     override fun date(claim: Document): Date? = claim["procDate"] as? Date
 }
 
-private class IIClaim837(doc: Document) : IIClaim(doc) {
+private class IIClaim837(doc: Document) : IIClaimSealed(doc) {
     override val type: String = "837"
     override fun date(claim: Document): Date? = claim["sendDate"] as? Date
 }
 
-private class IIClaimInvalid(doc: Document) : IIClaim(doc) {
+private class IIClaimInvalid(doc: Document) : IIClaimSealed(doc) {
     override val valid: Boolean = false
     override val type: String = "???"
     override fun date(claim: Document): Date? = throw AssertionError()

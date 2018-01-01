@@ -9,7 +9,6 @@ import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
 import com.simagis.edi.mdb.get
 import com.simagis.edi.mongodb.*
-import com.simagis.edi.mongodb.ImportJob.ii.Status.*
 import org.bson.Document
 import java.io.*
 import java.util.*
@@ -34,7 +33,7 @@ fun main(args: Array<String>) {
     fun log(message: String) = logLock.withLock { println(message) }
     val session = ImportJob.ii.newSession()
     try {
-        session.status = RUNNING
+        session.status = IIStatus.RUNNING
         if (ImportJob.options.scanMode == "R") {
             session.step = "Scanning source files"
             ImportJob.options.sourceDir.walk().forEach { file ->
@@ -43,7 +42,7 @@ fun main(args: Array<String>) {
         }
 
         session.step = "Finding new files"
-        session.files.find(NEW).toList().also { files ->
+        session.files.find(IIStatus.NEW).toList().also { files ->
             session.step = "Importing new files"
             ResourceManager().use { executor ->
                 files.forEachIndexed { index, file ->
@@ -67,7 +66,7 @@ fun main(args: Array<String>) {
         }
 
         session.step = "Adding new claims"
-        ImportJob.ii.getClaims().also { claims ->
+        ImportJob.ii.getClaims().also { claims: IIClaims ->
             AllClaimsUpdateChannel(ImportJob.options.after).also { channel ->
                 claims.findNew().forEach { channel.put(it) }
                 channel.join()
@@ -76,9 +75,9 @@ fun main(args: Array<String>) {
         }
 
         session.step = "Closing session"
-        session.status = SUCCESS
+        session.status = IIStatus.SUCCESS
     } catch (e: Throwable) {
-        session.status = FAILURE
+        session.status = IIStatus.FAILURE
         session.error = e
         e.printStackTrace()
     }
@@ -100,7 +99,7 @@ private class ExitCommand : Command {
     override val doc: Document? = null
 }
 
-private class ImportFileCommand(file: ImportJob.ii.File) : SessionCommand {
+private class ImportFileCommand(file: IIFile) : SessionCommand {
     override val command: String = "importFile"
     override val memSize: Long = 128.mb + 1.gb + file.size * 14
     override val doc: Document = file.doc
@@ -443,7 +442,7 @@ private class CommandProcess(memory: Long) : Closeable {
 }
 
 private sealed class ClaimsUpdateChannel {
-    abstract fun put(claim: ImportJob.ii.Claim)
+    abstract fun put(claim: IIClaim)
     abstract fun join()
 }
 
@@ -453,7 +452,7 @@ private class AllClaimsUpdateChannel(dateAfter: Date?) : ClaimsUpdateChannel() {
     private val channel837 = Claims837UpdateChannel(dateAfter)
     private val channel837a = AClaims837UpdateChannel()
 
-    override fun put(claim: ImportJob.ii.Claim) {
+    override fun put(claim: IIClaim) {
         if (claim.valid) {
             when (claim.type) {
                 "835" -> {
@@ -477,13 +476,13 @@ private class AllClaimsUpdateChannel(dateAfter: Date?) : ClaimsUpdateChannel() {
 }
 
 private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Runnable {
-    private val queue: BlockingQueue<ImportJob.ii.Claim> = LinkedBlockingQueue(10)
+    private val queue: BlockingQueue<IIClaim> = LinkedBlockingQueue(10)
     private val thread = Thread(this, "").apply { start() }
     private var closing = false
 
     override fun run() {
         var lastClaimId: String? = null
-        var maxDateClaim: ImportJob.ii.Claim? = null
+        var maxDateClaim: IIClaim? = null
         while (!closing) {
             val claim = queue.poll(1, TimeUnit.SECONDS) ?: continue
             val claimId = claim.claim["_id"] as String
@@ -519,7 +518,7 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
         createIndexes(indexes)
     }
 
-    private fun ImportJob.ii.Claim.insert() {
+    private fun IIClaim.insert() {
         val claim = claim.augment()
         try {
             claimsCollection.insertOne(claim)
@@ -538,7 +537,7 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
         }
     }
 
-    override fun put(claim: ImportJob.ii.Claim) {
+    override fun put(claim: IIClaim) {
         if (dateAfter == null || claim.date >= dateAfter) {
             queue.put(claim)
         }

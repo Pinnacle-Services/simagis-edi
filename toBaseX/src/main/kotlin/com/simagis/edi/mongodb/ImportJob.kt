@@ -128,50 +128,6 @@ internal object ImportJob : AbstractJob() {
                 val db: MongoDatabase by lazy { dbs["claimsArchive"] }
             }
         }
-
-        enum class Status { NEW, RUNNING, SUCCESS, FAILURE }
-
-        interface Session {
-            val id: Long
-            var status: Status
-            var step: String?
-            var error: Throwable?
-            val files: Files
-            var filesFound: Int
-            var filesSucceed: Int
-            var filesFailed: Int
-        }
-
-        interface Files {
-            fun registerFile(file: java.io.File): File
-            fun find(status: Status): MongoIterable<File>
-        }
-
-        interface File {
-            val id: String
-            val sessionId: Long
-            val doc: Document
-            val status: Status
-            val size: Long
-            val info: Document?
-            val error: Document?
-            fun markRunning()
-            fun markSucceed(info: Document?)
-            fun markFailed(error: Document)
-        }
-
-        interface Claims {
-            fun findNew(): MongoIterable<Claim>
-            fun commit()
-        }
-
-        interface Claim {
-            val valid: Boolean
-            val claim: Document
-            val type: String
-            val date: Date
-            fun date(claim: Document): Date?
-        }
     }
 
     object billed_acn {
