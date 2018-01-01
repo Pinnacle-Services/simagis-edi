@@ -30,6 +30,8 @@ import kotlin.math.abs
 fun main(args: Array<String>) {
     ImportJob.open(args)
     info("starting job", detailsJson = ImportJob.jobDoc)
+    val logLock = ReentrantLock()
+    fun log(message: String) = logLock.withLock { println(message) }
     val session = ImportJob.ii.newSession()
     try {
         session.status = RUNNING
@@ -46,16 +48,16 @@ fun main(args: Array<String>) {
             ResourceManager().use { executor ->
                 files.forEachIndexed { index, file ->
                     executor.call(ImportFileCommand(file)) { result ->
-                        print("""${result.javaClass.simpleName} "${file.doc["names"]}" $index [${files.size}] """)
+                        val message = """${result.javaClass.simpleName} "${file.doc["names"]}" $index [${files.size}]"""
                         when (result) {
                             is CommandSuccess -> {
                                 val info: Document? = result.doc["info"] as? Document
-                                println(": $info")
+                                log("$message: $info")
                                 file.markSucceed(info)
                             }
                             is CommandError -> {
                                 val error: Document = result.error
-                                println(": ${error["message"]}")
+                                log("$message: ${error["message"]}")
                                 file.markFailed(error)
                             }
                         }
