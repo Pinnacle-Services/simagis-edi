@@ -1,13 +1,19 @@
 package com.simagis.edi.mongodb.ii
 
+import com.mongodb.ErrorCategory
+import com.mongodb.MongoWriteException
+import com.mongodb.client.model.IndexModel
 import com.simagis.edi.basex.get
+import com.simagis.edi.mdb._id
 import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
-import com.simagis.edi.mongodb.ImportJob
+import com.simagis.edi.mdb.get
+import com.simagis.edi.mongodb.*
 import com.simagis.edi.mongodb.ImportJob.ii.Status.*
-import com.simagis.edi.mongodb.info
 import org.bson.Document
 import java.io.*
+import java.util.*
+import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
@@ -33,26 +39,35 @@ fun main(args: Array<String>) {
         }
 
         session.step = "Finding new files"
-        val files = session.files.find(NEW).toList()
-
-        session.step = "Importing new files"
-        ResourceManager().use { executor ->
-            files.forEachIndexed { index, file ->
-                executor.call(ImportFileCommand(file)) { result ->
-                    print("""${result.javaClass.simpleName} "${file.doc["names"]}" $index [${files.size}] """)
-                    when (result) {
-                        is CommandSuccess -> {
-                            val info: Document? = result.doc["info"] as? Document
-                            println(": $info")
-                            file.markSucceed(info)
-                        }
-                        is CommandError -> {
-                            val error: Document = result.error
-                            println(": ${error["message"]}")
-                            file.markFailed(error)
+        session.files.find(NEW).toList().also { files ->
+            session.step = "Importing new files"
+            ResourceManager().use { executor ->
+                files.forEachIndexed { index, file ->
+                    executor.call(ImportFileCommand(file)) { result ->
+                        print("""${result.javaClass.simpleName} "${file.doc["names"]}" $index [${files.size}] """)
+                        when (result) {
+                            is CommandSuccess -> {
+                                val info: Document? = result.doc["info"] as? Document
+                                println(": $info")
+                                file.markSucceed(info)
+                            }
+                            is CommandError -> {
+                                val error: Document = result.error
+                                println(": ${error["message"]}")
+                                file.markFailed(error)
+                            }
                         }
                     }
                 }
+            }
+        }
+
+        session.step = "Adding new claims"
+        ImportJob.ii.getClaims().also { claims ->
+            AllClaimsUpdateChannel(ImportJob.options.after).also { channel ->
+                claims.findNew().forEach { channel.put(it) }
+                channel.join()
+                claims.commit()
             }
         }
 
@@ -423,3 +438,147 @@ private class CommandProcess(memory: Long) : Closeable {
     }
 }
 
+private sealed class ClaimsUpdateChannel {
+    abstract fun put(claim: ImportJob.ii.Claim)
+    abstract fun join()
+}
+
+private class AllClaimsUpdateChannel(dateAfter: Date?) : ClaimsUpdateChannel() {
+    private val channel835 = Claims835UpdateChannel(dateAfter)
+    private val channel835a = AClaims835UpdateChannel()
+    private val channel837 = Claims837UpdateChannel(dateAfter)
+    private val channel837a = AClaims837UpdateChannel()
+
+    override fun put(claim: ImportJob.ii.Claim) {
+        if (claim.valid) {
+            when (claim.type) {
+                "835" -> {
+                    channel835.put(claim)
+                    channel835a.put(claim)
+                }
+                "837" -> {
+                    channel837.put(claim)
+                    channel837a.put(claim)
+                }
+            }
+        }
+    }
+
+    override fun join() {
+        channel835.join()
+        channel835a.join()
+        channel837.join()
+        channel837a.join()
+    }
+}
+
+private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Runnable {
+    private val queue: BlockingQueue<ImportJob.ii.Claim> = LinkedBlockingQueue(10)
+    private val thread = Thread(this, "").apply { start() }
+    private var closing = false
+
+    override fun run() {
+        var lastClaimId: String? = null
+        var maxDateClaim: ImportJob.ii.Claim? = null
+        while (!closing) {
+            val claim = queue.poll(1, TimeUnit.SECONDS) ?: continue
+            val claimId = claim.claim["_id"] as String
+            when {
+                lastClaimId == null -> {
+                    lastClaimId = claimId
+                    maxDateClaim = claim
+                }
+                lastClaimId == claimId -> {
+                    if (maxDateClaim == null || claim.date > maxDateClaim.date)
+                        maxDateClaim = claim
+
+                }
+                lastClaimId != claimId -> {
+                    maxDateClaim?.insert()
+                    lastClaimId = claimId
+                    maxDateClaim = claim
+                }
+            }
+        }
+    }
+
+    protected abstract val type: String
+    protected abstract val claimsCollection: DocumentCollection
+    protected abstract fun Document.augment(): Document
+    protected abstract val dateAfter: Date?
+
+    protected fun DocumentCollection.indexed(): DocumentCollection = apply {
+        val indexes: List<IndexModel> = (Document.parse(CreateIndexesJson[type])["indexes"] as? List<*>)
+                ?.filterIsInstance<Document>()
+                ?.map { IndexModel(it) }
+                ?: emptyList()
+        createIndexes(indexes)
+    }
+
+    private fun ImportJob.ii.Claim.insert() {
+        val claim = claim.augment()
+        try {
+            claimsCollection.insertOne(claim)
+        } catch (e: MongoWriteException) {
+            if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY) throw e
+            val key = doc(claim._id)
+            val oldDate = claimsCollection.find(key).first()?.let { date(it) }
+            val isReplaceRequired = when {
+                oldDate == null -> true
+                oldDate < date -> true
+                else -> false
+            }
+            if (isReplaceRequired) {
+                claimsCollection.findOneAndReplace(key, claim)
+            }
+        }
+    }
+
+    override fun put(claim: ImportJob.ii.Claim) {
+        if (dateAfter == null || claim.date >= dateAfter) {
+            queue.put(claim)
+        }
+    }
+
+    override fun join() {
+        closing = true
+        thread.join(30_000)
+        //TODO add warning if thread.isAlive
+    }
+
+}
+
+private class Claims835UpdateChannel(override val dateAfter: Date?) : ClaimsUpdateByMaxDateChannel() {
+    override val type: String = "835"
+    override val claimsCollection: DocumentCollection by lazy {
+        ImportJob.ii.claims.current.db["claims_$type"].indexed()
+    }
+    override fun Document.augment(): Document = apply { augment835() }
+
+}
+
+private class AClaims835UpdateChannel : ClaimsUpdateByMaxDateChannel() {
+    override val type: String = "835"
+    override val claimsCollection: DocumentCollection by lazy {
+        ImportJob.ii.claims.archive.db["claims_${type}a"].indexed()
+    }
+    override fun Document.augment(): Document = apply { augment835() }
+    override val dateAfter: Date? = null
+}
+
+private class Claims837UpdateChannel(override val dateAfter: Date?) : ClaimsUpdateByMaxDateChannel() {
+    override val type: String = "837"
+    override val claimsCollection: DocumentCollection by lazy {
+        ImportJob.ii.claims.current.db["claims_$type"].indexed()
+    }
+    override fun Document.augment(): Document = apply { augment837() }
+}
+
+private class AClaims837UpdateChannel : ClaimsUpdateByMaxDateChannel() {
+    override val type: String = "837"
+    override val claimsCollection: DocumentCollection by lazy {
+        ImportJob.ii.claims.archive.db["claims_${type}a"].indexed()
+    }
+    override fun Document.augment(): Document = apply { augment837() }
+    override val dateAfter: Date? = null
+}

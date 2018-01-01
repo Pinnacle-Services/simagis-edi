@@ -109,13 +109,24 @@ internal object ImportJob : AbstractJob() {
     }
 
     object ii {
-        val db: MongoDatabase by lazy { dbs["sourceClaims"] }
-        val sessions: DocumentCollection by lazy { db["sessions"].indexed("status") }
-        val files: DocumentCollection by lazy { db["files"].indexed("session", "status", "size", "names") }
-        val claims: DocumentCollection by lazy {
-            db["claims"].indexed(
-                    "session", "files", "type",
-                    "claim._id", "claim.procDate", "claim.sendDate")
+        object sourceClaims {
+            val db: MongoDatabase by lazy { dbs["sourceClaims"] }
+            val sessions: DocumentCollection by lazy { db["sessions"].indexed("status") }
+            val files: DocumentCollection by lazy { db["files"].indexed("session", "status", "size", "names") }
+            val claims: DocumentCollection by lazy {
+                db["claims"].indexed(
+                        "session", "files", "type",
+                        "claim._id", "claim.procDate", "claim.sendDate")
+            }
+        }
+
+        object claims {
+            object current {
+                val db: MongoDatabase by lazy { dbs["claimsCurrent"] }
+            }
+            object archive {
+                val db: MongoDatabase by lazy { dbs["claimsArchive"] }
+            }
         }
 
         enum class Status { NEW, RUNNING, SUCCESS, FAILURE }
@@ -147,6 +158,19 @@ internal object ImportJob : AbstractJob() {
             fun markRunning()
             fun markSucceed(info: Document?)
             fun markFailed(error: Document)
+        }
+
+        interface Claims {
+            fun findNew(): MongoIterable<Claim>
+            fun commit()
+        }
+
+        interface Claim {
+            val valid: Boolean
+            val claim: Document
+            val type: String
+            val date: Date
+            fun date(claim: Document): Date?
         }
     }
 
@@ -229,7 +253,7 @@ internal object CreateIndexesJson {
     private val lock = ReentrantLock()
     private val cache = mutableMapOf<String, String>()
 
-    private fun ImportJob.options.ClaimType.download(): String = URI(url).let { uri ->
+    private fun download(type: String): String = URI(url).let { uri ->
         uri.resolve("$type.createIndexes.json")
                 .toURL()
                 .openConnection()
@@ -243,25 +267,28 @@ internal object CreateIndexesJson {
                     } catch (e: Throwable) {
                         if (e !is FileNotFoundException) throw e
                         warning("$uri not found", e)
-                        read()
+                        read(type)
                     }
                 }
     }
 
-    private fun ImportJob.options.ClaimType.read(): String = CreateIndexesJson::class.java
+    private fun read(type: String): String = CreateIndexesJson::class.java
             .getResourceAsStream("$type.createIndexes.json")
             ?.use { it.reader().readText() }
             ?: "{}"
 
-    operator fun get(claimType: ImportJob.options.ClaimType): String = when (claimType.createIndexes) {
-        true -> lock.withLock {
-            cache.getOrPut(claimType.type) {
-                when (url) {
-                    null -> claimType.read()
-                    else -> claimType.download()
-                }
+    operator fun get(type: String): String = lock.withLock {
+        cache.getOrPut(type) {
+            when (url) {
+                null -> read(type)
+                else -> download(type)
             }
         }
+    }
+
+
+    operator fun get(claimType: ImportJob.options.ClaimType): String = when (claimType.createIndexes) {
+        true -> get(claimType.type)
         false -> "{}"
     }
 }

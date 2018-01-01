@@ -1,6 +1,7 @@
 package com.simagis.edi.mongodb.ii
 
 import com.mongodb.client.MongoIterable
+import com.mongodb.client.model.FindOneAndReplaceOptions
 import com.simagis.edi.mdb.*
 import com.simagis.edi.mongodb.DocumentCollection
 import com.simagis.edi.mongodb.ImportJob
@@ -11,6 +12,8 @@ import java.io.StringWriter
 import java.lang.StringBuilder
 import java.security.MessageDigest
 import java.util.*
+import java.util.concurrent.atomic.AtomicLong
+import kotlin.math.max
 
 /**
  * <p>
@@ -19,6 +22,9 @@ import java.util.*
 
 @Suppress("unused")
 internal fun ImportJob.ii.newSession(): ImportJob.ii.Session = IISession()
+
+@Suppress("unused")
+internal fun ImportJob.ii.getClaims(): ImportJob.ii.Claims = IIClaims()
 
 internal fun Throwable.toErrorDoc(): Document = doc {
     `+`("class", this@toErrorDoc.javaClass.name)
@@ -57,7 +63,7 @@ private fun Updatable.update(name: String, error: Throwable?) = update(name, err
 private class IISession(sessionId: Long? = null) : ImportJob.ii.Session, Updatable {
     override
     val id: Long = sessionId ?: (maxSessionId() + 1).also {
-        ImportJob.ii.sessions.insertOne(doc(it) {
+        ImportJob.ii.sourceClaims.sessions.insertOne(doc(it) {
             `+`("createdAt", Date())
             `+`("status", ImportJob.ii.Status.NEW.name)
         })
@@ -65,10 +71,10 @@ private class IISession(sessionId: Long? = null) : ImportJob.ii.Session, Updatab
 
     override
     val collection: DocumentCollection
-        get() = ImportJob.ii.sessions
+        get() = ImportJob.ii.sourceClaims.sessions
 
     private fun maxSessionId(): Long {
-        val found = ImportJob.ii.sessions.find(doc {}).sort(doc(-1)).first()?.get("_id")
+        val found = ImportJob.ii.sourceClaims.sessions.find(doc {}).sort(doc(-1)).first()?.get("_id")
         return found as? Long ?: 0.toLong()
     }
 
@@ -118,14 +124,14 @@ private class IISession(sessionId: Long? = null) : ImportJob.ii.Session, Updatab
 
 private class IIFiles(val session: IISession) : ImportJob.ii.Files {
     val collection: DocumentCollection
-        get() = ImportJob.ii.files
+        get() = ImportJob.ii.sourceClaims.files
 
     override fun registerFile(file: File): ImportJob.ii.File {
         val fileName = file.name
         val filePath = file.absolutePath
         val fileSize = file.length()
 
-        val foundByName = ImportJob.ii.files.find(doc {
+        val foundByName = ImportJob.ii.sourceClaims.files.find(doc {
             `+`("names", fileName)
             `+`("size", fileSize)
         }).toList()
@@ -134,7 +140,7 @@ private class IIFiles(val session: IISession) : ImportJob.ii.Files {
         }
 
         val id = file.sha2()
-        val foundByDigest: Document? = ImportJob.ii.files.find(doc(id)).first()
+        val foundByDigest: Document? = ImportJob.ii.sourceClaims.files.find(doc(id)).first()
         return when {
             foundByDigest != null -> {
                 val updates = Document()
@@ -147,7 +153,7 @@ private class IIFiles(val session: IISession) : ImportJob.ii.Files {
                 addToSet("paths", filePath)
                 if (updates.isEmpty()) foundByDigest else {
                     collection.updateOne(doc(id), updates)
-                    ImportJob.ii.files.find(doc(id)).first()
+                    ImportJob.ii.sourceClaims.files.find(doc(id)).first()
                 }
             }
             else -> {
@@ -158,7 +164,7 @@ private class IIFiles(val session: IISession) : ImportJob.ii.Files {
                     `+`("names", listOf(fileName))
                     `+`("paths", listOf(filePath))
                 }
-                ImportJob.ii.files.insertOne(new)
+                ImportJob.ii.sourceClaims.files.insertOne(new)
                 session.filesFound++
                 new
             }
@@ -186,7 +192,7 @@ private class IIFile(
     override val sessionId: Long get() = files.session.id
     override val status: ImportJob.ii.Status get() = enumValueOf(doc["status"] as String)
     override val size: Long = doc["size"] as Long
-    override val collection: DocumentCollection get() = ImportJob.ii.files
+    override val collection: DocumentCollection get() = ImportJob.ii.sourceClaims.files
     override val info: Document? = doc["info"] as? Document
     override val error: Document? = doc["error"] as? Document
 
@@ -218,6 +224,60 @@ private class IIFile(
                 "error" to error
         )
     }
+}
+
+private class IIClaims : ImportJob.ii.Claims {
+    private val iiStatus: DocumentCollection = ImportJob.ii.claims.current.db["iiStatus"]
+    private val newMaxSessionId = AtomicLong()
+
+    override fun findNew(): MongoIterable<ImportJob.ii.Claim> {
+        val maxSessionId = iiStatus.find(doc("current")).first()?.get("maxSessionId") as? Long
+        newMaxSessionId.set(maxSessionId ?: 0)
+        return ImportJob.ii.sourceClaims.claims
+                .find(doc { if (maxSessionId != null) `+$gt`("session", maxSessionId) })
+                .sort(doc { `+`("claims._id", 1) })
+                .map { doc ->
+                    (doc["session"] as? Long)?.let { session ->
+                        newMaxSessionId.getAndUpdate { max(it, session) }
+                    }
+                    val type = doc["type"] as? String
+                    when (type) {
+                        "835" -> IIClaim835(doc)
+                        "837" -> IIClaim837(doc)
+                        else -> IIClaimInvalid(doc)
+                    }
+                }
+    }
+
+    override fun commit() {
+        val key = doc("current")
+        val current = iiStatus.find(key).first() ?: doc("current")
+        current["maxSessionId"] = newMaxSessionId.get()
+        iiStatus.findOneAndReplace(key, current, FindOneAndReplaceOptions().upsert(true))
+    }
+}
+
+private sealed class IIClaim(val doc: Document) : ImportJob.ii.Claim {
+    override val claim: Document = doc["claim"] as Document
+    private val _date: Date? by lazy { date(claim) }
+    override val date: Date get() = _date!!
+    override val valid: Boolean = _date != null
+}
+
+private class IIClaim835(doc: Document) : IIClaim(doc) {
+    override val type: String = "835"
+    override fun date(claim: Document): Date? = claim["procDate"] as? Date
+}
+
+private class IIClaim837(doc: Document) : IIClaim(doc) {
+    override val type: String = "837"
+    override fun date(claim: Document): Date? = claim["sendDate"] as? Date
+}
+
+private class IIClaimInvalid(doc: Document) : IIClaim(doc) {
+    override val valid: Boolean = false
+    override val type: String = "???"
+    override fun date(claim: Document): Date? = throw AssertionError()
 }
 
 private fun File.sha2() = digest(MessageDigest.getInstance("SHA"))
