@@ -233,7 +233,7 @@ private class IIClaimsImpl : IIClaims {
         newMaxSessionId.set(maxSessionId ?: 0)
         return ImportJob.ii.sourceClaims.claims
                 .find(doc { if (maxSessionId != null) `+$gt`("session", maxSessionId) })
-                .sort(doc { `+`("claims._id", 1) })
+                .sort(doc { `+`("claim._id", 1) })
                 .map { doc ->
                     (doc["session"] as? Long)?.let { session ->
                         newMaxSessionId.getAndUpdate { max(it, session) }
