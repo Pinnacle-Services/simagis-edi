@@ -127,15 +127,15 @@ private class UnknownCmd(channel: CmdChannel, private val command: String?) : Cm
 private class ImportFileCmd(channel: CmdChannel,
                             private val sessionId: Long,
                             private val fileDoc: Document) : Cmd(channel) {
-    private val claims: DocumentCollection = ImportJob.ii.sourceClaims.claims
     private val fileId = fileDoc._id as String
 
     override fun run() {
-        insertClaims()
+        val claims: DocumentCollection = ImportJob.ii.sourceClaims.openClaims()
+        insertClaims(claims)
         channel.printDoc(fileDoc)
     }
 
-    private fun insertClaims() {
+    private fun insertClaims(claims: DocumentCollection) {
         var isaFound = 0
         var claimsFound = 0
         var claimsSucceed = 0

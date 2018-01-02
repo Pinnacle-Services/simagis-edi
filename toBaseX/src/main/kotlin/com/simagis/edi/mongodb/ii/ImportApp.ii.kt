@@ -481,6 +481,7 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
     private var closing = false
 
     override fun run() {
+        val claimsCollection = openClaimsCollection()
         var lastClaimId: String? = null
         var maxDateClaim: IIClaim? = null
         while (!closing) {
@@ -497,7 +498,7 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
 
                 }
                 lastClaimId != claimId -> {
-                    maxDateClaim?.insert()
+                    maxDateClaim?.insert(claimsCollection)
                     lastClaimId = claimId
                     maxDateClaim = claim
                 }
@@ -506,7 +507,7 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
     }
 
     protected abstract val type: String
-    protected abstract val claimsCollection: DocumentCollection
+    protected abstract fun openClaimsCollection(): DocumentCollection
     protected abstract fun Document.augment(): Document
     protected abstract val dateAfter: Date?
 
@@ -518,7 +519,7 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
         createIndexes(indexes)
     }
 
-    private fun IIClaim.insert() {
+    private fun IIClaim.insert(claimsCollection: DocumentCollection) {
         val claim = claim.augment()
         try {
             claimsCollection.insertOne(claim)
@@ -553,35 +554,27 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
 
 private class Claims835UpdateChannel(override val dateAfter: Date?) : ClaimsUpdateByMaxDateChannel() {
     override val type: String = "835"
-    override val claimsCollection: DocumentCollection by lazy {
-        ImportJob.ii.claims.current.db["claims_$type"].indexed()
-    }
+    override fun openClaimsCollection(): DocumentCollection = ImportJob.ii.claims.current.openDb()["claims_$type"].indexed()
     override fun Document.augment(): Document = apply { augment835() }
 
 }
 
 private class AClaims835UpdateChannel : ClaimsUpdateByMaxDateChannel() {
     override val type: String = "835"
-    override val claimsCollection: DocumentCollection by lazy {
-        ImportJob.ii.claims.archive.db["claims_${type}a"].indexed()
-    }
+    override fun openClaimsCollection(): DocumentCollection = ImportJob.ii.claims.archive.openDb()["claims_${type}a"].indexed()
     override fun Document.augment(): Document = apply { augment835() }
     override val dateAfter: Date? = null
 }
 
 private class Claims837UpdateChannel(override val dateAfter: Date?) : ClaimsUpdateByMaxDateChannel() {
     override val type: String = "837"
-    override val claimsCollection: DocumentCollection by lazy {
-        ImportJob.ii.claims.current.db["claims_$type"].indexed()
-    }
+    override fun openClaimsCollection(): DocumentCollection = ImportJob.ii.claims.current.openDb()["claims_$type"].indexed()
     override fun Document.augment(): Document = apply { augment837() }
 }
 
 private class AClaims837UpdateChannel : ClaimsUpdateByMaxDateChannel() {
     override val type: String = "837"
-    override val claimsCollection: DocumentCollection by lazy {
-        ImportJob.ii.claims.archive.db["claims_${type}a"].indexed()
-    }
+    override fun openClaimsCollection(): DocumentCollection = ImportJob.ii.claims.archive.openDb()["claims_${type}a"].indexed()
     override fun Document.augment(): Document = apply { augment837() }
     override val dateAfter: Date? = null
 }

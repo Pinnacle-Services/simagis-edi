@@ -2,7 +2,6 @@ package com.simagis.edi.mongodb
 
 import com.mongodb.MongoNamespace
 import com.mongodb.client.MongoDatabase
-import com.mongodb.client.MongoIterable
 import com.mongodb.client.model.IndexModel
 import com.simagis.edi.mdb.get
 import org.bson.Document
@@ -110,22 +109,21 @@ internal object ImportJob : AbstractJob() {
 
     object ii {
         object sourceClaims {
-            val db: MongoDatabase by lazy { dbs["sourceClaims"] }
-            val sessions: DocumentCollection by lazy { db["sessions"].indexed("status") }
-            val files: DocumentCollection by lazy { db["files"].indexed("session", "status", "size", "names") }
-            val claims: DocumentCollection by lazy {
-                db["claims"].indexed(
-                        "session", "files", "type",
-                        "claim._id", "claim.procDate", "claim.sendDate")
-            }
+            private fun openDb(): MongoDatabase = dbs["sourceClaims"]
+            fun openSessions(): DocumentCollection = openDb()["sessions"].indexed("status")
+            fun openFiles(): DocumentCollection = openDb()["files"].indexed("session", "status", "size", "names")
+            fun openClaims(): DocumentCollection = openDb()["claims"].indexed(
+                    "session", "files", "type",
+                    "claim._id", "claim.procDate", "claim.sendDate")
         }
 
         object claims {
             object current {
-                val db: MongoDatabase by lazy { dbs["claimsCurrent"] }
+                fun openDb(): MongoDatabase = dbs["claimsCurrent"]
             }
+
             object archive {
-                val db: MongoDatabase by lazy { dbs["claimsArchive"] }
+                fun openDb(): MongoDatabase = dbs["claimsArchive"]
             }
         }
     }

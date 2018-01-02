@@ -13,6 +13,8 @@ import java.lang.StringBuilder
 import java.security.MessageDigest
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.math.max
 
 /**
@@ -33,12 +35,19 @@ internal fun Throwable.toErrorDoc(): Document = doc {
 }
 
 
-private interface Updatable {
-    val id: Any
-    val collection: DocumentCollection
+private class SyncCollection(
+        val collection: DocumentCollection,
+        private val lock: ReentrantLock = ReentrantLock()) {
+
+    operator fun <T> invoke(block: SyncCollection.() -> T) = lock.withLock { block() }
 }
 
-private fun Updatable.update(doc: Document, vararg pairs: Pair<String, Any?>) {
+private interface Updatable {
+    val sync: SyncCollection
+    val id: Any
+}
+
+private fun Updatable.update(doc: Document, vararg pairs: Pair<String, Any?>) = sync {
     pairs.forEach { pair ->
         with(pair) {
             if (second != null) doc[first] = second else doc.remove(first)
@@ -48,7 +57,7 @@ private fun Updatable.update(doc: Document, vararg pairs: Pair<String, Any?>) {
 }
 
 
-private fun Updatable.update(name: String, value: Any?) {
+private fun Updatable.update(name: String, value: Any?) = sync {
     collection.updateOne(doc(id), doc {
         if (value != null)
             `+$set` { `+`(name, value) } else
@@ -59,61 +68,57 @@ private fun Updatable.update(name: String, value: Any?) {
 private fun Updatable.update(name: String, error: Throwable?) = update(name, error?.toErrorDoc())
 
 private class IISessionImpl(sessionId: Long? = null) : IISession, Updatable {
-    override
-    val id: Long = sessionId ?: (maxSessionId() + 1).also {
-        ImportJob.ii.sourceClaims.sessions.insertOne(doc(it) {
-            `+`("createdAt", Date())
-            `+`("status", IIStatus.NEW.name)
-        })
+    override val sync: SyncCollection = SyncCollection(ImportJob.ii.sourceClaims.openSessions())
+
+    override val id: Long = sync {
+        sessionId ?: (maxSessionId() + 1).also { newSessionId ->
+            sync {
+                collection.insertOne(doc(newSessionId) {
+                    `+`("createdAt", Date())
+                    `+`("status", IIStatus.NEW.name)
+                })
+            }
+        }
     }
 
-    override
-    val collection: DocumentCollection
-        get() = ImportJob.ii.sourceClaims.sessions
-
-    private fun maxSessionId(): Long {
-        val found = ImportJob.ii.sourceClaims.sessions.find(doc {}).sort(doc(-1)).first()?.get("_id")
+    private fun SyncCollection.maxSessionId(): Long {
+        val found = collection.find(doc {}).sort(doc(-1)).first()?.get("_id")
         return found as? Long ?: 0.toLong()
     }
 
-    override
-    var status: IIStatus = IIStatus.NEW
+    override var status: IIStatus = IIStatus.NEW
         set(value) {
             update("status", value.name)
             field = value
         }
 
-    override
-    var step: String? = null
+    override var step: String? = null
         set(value) {
             update("step", value)
             field = value
         }
 
-    override
-    var error: Throwable? = null
+    override var error: Throwable? = null
         set(value) {
             update("error", value)
             field = value
         }
 
-    override
-    val files: IIFiles by lazy { IIFilesImpl(this) }
+    override val files: IIFiles by lazy { IIFilesImpl(this) }
 
-    override
-    var filesFound: Int = 0
+    override var filesFound: Int = 0
         set(value) {
             update("filesFound", value)
             field = value
         }
-    override
-    var filesSucceed: Int = 0
+
+    override var filesSucceed: Int = 0
         set(value) {
             update("filesSucceed", value)
             field = value
         }
-    override
-    var filesFailed: Int = 0
+
+    override var filesFailed: Int = 0
         set(value) {
             update("filesFailed", value)
             field = value
@@ -121,25 +126,24 @@ private class IISessionImpl(sessionId: Long? = null) : IISession, Updatable {
 }
 
 private class IIFilesImpl(val session: IISessionImpl) : IIFiles {
-    val collection: DocumentCollection
-        get() = ImportJob.ii.sourceClaims.files
+    val sync: SyncCollection = SyncCollection(ImportJob.ii.sourceClaims.openFiles())
 
-    override fun registerFile(file: File): IIFile {
+    override fun registerFile(file: File): IIFile = sync {
         val fileName = file.name
         val filePath = file.absolutePath
         val fileSize = file.length()
 
-        val foundByName = ImportJob.ii.sourceClaims.files.find(doc {
+        val foundByName = collection.find(doc {
             `+`("names", fileName)
             `+`("size", fileSize)
         }).toList()
         if (foundByName.size == 1) {
-            return foundByName.first().toIIFile()
+            return@sync foundByName.first().toIIFile()
         }
 
         val id = file.sha2()
-        val foundByDigest: Document? = ImportJob.ii.sourceClaims.files.find(doc(id)).first()
-        return when {
+        val foundByDigest: Document? = collection.find(doc(id)).first()
+        return@sync when {
             foundByDigest != null -> {
                 val updates = Document()
                 fun addToSet(name: String, value: String) {
@@ -151,7 +155,7 @@ private class IIFilesImpl(val session: IISessionImpl) : IIFiles {
                 addToSet("paths", filePath)
                 if (updates.isEmpty()) foundByDigest else {
                     collection.updateOne(doc(id), updates)
-                    ImportJob.ii.sourceClaims.files.find(doc(id)).first()
+                    collection.find(doc(id)).first()
                 }
             }
             else -> {
@@ -162,18 +166,19 @@ private class IIFilesImpl(val session: IISessionImpl) : IIFiles {
                     `+`("names", listOf(fileName))
                     `+`("paths", listOf(filePath))
                 }
-                ImportJob.ii.sourceClaims.files.insertOne(new)
+                collection.insertOne(new)
                 session.filesFound++
                 new
             }
         }.toIIFile()
     }
 
-    override
-    fun find(status: IIStatus): MongoIterable<IIFile> = collection
-            .find(doc { `+`("status", status.name) })
-            .sort(doc { `+`("size", -1) })
-            .map { it.toIIFile() }
+    override fun find(status: IIStatus): MongoIterable<IIFile> = sync {
+        collection
+                .find(doc { `+`("status", status.name) })
+                .sort(doc { `+`("size", -1) })
+                .map { it.toIIFile() }
+    }
 
     private fun Document.toIIFile(): IIFileImpl = IIFileImpl(
             files = this@IIFilesImpl,
@@ -186,11 +191,10 @@ private class IIFileImpl(
         val files: IIFilesImpl,
         override val id: String,
         override val doc: Document) : IIFile, Updatable {
-
+    override val sync: SyncCollection = SyncCollection(ImportJob.ii.sourceClaims.openFiles())
     override val sessionId: Long get() = files.session.id
     override val status: IIStatus get() = enumValueOf(doc["status"] as String)
     override val size: Long = doc["size"] as Long
-    override val collection: DocumentCollection get() = ImportJob.ii.sourceClaims.files
     override val info: Document? = doc["info"] as? Document
     override val error: Document? = doc["error"] as? Document
 
@@ -225,13 +229,14 @@ private class IIFileImpl(
 }
 
 private class IIClaimsImpl : IIClaims {
-    private val iiStatus: DocumentCollection = ImportJob.ii.claims.current.db["iiStatus"]
+    private val iiStatus: DocumentCollection = ImportJob.ii.claims.current.openDb()["iiStatus"]
     private val newMaxSessionId = AtomicLong()
 
     override fun findNew(): MongoIterable<IIClaim> {
         val maxSessionId = iiStatus.find(doc("current")).first()?.get("maxSessionId") as? Long
         newMaxSessionId.set(maxSessionId ?: 0)
-        return ImportJob.ii.sourceClaims.claims
+        return ImportJob.ii.sourceClaims
+                .openClaims()
                 .find(doc { if (maxSessionId != null) `+$gt`("session", maxSessionId) })
                 .sort(doc { `+`("claim._id", 1) })
                 .map { doc ->
