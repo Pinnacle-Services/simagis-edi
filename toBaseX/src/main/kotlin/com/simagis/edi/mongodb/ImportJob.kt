@@ -118,6 +118,8 @@ internal object ImportJob : AbstractJob() {
         }
 
         object claims {
+            fun openOptions(): DocumentCollection = dbs["claimsAPI"]["options"]
+
             object current {
                 fun openDb(): MongoDatabase = dbs["claimsCurrent"]
             }

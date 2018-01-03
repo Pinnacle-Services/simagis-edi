@@ -229,11 +229,12 @@ private class IIFileImpl(
 }
 
 private class IIClaimsImpl : IIClaims {
-    private val iiStatus: DocumentCollection = ImportJob.ii.claims.current.openDb()["iiStatus"]
+    private val optionKey: Document get() = doc(IIClaims::class.java.name)
+    private val options: DocumentCollection = ImportJob.ii.claims.openOptions()
     private val newMaxSessionId = AtomicLong()
 
     override fun findNew(): MongoIterable<IIClaim> {
-        val maxSessionId = iiStatus.find(doc("current")).first()?.get("maxSessionId") as? Long
+        val maxSessionId = options.find(optionKey).first()?.get("maxSessionId") as? Long
         newMaxSessionId.set(maxSessionId ?: 0)
         return ImportJob.ii.sourceClaims
                 .openClaims()
@@ -253,10 +254,9 @@ private class IIClaimsImpl : IIClaims {
     }
 
     override fun commit() {
-        val key = doc("current")
-        val current = iiStatus.find(key).first() ?: doc("current")
+        val current = options.find(optionKey).first() ?: optionKey
         current["maxSessionId"] = newMaxSessionId.get()
-        iiStatus.findOneAndReplace(key, current, FindOneAndReplaceOptions().upsert(true))
+        options.findOneAndReplace(optionKey, current, FindOneAndReplaceOptions().upsert(true))
     }
 }
 
