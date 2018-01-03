@@ -277,11 +277,7 @@ private class IIClaim837(doc: Document) : IIClaimSealed(doc) {
     override fun date(claim: Document): Date? = claim["sendDate"] as? Date
 }
 
-private class IIClaimInvalid(doc: Document) : IIClaimSealed(doc) {
-    override val valid: Boolean = false
-    override val type: String = "???"
-    override fun date(claim: Document): Date? = throw AssertionError()
-}
+private class IIClaimInvalid(doc: Document) : IIClaimSealed(doc)
 
 private fun File.sha2() = digest(MessageDigest.getInstance("SHA"))
 

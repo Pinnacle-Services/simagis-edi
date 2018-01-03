@@ -69,7 +69,7 @@ fun main(args: Array<String>) {
         ImportJob.ii.getClaims().also { claims: IIClaims ->
             AllClaimsUpdateChannel(ImportJob.options.after).also { channel ->
                 claims.findNew().forEach { channel.put(it) }
-                channel.join()
+                channel.shutdownAndWait()
                 claims.commit()
             }
         }
@@ -443,7 +443,7 @@ private class CommandProcess(memory: Long) : Closeable {
 
 private sealed class ClaimsUpdateChannel {
     abstract fun put(claim: IIClaim)
-    abstract fun join()
+    abstract fun shutdownAndWait()
 }
 
 private class AllClaimsUpdateChannel(dateAfter: Date?) : ClaimsUpdateChannel() {
@@ -467,41 +467,47 @@ private class AllClaimsUpdateChannel(dateAfter: Date?) : ClaimsUpdateChannel() {
         }
     }
 
-    override fun join() {
-        channel835.join()
-        channel835a.join()
-        channel837.join()
-        channel837a.join()
+    override fun shutdownAndWait() {
+        channel835.shutdownAndWait()
+        channel835a.shutdownAndWait()
+        channel837.shutdownAndWait()
+        channel837a.shutdownAndWait()
     }
 }
 
 private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Runnable {
     private val queue: BlockingQueue<IIClaim> = LinkedBlockingQueue(10)
     private val thread = Thread(this, "").apply { start() }
-    private var closing = false
+
+    private object ShutdownMarker : IIClaim
 
     override fun run() {
         val claimsCollection = openClaimsCollection()
         var lastClaimId: String? = null
         var maxDateClaim: IIClaim? = null
-        while (!closing) {
-            val claim = queue.poll(1, TimeUnit.SECONDS) ?: continue
-            val claimId = claim.claim["_id"] as String
-            when {
-                lastClaimId == null -> {
-                    lastClaimId = claimId
-                    maxDateClaim = claim
-                }
-                lastClaimId == claimId -> {
-                    if (maxDateClaim == null || claim.date > maxDateClaim.date)
+        while (true) {
+            val claim = queue.poll(30, TimeUnit.SECONDS) ?: continue
+            if (claim == ShutdownMarker) break
+            try {
+                val claimId = claim.claim["_id"] as String
+                when {
+                    lastClaimId == null -> {
+                        lastClaimId = claimId
                         maxDateClaim = claim
+                    }
+                    lastClaimId == claimId -> {
+                        if (maxDateClaim == null || claim.date > maxDateClaim.date)
+                            maxDateClaim = claim
 
+                    }
+                    lastClaimId != claimId -> {
+                        maxDateClaim?.insert(claimsCollection)
+                        lastClaimId = claimId
+                        maxDateClaim = claim
+                    }
                 }
-                lastClaimId != claimId -> {
-                    maxDateClaim?.insert(claimsCollection)
-                    lastClaimId = claimId
-                    maxDateClaim = claim
-                }
+            } catch (e: Throwable) {
+                e.printStackTrace()
             }
         }
     }
@@ -544,8 +550,8 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
         }
     }
 
-    override fun join() {
-        closing = true
+    override fun shutdownAndWait() {
+        queue.put(ShutdownMarker)
         thread.join(30_000)
         //TODO add warning if thread.isAlive
     }
