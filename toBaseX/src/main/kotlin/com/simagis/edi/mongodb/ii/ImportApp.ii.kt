@@ -251,10 +251,6 @@ private class CommandExecutor(var memory: Long = 2.gb) : Closeable {
         }
     }
 
-    fun free() {
-        closeCommandProcessor()
-    }
-
     private fun call(command: Command): CommandResult = process
             .let {
                 it ?: newCommandProcess()
