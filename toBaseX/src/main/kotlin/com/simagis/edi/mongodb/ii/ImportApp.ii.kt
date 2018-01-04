@@ -10,24 +10,33 @@ import kotlin.concurrent.withLock
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 12/19/2017.
  */
+
+
+private val logLock = ReentrantLock()
+
+private fun log(message: String) = logLock.withLock { println(message) }
+
+private fun IISession.step(stepName: String) {
+    step = stepName
+    log("STEP $stepName")
+}
+
 fun main(args: Array<String>) {
     ImportJob.open(args)
     info("starting job", detailsJson = ImportJob.jobDoc)
-    val logLock = ReentrantLock()
-    fun log(message: String) = logLock.withLock { println(message) }
-    val session = ImportJob.ii.newSession()
+    val session: IISession = ImportJob.ii.newSession()
     try {
         session.status = IIStatus.RUNNING
         if (ImportJob.options.scanMode == "R") {
-            session.step = "Scanning source files"
+            session.step("Scanning source files")
             ImportJob.options.sourceDir.walk().forEach { file ->
                 if (file.isFile) session.files.registerFile(file)
             }
         }
 
-        session.step = "Finding new files"
+        session.step("Finding new files")
         session.files.find(IIStatus.NEW).toList().also { files ->
-            session.step = "Importing new files"
+            session.step("Importing new files")
             ResourceManager().use { executor ->
                 files.forEachIndexed { index, file ->
                     executor.call(ImportFileCommand(file)) { result ->
@@ -49,7 +58,7 @@ fun main(args: Array<String>) {
             }
         }
 
-        session.step = "Adding new claims"
+        session.step("Adding new claims")
         ImportJob.ii.getClaims().also { claims: IIClaims ->
             AllClaimsUpdateChannel(ImportJob.options.after).also { channel ->
                 claims.findNew().forEach { channel.put(it) }
@@ -58,7 +67,7 @@ fun main(args: Array<String>) {
             }
         }
 
-        session.step = "Closing session"
+        session.step("Closing session")
         session.status = IIStatus.SUCCESS
     } catch (e: Throwable) {
         session.status = IIStatus.FAILURE
