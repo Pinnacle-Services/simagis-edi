@@ -60,12 +60,24 @@ fun main(args: Array<String>) {
 
         session.step("Adding new claims")
         ImportJob.ii.getClaims().also { claims: IIClaims ->
-            AllClaimsUpdateChannel(ImportJob.options.after).also { channel ->
+            val options = AllClaimsUpdateChannel.Options(
+                    sessionId = session.id,
+                    dateAfter = ImportJob.options.after)
+            AllClaimsUpdateChannel(options).also { channel ->
                 claims.findNew().forEach { channel.put(it) }
                 channel.shutdownAndWait()
                 claims.commit()
             }
         }
+
+        session.step("Adding new 835c claims")
+//        ImportJob.ii.claims.openCollection(ImportJob.ii.claims.ClaimType.`835`).also { claims: IIClaims ->
+//            Claims835cUpdateChannel().also { channel ->
+//                claims.findNew().forEach { channel.put(it) }
+//                channel.shutdownAndWait()
+//                claims.commit()
+//            }
+//        }
 
         session.step("Closing session")
         session.status = IIStatus.SUCCESS

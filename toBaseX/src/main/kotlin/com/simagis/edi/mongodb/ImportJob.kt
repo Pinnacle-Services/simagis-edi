@@ -120,12 +120,15 @@ internal object ImportJob : AbstractJob() {
         object claims {
             fun openOptions(): DocumentCollection = dbs["claimsAPI"]["options"]
 
-            object current {
-                fun openDb(): MongoDatabase = dbs["claimsCurrent"]
-            }
+            enum class ClaimType {`835`, `837`, `835a`, `837a`, `835c`, `835ac`}
 
-            object archive {
-                fun openDb(): MongoDatabase = dbs["claimsArchive"]
+            fun openCollection(type: ClaimType): DocumentCollection = when(type) {
+                ClaimType.`835` -> dbs["claimsCurrent"]["claims_$type"]
+                ClaimType.`837` -> dbs["claimsCurrent"]["claims_$type"]
+                ClaimType.`835a` -> dbs["claimsArchive"]["claims_$type"]
+                ClaimType.`837a` -> dbs["claimsArchive"]["claims_$type"]
+                ClaimType.`835c` -> dbs["claimsCurrent"]["claims_$type"]
+                ClaimType.`835ac` -> dbs["claimsArchive"]["claims_$type"]
             }
         }
     }

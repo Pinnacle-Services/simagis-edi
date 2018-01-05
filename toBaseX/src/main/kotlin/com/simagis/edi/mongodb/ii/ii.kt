@@ -48,6 +48,7 @@ interface IIClaims {
 interface IIClaim {
     val valid: Boolean get() = false
     val claim: Document get() = throw AssertionError()
+    val digest: String get() = throw AssertionError()
     val type: String get() = "???"
     val date: Date get() = throw AssertionError()
     fun date(claim: Document): Date? = throw AssertionError()

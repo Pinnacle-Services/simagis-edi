@@ -262,6 +262,7 @@ private class IIClaimsImpl : IIClaims {
 
 private sealed class IIClaimSealed(val doc: Document) : IIClaim {
     override val claim: Document = doc["claim"] as Document
+    override val digest: String get() = doc._id as String
     private val _date: Date? by lazy { date(claim) }
     override val date: Date get() = _date!!
     override val valid: Boolean = _date != null

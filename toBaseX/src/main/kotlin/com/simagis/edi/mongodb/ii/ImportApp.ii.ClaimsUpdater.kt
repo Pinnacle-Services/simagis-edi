@@ -4,12 +4,10 @@ import com.mongodb.ErrorCategory
 import com.mongodb.MongoWriteException
 import com.mongodb.client.model.IndexModel
 import com.simagis.edi.mdb._id
+import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
-import com.simagis.edi.mdb.get
-import com.simagis.edi.mongodb.DocumentCollection
-import com.simagis.edi.mongodb.ImportJob
-import com.simagis.edi.mongodb.augment835
-import com.simagis.edi.mongodb.augment837
+import com.simagis.edi.mongodb.*
+import com.simagis.edi.mongodb.ImportJob.ii.claims.ClaimType.*
 import org.bson.Document
 import java.util.*
 import java.util.concurrent.BlockingQueue
@@ -25,11 +23,16 @@ internal sealed class ClaimsUpdateChannel {
     abstract fun shutdownAndWait()
 }
 
-internal class AllClaimsUpdateChannel(dateAfter: Date?) : ClaimsUpdateChannel() {
-    private val channel835 = Claims835UpdateChannel(dateAfter)
-    private val channel835a = AClaims835UpdateChannel()
-    private val channel837 = Claims837UpdateChannel(dateAfter)
-    private val channel837a = AClaims837UpdateChannel()
+internal class AllClaimsUpdateChannel(options: Options) : ClaimsUpdateChannel() {
+    data class Options(
+            val sessionId: Long,
+            val dateAfter: Date? = null
+    )
+
+    private val channel835 = Claims835UpdateChannel(options)
+    private val channel835a = AClaims835UpdateChannel(options)
+    private val channel837 = Claims837UpdateChannel(options)
+    private val channel837a = AClaims837UpdateChannel(options)
 
     override fun put(claim: IIClaim) {
         if (claim.valid) {
@@ -54,14 +57,14 @@ internal class AllClaimsUpdateChannel(dateAfter: Date?) : ClaimsUpdateChannel() 
     }
 }
 
-private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Runnable {
-    private val queue: BlockingQueue<IIClaim> = LinkedBlockingQueue(10)
+private abstract class ClaimsUpdateByMaxDateChannel(val options: AllClaimsUpdateChannel.Options) : ClaimsUpdateChannel(), Runnable {
+    private val queue: BlockingQueue<IIClaim> = LinkedBlockingQueue(32)
     private val thread = Thread(this, "").apply { start() }
 
     private object ShutdownMarker : IIClaim
 
     override fun run() {
-        val claimsCollection = openClaimsCollection()
+        val claimsCollection = ImportJob.ii.claims.openCollection(type).indexed()
         var lastClaimId: String? = null
         var maxDateClaim: IIClaim? = null
         while (true) {
@@ -91,13 +94,11 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
         }
     }
 
-    protected abstract val type: String
-    protected abstract fun openClaimsCollection(): DocumentCollection
+    protected abstract val type: ImportJob.ii.claims.ClaimType
     protected abstract fun Document.augment(): Document
-    protected abstract val dateAfter: Date?
 
     protected fun DocumentCollection.indexed(): DocumentCollection = apply {
-        val indexes: List<IndexModel> = (org.bson.Document.parse(com.simagis.edi.mongodb.CreateIndexesJson[type])["indexes"] as? List<*>)
+        val indexes: List<IndexModel> = (Document.parse(CreateIndexesJson[type.name])["indexes"] as? List<*>)
                 ?.filterIsInstance<Document>()
                 ?.map { com.mongodb.client.model.IndexModel(it) }
                 ?: kotlin.collections.emptyList()
@@ -106,6 +107,10 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
 
     private fun IIClaim.insert(claimsCollection: DocumentCollection) {
         val claim = claim.augment()
+        claim["o"] = doc {
+            `+`("s", options.sessionId)
+            `+`("d", digest)
+        }
         try {
             claimsCollection.insertOne(claim)
         } catch (e: MongoWriteException) {
@@ -124,7 +129,7 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
     }
 
     override fun put(claim: IIClaim) {
-        if (dateAfter == null || claim.date >= dateAfter) {
+        if (options.dateAfter == null || claim.date >= options.dateAfter) {
             queue.put(claim)
         }
     }
@@ -137,29 +142,23 @@ private abstract class ClaimsUpdateByMaxDateChannel : ClaimsUpdateChannel(), Run
 
 }
 
-private class Claims835UpdateChannel(override val dateAfter: Date?) : ClaimsUpdateByMaxDateChannel() {
-    override val type: String = "835"
-    override fun openClaimsCollection(): DocumentCollection = ImportJob.ii.claims.current.openDb()["claims_$type"].indexed()
+private class Claims835UpdateChannel(options: AllClaimsUpdateChannel.Options) : ClaimsUpdateByMaxDateChannel(options) {
+    override val type get() = `835`
     override fun Document.augment(): Document = apply { augment835() }
 
 }
 
-private class AClaims835UpdateChannel : ClaimsUpdateByMaxDateChannel() {
-    override val type: String = "835"
-    override fun openClaimsCollection(): DocumentCollection = ImportJob.ii.claims.archive.openDb()["claims_${type}a"].indexed()
+private class AClaims835UpdateChannel(options: AllClaimsUpdateChannel.Options) : ClaimsUpdateByMaxDateChannel(options) {
+    override val type get() = `835a`
     override fun Document.augment(): Document = apply { augment835() }
-    override val dateAfter: Date? = null
 }
 
-private class Claims837UpdateChannel(override val dateAfter: Date?) : ClaimsUpdateByMaxDateChannel() {
-    override val type: String = "837"
-    override fun openClaimsCollection(): DocumentCollection = ImportJob.ii.claims.current.openDb()["claims_$type"].indexed()
+private class Claims837UpdateChannel(options: AllClaimsUpdateChannel.Options) : ClaimsUpdateByMaxDateChannel(options) {
+    override val type get() = `837`
     override fun Document.augment(): Document = apply { augment837() }
 }
 
-private class AClaims837UpdateChannel : ClaimsUpdateByMaxDateChannel() {
-    override val type: String = "837"
-    override fun openClaimsCollection(): DocumentCollection = ImportJob.ii.claims.archive.openDb()["claims_${type}a"].indexed()
+private class AClaims837UpdateChannel(options: AllClaimsUpdateChannel.Options) : ClaimsUpdateByMaxDateChannel(options) {
+    override val type get() = `837a`
     override fun Document.augment(): Document = apply { augment837() }
-    override val dateAfter: Date? = null
 }
