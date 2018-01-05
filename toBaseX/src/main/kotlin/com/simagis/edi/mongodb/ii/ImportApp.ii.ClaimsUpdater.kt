@@ -58,7 +58,7 @@ internal class AllClaimsUpdateChannel(options: Options) : ClaimsUpdateChannel() 
 }
 
 private abstract class ClaimsUpdateByMaxDateChannel(val options: AllClaimsUpdateChannel.Options) : ClaimsUpdateChannel(), Runnable {
-    private val queue: BlockingQueue<IIClaim> = LinkedBlockingQueue(32)
+    private val queue: BlockingQueue<IIClaim> = LinkedBlockingQueue(1024)
     private val thread = Thread(this, "").apply { start() }
 
     private object ShutdownMarker : IIClaim
