@@ -100,9 +100,9 @@ private abstract class ClaimsUpdateByMaxDateChannel(val options: AllClaimsUpdate
     protected fun DocumentCollection.indexed(): DocumentCollection = apply {
         val indexes: List<IndexModel> = (Document.parse(CreateIndexesJson[type.name])["indexes"] as? List<*>)
                 ?.filterIsInstance<Document>()
-                ?.map { com.mongodb.client.model.IndexModel(it) }
-                ?: kotlin.collections.emptyList()
-        createIndexes(indexes)
+                ?.map { IndexModel(it) }
+                ?: emptyList()
+        createIndexes(indexes + IndexModel(Document("o.s", 1)))
     }
 
     private fun IIClaim.insert(claimsCollection: DocumentCollection) {
