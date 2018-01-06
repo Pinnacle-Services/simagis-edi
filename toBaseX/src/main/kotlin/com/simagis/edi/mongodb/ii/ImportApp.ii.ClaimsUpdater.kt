@@ -106,7 +106,7 @@ private abstract class ClaimsUpdateByMaxDateChannel(val options: AllClaimsUpdate
     }
 
     private fun IIClaim.insert(claimsCollection: DocumentCollection) {
-        val claim = claim.augment()
+        val claim = Document(claim).augment()
         claim["o"] = doc {
             `+`("s", options.sessionId)
             `+`("d", digest)
