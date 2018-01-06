@@ -109,26 +109,27 @@ internal object ImportJob : AbstractJob() {
 
     object ii {
         object sourceClaims {
-            private fun openDb(): MongoDatabase = dbs["sourceClaims"]
-            fun openSessions(): DocumentCollection = openDb()["sessions"].indexed("status")
-            fun openFiles(): DocumentCollection = openDb()["files"].indexed("session", "status", "size", "names")
-            fun openClaims(): DocumentCollection = openDb()["claims"].indexed(
-                    "session", "files", "type",
-                    "claim._id", "claim.procDate", "claim.sendDate")
+            fun openSessions(): DocumentCollection = dbs.open("sourceClaims", "sessions")
+                    .indexed("status")
+            fun openFiles(): DocumentCollection = dbs.open("sourceClaims", "files")
+                    .indexed("session", "status", "size", "names")
+            fun openClaims(): DocumentCollection = dbs.open("sourceClaims", "claims")
+                    .indexed("session", "files", "type",
+                            "claim._id", "claim.procDate", "claim.sendDate")
         }
 
         object claims {
-            fun openOptions(): DocumentCollection = dbs["claimsAPI"]["options"]
+            fun openOptions(): DocumentCollection = dbs.open("claimsAPI", "options")
 
-            enum class ClaimType {`835`, `837`, `835a`, `837a`, `835c`, `835ac`}
+            enum class ClaimType { `835`, `837`, `835a`, `837a`, `835c`, `835ac` }
 
-            fun openCollection(type: ClaimType): DocumentCollection = when(type) {
-                ClaimType.`835` -> dbs["claimsCurrent"]["claims_$type"]
-                ClaimType.`837` -> dbs["claimsCurrent"]["claims_$type"]
-                ClaimType.`835a` -> dbs["claimsArchive"]["claims_$type"]
-                ClaimType.`837a` -> dbs["claimsArchive"]["claims_$type"]
-                ClaimType.`835c` -> dbs["claimsCurrent"]["claims_$type"]
-                ClaimType.`835ac` -> dbs["claimsArchive"]["claims_$type"]
+            fun openCollection(type: ClaimType): DocumentCollection = when (type) {
+                ClaimType.`835` -> dbs.open("claimsCurrent", "claims_$type")
+                ClaimType.`837` -> dbs.open("claimsCurrent", "claims_$type")
+                ClaimType.`835a` -> dbs.open("claimsArchive", "claims_$type")
+                ClaimType.`837a` -> dbs.open("claimsArchive", "claims_$type")
+                ClaimType.`835c` -> dbs.open("claimsCurrent", "claims_$type")
+                ClaimType.`835ac` -> dbs.open("claimsArchive", "claims_$type")
             }
         }
     }

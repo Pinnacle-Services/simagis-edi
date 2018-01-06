@@ -165,9 +165,12 @@ internal class JobDBS(host: String) {
     private val mongoClient = MDBCredentials.mongoClient(host)
     private val cache = mutableMapOf<String, MongoDatabase>()
 
-    operator fun get(name: String): MongoDatabase = cache.getOrPut(name) {
-        mongoClient.getDatabase(name)
-    }
+    operator fun get(name: String): MongoDatabase = cache.getOrPut(name) { open(name) }
+
+    fun open(databaseName: String): MongoDatabase = mongoClient.getDatabase(databaseName)
+
+    fun open(databaseName: String, collectionName: String): DocumentCollection = open(databaseName)
+            .getCollection(collectionName)
 }
 
 val DocumentCollection.isExists: Boolean get() = namespace.let {
