@@ -96,6 +96,7 @@ private abstract class ClaimsUpdateByMaxDateChannel(val options: AllClaimsUpdate
 
     protected abstract val type: ImportJob.ii.claims.ClaimType
     protected abstract fun Document.augment(): Document
+    protected abstract fun isMatches(claim: IIClaim): Boolean
 
     protected fun DocumentCollection.indexed(): DocumentCollection = apply {
         val indexes: List<IndexModel> = (Document.parse(CreateIndexesJson[type.name])["indexes"] as? List<*>)
@@ -129,7 +130,7 @@ private abstract class ClaimsUpdateByMaxDateChannel(val options: AllClaimsUpdate
     }
 
     override fun put(claim: IIClaim) {
-        if (options.dateAfter == null || claim.date >= options.dateAfter) {
+        if (isMatches(claim)) {
             queue.put(claim)
         }
     }
@@ -145,20 +146,25 @@ private abstract class ClaimsUpdateByMaxDateChannel(val options: AllClaimsUpdate
 private class Claims835UpdateChannel(options: AllClaimsUpdateChannel.Options) : ClaimsUpdateByMaxDateChannel(options) {
     override val type get() = `835`
     override fun Document.augment(): Document = apply { augment835() }
-
+    override fun isMatches(claim: IIClaim): Boolean =
+            options.dateAfter == null || claim.date >= options.dateAfter
 }
 
 private class AClaims835UpdateChannel(options: AllClaimsUpdateChannel.Options) : ClaimsUpdateByMaxDateChannel(options) {
     override val type get() = `835a`
     override fun Document.augment(): Document = apply { augment835() }
+    override fun isMatches(claim: IIClaim): Boolean = true
 }
 
 private class Claims837UpdateChannel(options: AllClaimsUpdateChannel.Options) : ClaimsUpdateByMaxDateChannel(options) {
     override val type get() = `837`
     override fun Document.augment(): Document = apply { augment837() }
+    override fun isMatches(claim: IIClaim): Boolean =
+            options.dateAfter == null || claim.date >= options.dateAfter
 }
 
 private class AClaims837UpdateChannel(options: AllClaimsUpdateChannel.Options) : ClaimsUpdateByMaxDateChannel(options) {
     override val type get() = `837a`
     override fun Document.augment(): Document = apply { augment837() }
+    override fun isMatches(claim: IIClaim): Boolean = true
 }
