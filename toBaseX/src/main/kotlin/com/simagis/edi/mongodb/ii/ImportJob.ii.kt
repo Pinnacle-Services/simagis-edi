@@ -240,6 +240,7 @@ private class IIClaimsImpl : IIClaims {
                 .openClaims()
                 .find(doc { if (maxSessionId != null) `+$gt`("session", maxSessionId) })
                 .sort(doc { `+`("claim._id", 1) })
+                .noCursorTimeout(true)
                 .map { doc ->
                     (doc["session"] as? Long)?.let { session ->
                         newMaxSessionId.getAndUpdate { max(it, session) }
