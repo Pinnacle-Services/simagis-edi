@@ -12,6 +12,6 @@ import com.simagis.edi.mdb.grantRolesToUser
  */
 fun main(args: Array<String>) {
     val host = "mongodb.loc"
-    val mongo = MDBCredentials.mongoClient(host)
-    mongo.grantRolesToUser("admin", "readWriteAnyDatabase" to "admin")
+//    val mongo = MDBCredentials.mongoClient(host)
+//    mongo.grantRolesToUser("admin", "readWriteAnyDatabase" to "admin")
 }

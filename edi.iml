@@ -7,6 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/claim-db" />
       <excludeFolder url="file://$MODULE_DIR$/claims-web" />
       <excludeFolder url="file://$MODULE_DIR$/edireader" />
+      <excludeFolder url="file://$MODULE_DIR$/logs" />
       <excludeFolder url="file://$MODULE_DIR$/mdb" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/toBaseX" />

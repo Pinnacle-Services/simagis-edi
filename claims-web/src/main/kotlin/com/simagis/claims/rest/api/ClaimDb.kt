@@ -1,8 +1,9 @@
 package com.simagis.claims.rest.api
 
+import com.mongodb.MongoClient
+import com.mongodb.ServerAddress
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
-import com.mongodb.client.model.CreateCollectionOptions
 import com.simagis.edi.mdb.MDBCredentials
 import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
@@ -10,6 +11,7 @@ import org.bson.Document
 import org.bson.json.JsonMode
 import org.bson.json.JsonWriterSettings
 import java.io.File
+import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.concurrent.ExecutorService
@@ -24,17 +26,46 @@ import javax.json.stream.JsonGenerator
  * Created by alexei.vylegzhanin@gmail.com on 3/17/2017.
  */
 
-val claimDbRootDir: File = File("/claim-db").absoluteFile
-val claimDbTempDir: File by lazy { claimDbRootDir.resolve("temp").apply { mkdir() } }
+val clientName: String by lazy { System.getProperty("paypredict.client", "ROOT") }
+
+val clientsRootDir: File by lazy { File("/PayPredict/clients").absoluteFile.checkDir() }
+val clientDir: File by lazy { clientsRootDir.resolve(clientName).checkDir() }
+
+val claimDbRootDir: File by lazy { clientDir.resolve("claim-db").checkDir() }
+val claimDbTempDir: File by lazy { claimDbRootDir.resolve("temp").checkDir() }
+
+private fun File.checkDir(): File = apply {
+    if (!isDirectory) throw IOException("directory ${this} not found")
+}
 
 internal object ClaimDb {
-    val mongoHost: String = System.getProperty("claims.mongo.host", "127.0.0.1")
-    private val mongoDB = System.getProperty("claims.mongo.jobs.db", "claimsAPI")
-    private val mongoClient = MDBCredentials.mongoClient(mongoHost)
-    private val db: MongoDatabase = mongoClient.getDatabase(mongoDB)
+    private val conf: JsonObject by lazy {
+        clientDir
+            .resolve("conf").checkDir()
+            .resolve("claims-db.json")
+            .readText()
+            .toJsonObject()
+    }
+
+    private fun JsonObject.json(name: String): JsonObject =
+        this[name] as? JsonObject ?: "{}".toJsonObject()
+
+    private val mongoClient: MongoClient by lazy { MDBCredentials.mongoClient(server) }
+
+    private val db: MongoDatabase by lazy {
+        mongoClient.getDatabase(conf.json("api").getString("db", "claimsAPI"))
+    }
+
+    val server: ServerAddress by lazy {
+        conf.json("mongo").let {
+            ServerAddress(
+                it.getString("host", ServerAddress.defaultHost()),
+                it.getInt("port", ServerAddress.defaultPort())
+            )
+        }
+    }
 
     val apiJobs: MongoCollection<Document> by lazy { db.getCollection("apiJobs") }
-    val apiLog: MongoCollection<Document> by lazy { db.openCappedCollection("apiLog") }
     val cqb: MongoCollection<Document> by lazy { db.getCollection("cqb") }
     val cq: MongoCollection<Document> by lazy { db.getCollection("cq") }
 
@@ -45,8 +76,9 @@ internal object ClaimDb {
     }
 }
 
-internal val jsonPP: JsonWriterFactory = Json.createWriterFactory(mapOf(
-        JsonGenerator.PRETTY_PRINTING to true))
+internal val jsonPP: JsonWriterFactory = Json.createWriterFactory(
+    mapOf(JsonGenerator.PRETTY_PRINTING to true)
+)
 
 internal fun JsonObject?.toStringPP(): String = when {
     this == null -> "{}"
@@ -77,16 +109,4 @@ private val jsonWriterSettingsPPM by lazy { JsonWriterSettings(JsonMode.SHELL, t
 internal fun Document?.toStringPPM(): String = when {
     this == null -> "{}"
     else -> toJson(jsonWriterSettingsPPM)
-}
-
-private fun MongoDatabase.openCappedCollection(collectionName: String,
-                                               maxDocuments: Long = 10000,
-                                               sizeInBytes: Long = 1024 * 1024): MongoCollection<Document> {
-    if (listCollectionNames().contains(collectionName).not()) {
-        createCollection(collectionName, CreateCollectionOptions()
-                .capped(true)
-                .sizeInBytes(sizeInBytes)
-                .maxDocuments(maxDocuments))
-    }
-    return getCollection(collectionName)
 }

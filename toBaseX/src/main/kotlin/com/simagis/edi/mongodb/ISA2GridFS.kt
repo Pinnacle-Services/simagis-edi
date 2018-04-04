@@ -2,11 +2,11 @@ package com.simagis.edi.mongodb
 
 import com.mongodb.DB
 import com.mongodb.DBRef
+import com.mongodb.ServerAddress
 import com.mongodb.client.MongoCollection
 import com.mongodb.gridfs.GridFS
 import com.simagis.edi.basex.ISA
 import com.simagis.edi.basex.get
-import com.simagis.edi.mdb.MDBCredentials
 import com.simagis.edi.mdb.*
 import org.bson.Document
 import java.io.File
@@ -23,12 +23,16 @@ import java.util.*
  */
 fun main(args: Array<String>) {
     val commandLine = com.berryworks.edireader.util.CommandLine(args)
-    val _host = commandLine["host"] ?: "localhost"
     val _fs = commandLine["fs"] ?: "isa"
     val _mode = commandLine["mode"] ?: "R"
     val _path = File(commandLine[0])
 
-    val mongo = MDBCredentials.mongoClient(_host)
+    val mongo = MDBCredentials.mongoClient(
+        ServerAddress(
+            commandLine["host"] ?: ServerAddress.defaultHost(),
+            commandLine["port"]?.toInt() ?: ServerAddress.defaultPort()
+        )
+    )
     val db = DB(mongo, _fs)
 
     val fs = GridFS(db)
@@ -58,16 +62,16 @@ fun main(args: Array<String>) {
                             `+`("status", "NEW")
                         })
                         srcCollection.updateOne(
-                                doc(srcFileDoc._id),
-                                doc { `+$addToSet` { `+`("isas", isaDigest) } })
+                            doc(srcFileDoc._id),
+                            doc { `+$addToSet` { `+`("isas", isaDigest) } })
                     }
                 }
                 srcCollection.updateStatus(srcFileDoc, "NEW")
-            } catch(e: Throwable) {
+            } catch (e: Throwable) {
                 e.printStackTrace()
                 srcCollection.updateStatus(srcFileDoc, "ERROR", e)
             }
-        } catch(e: Throwable) {
+        } catch (e: Throwable) {
             e.printStackTrace()
         }
     }
@@ -75,23 +79,23 @@ fun main(args: Array<String>) {
 
 private fun MongoCollection<Document>.updateStatus(doc: Document, status: String, e: Throwable? = null) {
     updateOne(
-            doc(doc._id),
-            doc {
-                `+$set` {
-                    `+`("status", status)
-                    if (e != null) {
-                        `+`("error", doc {
-                            `+`("class", e.javaClass.name)
-                            `+`("message", e.message)
-                            `+`("stackTrace", StringWriter().let {
-                                PrintWriter(it).use { e.printStackTrace(it) }
-                                it.toString()
-                            })
-
+        doc(doc._id),
+        doc {
+            `+$set` {
+                `+`("status", status)
+                if (e != null) {
+                    `+`("error", doc {
+                        `+`("class", e.javaClass.name)
+                        `+`("message", e.message)
+                        `+`("stackTrace", StringWriter().let {
+                            PrintWriter(it).use { e.printStackTrace(it) }
+                            it.toString()
                         })
-                    }
+
+                    })
                 }
-            })
+            }
+        })
 }
 
 
@@ -113,8 +117,8 @@ private fun MongoCollection<Document>.openSrcFileDoc(file: File): Document {
         return newDoc
     } else {
         val updateResult = updateOne(
-                doc(srcDigest),
-                doc { `+$addToSet` { `+`("paths", path) } })
+            doc(srcDigest),
+            doc { `+$addToSet` { `+`("paths", path) } })
         if (updateResult.modifiedCount > 0) {
             return find(doc(srcDigest)).first()
         } else {

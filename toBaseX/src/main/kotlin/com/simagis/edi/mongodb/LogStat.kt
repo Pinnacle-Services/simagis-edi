@@ -1,5 +1,6 @@
 package com.simagis.edi.mongodb
 
+import com.mongodb.ServerAddress
 import com.simagis.edi.basex.get
 import com.simagis.edi.mdb.MDBCredentials
 import com.simagis.edi.mdb.`+$gt`
@@ -13,7 +14,10 @@ import java.sql.Date
 
 fun main(args: Array<String>) {
     val commandLine = com.berryworks.edireader.util.CommandLine(args)
-    val mongo = MDBCredentials.mongoClient(commandLine["host"] ?: "localhost")
+    val mongo = MDBCredentials.mongoClient(ServerAddress(
+        commandLine["host"] ?: ServerAddress.defaultHost(),
+        commandLine["port"]?.toInt() ?: ServerAddress.defaultPort()
+    ))
     val claimsAPI = mongo.getDatabase("claimsAPI")
     val apiJobsLog = claimsAPI.getCollection("apiJobsLog")
 

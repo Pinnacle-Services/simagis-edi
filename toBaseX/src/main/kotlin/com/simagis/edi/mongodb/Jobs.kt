@@ -1,5 +1,6 @@
 package com.simagis.edi.mongodb
 
+import com.mongodb.ServerAddress
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.simagis.edi.basex.exit
@@ -31,6 +32,7 @@ private var job: AbstractJob? = null
 internal abstract class AbstractJob {
     lateinit var commandLine: com.berryworks.edireader.util.CommandLine
     lateinit var host: String
+    lateinit var port: String
     lateinit var jobId: String
     lateinit var dbs: JobDBS
     lateinit var claimsAPI: MongoDatabase
@@ -48,9 +50,10 @@ internal abstract class AbstractJob {
 
     internal fun open(args: Array<String>) {
         commandLine = com.berryworks.edireader.util.CommandLine(args)
-        host = commandLine["host"] ?: "localhost"
+        host = commandLine["host"] ?: ServerAddress.defaultHost()
+        port = commandLine["port"] ?: ServerAddress.defaultPort().toString()
         jobId = commandLine["job"] ?: throw IllegalArgumentException("argument -job required")
-        dbs = JobDBS(host)
+        dbs = JobDBS(ServerAddress(host, port.toInt()))
         claimsAPI = dbs["claimsAPI"]
         claims = dbs[commandLine["db"] ?: "claims"]
         claimsA = dbs[commandLine["dbA"] ?: "claimsA"]
@@ -161,8 +164,8 @@ internal fun AbstractJob.updateProcessing(field: String, value: Any?) {
     apiJobs.updateOne(jobFilter, doc { `+$set` { `+`("processing.$field", value) } })
 }
 
-internal class JobDBS(host: String) {
-    private val mongoClient = MDBCredentials.mongoClient(host)
+internal class JobDBS(address: ServerAddress) {
+    private val mongoClient = MDBCredentials.mongoClient(address)
     private val cache = mutableMapOf<String, MongoDatabase>()
 
     operator fun get(name: String): MongoDatabase = cache.getOrPut(name) { open(name) }

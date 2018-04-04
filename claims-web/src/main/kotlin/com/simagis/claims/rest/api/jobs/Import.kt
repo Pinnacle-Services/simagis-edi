@@ -35,10 +35,11 @@ class Import private constructor(
 
         fun start(job: Import) {
             isAliveA.set(true)
-            future = RJobManager.submit(Callable<Unit> {
+            future = RJobManager.submit(Callable {
                 try {
                     fun loadCommand(app: String): JavaProcess.Command = JavaProcess.Command.load(app).apply {
-                        parameters += "-host" to ClaimDb.mongoHost
+                        parameters += "-host" to ClaimDb.server.host
+                        parameters += "-port" to ClaimDb.server.port.toString()
                         parameters += "-job" to id
                     }
                     while (true) {
@@ -89,8 +90,8 @@ class Import private constructor(
             ?: throw ClaimDbApiException("The job $id isn't running")
 
     companion object {
-        val TYPE: String = "Import"
-        val RESTART_CODE = 302
+        const val TYPE: String = "Import"
+        const val RESTART_CODE = 302
 
         private val running: MutableMap<String, Running> = mutableMapOf()
         private val lock = ReentrantLock()
@@ -112,7 +113,7 @@ class Import private constructor(
             runningNew.start(this)
         }
 
-        inline fun <reified T> Document.req(key: String): T
+        private inline fun <reified T> Document.req(key: String): T
                 = get(key) as? T ?: throw ClaimDbApiException("Invalid job format: $key is not ${T::class}")
 
         fun of(document: Document): Import = Import(

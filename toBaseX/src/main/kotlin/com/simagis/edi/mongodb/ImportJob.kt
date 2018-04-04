@@ -7,6 +7,7 @@ import com.simagis.edi.mdb.get
 import org.bson.Document
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.net.URI
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -27,8 +28,8 @@ internal object ImportJob : AbstractJob() {
 
     object options {
         private val options: Document by lazy { jobDoc?.get("options") as? Document ?: Document() }
-        val sourceDir: File by lazy { (options["sourceDir"] as? String)?.let(::File) ?: File("/DATA/source_files") }
-        val scanMode: String by lazy { (options["scanMode"] as? String) ?: "R" }
+        val sourceDir: File by lazy { clientDir.checkDir().resolve("sourceFiles").checkDir() }
+        val scanMode: String by lazy { "R" }
         val xqDir: File by lazy { (options["xqDir"] as? String)?.let(::File) ?: File("isa-claims-xq") }
         val parallel: Int by lazy { (options["parallel"] as? Int) ?: Runtime.getRuntime().availableProcessors() }
         val after: java.util.Date?  by lazy {
@@ -172,6 +173,14 @@ internal object ImportJob : AbstractJob() {
             else -> null
         }
     }
+}
+
+val clientName: String by lazy { System.getProperty("paypredict.client", "ROOT") }
+val clientsRootDir: File by lazy { File("/PayPredict/clients").absoluteFile.checkDir() }
+val clientDir: File by lazy { clientsRootDir.resolve(clientName).checkDir() }
+
+private fun File.checkDir(): File = apply {
+    if (!isDirectory) throw IOException("directory ${this} not found")
 }
 
 private fun DocumentCollection.indexed(vararg indexes: String): DocumentCollection = apply {

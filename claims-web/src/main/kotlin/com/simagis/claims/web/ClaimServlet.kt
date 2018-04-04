@@ -35,11 +35,10 @@ class ClaimServlet : HttpServlet() {
         response.status = HTTP_NOT_FOUND
     }
 
-    private val mongoHost = System.getProperty("claims.mongo.host", "127.0.0.1")
     private val claimsDbName = System.getProperty("claims.mongo.db", "claims")
     private val claimsADbName = System.getProperty("claims.mongo.adb", "claimsA")
     private val decoder: Base64.Decoder = Base64.getUrlDecoder()
-    private val mongoClient: MongoClient by lazy { MDBCredentials.mongoClient(mongoHost) }
+    private val mongoClient: MongoClient by lazy { MDBCredentials.mongoClient(ClaimDb.server) }
     private val claimsDb = mongoClient.getDatabase(claimsDbName)
     private val claimsADb = mongoClient.getDatabase(claimsADbName)
     private val claimsCollectionPrefix = System.getProperty("claims.mongo.db.claimsPrefix", "claims_")

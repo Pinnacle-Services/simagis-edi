@@ -1,7 +1,6 @@
 package com.simagis.edi.mdb
 
 import com.mongodb.MongoClient
-import com.mongodb.ServerAddress
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import org.bson.Document
@@ -10,8 +9,6 @@ import org.bson.Document
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/8/2017.
  */
-
-fun mongoClient(host: String): MongoClient = MongoClient(ServerAddress(host))
 
 fun MongoClient.grantRolesToUser(user: String, vararg roleToDBs: Pair<String, String>) {
     val database = getDatabase("admin")
