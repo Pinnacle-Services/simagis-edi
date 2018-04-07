@@ -1,0 +1,1 @@
+"C:\Program Files\MongoDB\Server\3.6\bin\mongod.exe" --config C:\PayPredict\clients\ROOT\mongo\mongod.cfg --install
