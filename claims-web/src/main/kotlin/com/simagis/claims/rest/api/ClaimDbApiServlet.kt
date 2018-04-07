@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/16/2017.
  */
-@WebServlet(name = "ClaimApiServlet", urlPatterns = arrayOf("/api/*"))
+@WebServlet(name = "ClaimApiServlet", urlPatterns = ["/api/*"])
 class ClaimDbApiServlet : HttpServlet() {
 
     override fun doPost(request: HttpServletRequest, response: HttpServletResponse) {

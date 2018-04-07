@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse
  *
  * Created by alexei.vylegzhanin@gmail.com on 3/10/2017.
  */
-@WebServlet(name = "ClaimServlet", urlPatterns = arrayOf("/claim/*", "/query/*"))
+@WebServlet(name = "ClaimServlet", urlPatterns = ["/claim/*", "/query/*"])
 class ClaimServlet : HttpServlet() {
     override fun doPost(request: HttpServletRequest, response: HttpServletResponse) {
         response.status = HTTP_NOT_FOUND
@@ -64,7 +64,7 @@ class ClaimServlet : HttpServlet() {
                 db = claimsDb,
                 cq = cq,
                 paging = paging,
-                root = servletPath + request.pathInfo,
+                root = request.contextPath + servletPath + request.pathInfo,
                 queryString = queryString)
                 .apply {
                     documents.forEach { document ->

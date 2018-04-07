@@ -1,5 +1,6 @@
 package com.simagis.claims.web.ui
 
+import com.simagis.claims.clientName
 import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.claims.rest.api.toJsonObject
 import com.simagis.claims.rest.api.toStringPP
@@ -244,7 +245,7 @@ class ClaimQueryBuilderUI : UI() {
                                 binder.readBean(this)
 
                                 link = Link().apply {
-                                    val href = "/claim/$type/=${encode()}?ps=$pageSize"
+                                    val href = "/$clientName/claim/$type/=${encode()}?ps=$pageSize"
                                     caption = href
                                     resource = ExternalResource(href)
                                     targetName = "_blank"
@@ -321,7 +322,7 @@ class ClaimQueryBuilderUI : UI() {
             date = getDate("date") ?: Date()
     )
 
-    @WebServlet(urlPatterns = arrayOf("/cqb/*"), name = "CQBServlet", asyncSupported = true)
+    @WebServlet(urlPatterns = ["/cqb/*"], name = "CQBServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = ClaimQueryBuilderUI::class, productionMode = false)
     class MyUIServlet : VaadinServlet()
 }

@@ -2,6 +2,7 @@ package com.simagis.claims.web.ui
 
 import com.mongodb.client.model.FindOneAndReplaceOptions
 import com.mongodb.client.model.ReturnDocument
+import com.simagis.claims.clientName
 import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.edi.mdb._id
 import com.simagis.edi.mdb.`+$set`
@@ -498,7 +499,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 path.isNotBlank() && value_id != null -> {
                     val parameters = toParameters()
                     fun toHRef() :String {
-                        return  "/query/$path?" + parameters.joinToString(separator = "&") {
+                        return  "/$clientName/query/$path?" + parameters.joinToString(separator = "&") {
                             "${it.name}=${it.default?.let { URLEncoder.encode(it, "UTF-8") } ?: ""}"
                         }
                     }
@@ -517,7 +518,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                     }
                     toHRef()
                 }
-                else -> "/claim/$type/=${encode()}?ps=$pageSize"
+                else -> "/$clientName/claim/$type/=${encode()}?ps=$pageSize"
             }
             updateLink(href)
 

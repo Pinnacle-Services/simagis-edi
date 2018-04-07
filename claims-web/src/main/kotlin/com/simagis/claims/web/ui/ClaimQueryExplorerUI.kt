@@ -78,7 +78,7 @@ class ClaimQueryExplorerUI : UI() {
         cqGrid.refresh()
     }
 
-    @WebServlet(urlPatterns = arrayOf("/cq/*", "/VAADIN/*"), name = "CQEServlet", asyncSupported = true)
+    @WebServlet(urlPatterns = ["/cq/*", "/VAADIN/*"], name = "CQEServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = ClaimQueryExplorerUI::class, productionMode = false)
     class MyUIServlet : VaadinServlet()
 }
