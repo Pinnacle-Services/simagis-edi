@@ -19,6 +19,8 @@
             }
         }
         function POST(url, json) {
+            var index = location.href.lastIndexOf("/");
+            url = location.href.substring(0, index) + url;
             e("request").innerText = "POST " + url + "\n" + JSON.stringify(json, undefined, 4);
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);

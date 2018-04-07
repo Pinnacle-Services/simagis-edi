@@ -1,18 +1,28 @@
 package com.simagis.claims
 
-import javax.servlet.annotation.WebServlet
-import javax.servlet.http.HttpServlet
+import javax.servlet.ServletContextEvent
+import javax.servlet.ServletContextListener
+import javax.servlet.annotation.WebListener
 
 /**
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/31/2018.
  */
-@WebServlet(name = "ClaimDb Startup Servlet", loadOnStartup = 0)
-class ClaimDbStartup : HttpServlet() {
-    override fun init() {
-        val contextPath = servletContext.contextPath
-        if (contextPath.isNotEmpty()) {
-            System.setProperty("paypredict.client", contextPath.removePrefix("/"))
-        }
+@WebListener
+class ClaimDbStartup : ServletContextListener {
+    override fun contextInitialized(sce: ServletContextEvent) {
+        clientName = sce.servletContext.contextPath.let {
+            when (it) {
+                "" -> "ROOT"
+                else -> it.removePrefix("/")
+            }
+        }.also { sce.servletContext.log("clientName initialized as $it") }
     }
+
+    override fun contextDestroyed(sce: ServletContextEvent) = Unit
 }
+
+var clientName: String = "ROOT"
+    private set(value) {
+        field = value
+    }

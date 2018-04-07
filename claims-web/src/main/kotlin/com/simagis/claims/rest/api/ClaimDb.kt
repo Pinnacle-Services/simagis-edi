@@ -4,6 +4,7 @@ import com.mongodb.MongoClient
 import com.mongodb.ServerAddress
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
+import com.simagis.claims.clientName
 import com.simagis.edi.mdb.MDBCredentials
 import com.simagis.edi.mdb.`+`
 import com.simagis.edi.mdb.doc
@@ -25,8 +26,6 @@ import javax.json.stream.JsonGenerator
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/17/2017.
  */
-
-val clientName: String by lazy { System.getProperty("paypredict.client", "ROOT") }
 
 val clientsRootDir: File by lazy { File("/PayPredict/clients").absoluteFile.checkDir() }
 val clientDir: File by lazy { clientsRootDir.resolve(clientName).checkDir() }

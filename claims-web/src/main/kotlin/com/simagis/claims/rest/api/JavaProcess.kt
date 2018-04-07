@@ -1,5 +1,6 @@
 package com.simagis.claims.rest.api
 
+import com.simagis.claims.clientName
 import java.io.*
 import java.util.concurrent.TimeUnit
 import javax.json.Json
@@ -28,7 +29,11 @@ internal class JavaProcess private constructor(val command: Command) : Closeable
         }
     }
 
-    class Options : Args()
+    class Options : Args() {
+        init {
+            this += "-Dpaypredict.client=$clientName"
+        }
+    }
 
     class Parameters : Args()
 

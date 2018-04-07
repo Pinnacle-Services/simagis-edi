@@ -175,7 +175,7 @@ internal object ImportJob : AbstractJob() {
     }
 }
 
-val clientName: String by lazy { System.getProperty("paypredict.client", "ROOT") }
+val clientName: String by lazy { System.getProperty("paypredict.client") }
 val clientsRootDir: File by lazy { File("/PayPredict/clients").absoluteFile.checkDir() }
 val clientDir: File by lazy { clientsRootDir.resolve(clientName).checkDir() }
 
