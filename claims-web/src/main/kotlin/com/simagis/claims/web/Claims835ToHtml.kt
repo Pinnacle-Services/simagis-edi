@@ -169,21 +169,16 @@ class Claims835ToHtml(val db: MongoDatabase,
             """
             <div style="padding: 5pt; background-color: #d4d4d4">
                 <a name="${claim._id}"></a>
-                <strong>
-                    ${claim._id} | ${claim["prn"].esc}
-                    (${claim.amountHtml("clmAsk")}
-                    | ${claim.amountHtml("clmPayTotal")}
-                    | ${claim.amountHtml("clmPay")}
-                    | ${claim.amountHtml("pr")})
-                </strong>
+                <strong>${claim._id} | ${claim["prn"].esc}</strong>
+                    (${claim.strongAmount("clmAsk")}
+                    | ${claim.strongAmount("clmPayTotal")}
+                    | ${claim.strongAmount("clmPay")}
+                    | ${claim.strongAmount("pr")})
+
             </div>
             """
         )
     }
-
-    @Language("HTML")
-    private fun Document.amountHtml(key: String) =
-        """<span title="${formatKey(key).esc}">${'$'}${this[key].esc}</span>"""
 
     private fun addClaimBody(claim: Document) {
         addDoc(claim)
@@ -203,14 +198,45 @@ class Claims835ToHtml(val db: MongoDatabase,
 
     private fun addArray(key: String, value: List<*>, contex: ParentContext = ParentContext.DOC) {
         if (value.isNotEmpty()) {
-            addArrayHeader(key, value.size)
-            addArrayBody(key, value)
-            addArrayFooter(key, value.size)
+            when (key) {
+                "adj" -> addCptAdjustments(key, value, contex)
+                else -> {
+                    addArrayHeader(key, value.size)
+                    addArrayBody(key, value)
+                    addArrayFooter(key, value.size)
+                }
+            }
         }
     }
 
+    private fun addCptAdjustments(key: String, value: List<*>, contex: ParentContext) {
+        addIndented(keyToHTML(formatKey(key, value.size)) + ":")
+        indent++
+        //language=HTML
+        addIndented(
+            """
+            <ul style="margin: 0">${value
+                .mapNotNull {
+                    when (it) {
+                        is Document -> """
+                            <li>
+                                ${it.strongValue("adjGrp")} |
+                                ${it.strongValue("adjReason", caption = "Reason: ".graySpan())} |
+                                ${it.strongAmount("adjAmt", caption = "Amount: ".graySpan())}
+                            </li>
+                            """
+                        else -> null
+                    }
+                }
+                .joinToString(separator = "")}
+            </ul>
+            """
+        )
+        indent--
+    }
+
     private fun addArrayHeader(key: String, size: Int) {
-        addIndentedText(keyToHTML(formatKey(key, size)) + ":")
+        addIndented(keyToHTML(formatKey(key, size)) + ":")
     }
 
     private fun addArrayBody(key: String, value: List<*>) {
@@ -251,7 +277,7 @@ class Claims835ToHtml(val db: MongoDatabase,
 
     private fun addArrayBody837eob(key: String, value: List<*>) {
         if (value.all { it is Document }) {
-            addIndentedText(StringBuilder().apply {
+            addIndented(StringBuilder().apply {
                 append("<table>")
                 value.forEach {
                     val doc = it as Document
@@ -283,7 +309,7 @@ class Claims835ToHtml(val db: MongoDatabase,
             }
             else -> value.toString().esc
         }
-        addIndentedText(str)
+        addIndented(str)
     }
 
     private fun addArrayFooter(key: String, size: Int) {
@@ -292,7 +318,7 @@ class Claims835ToHtml(val db: MongoDatabase,
     private fun addDocHeader(key: String, value: Document, context: ParentContext = ParentContext.DOC) {
         if (key.isBlank()) {
         } else {
-            addIndentedText(keyToHTML(formatKey(key, 0)) + ":")
+            addIndented(keyToHTML(formatKey(key, 0)) + ":")
         }
     }
 
@@ -306,17 +332,17 @@ class Claims835ToHtml(val db: MongoDatabase,
 
     private fun addDocFooter(key: String, value: Document, context: ParentContext = ParentContext.DOC) {
         if (context.isArrayItem && !context.isLastArrayItem)
-            addIndentedText("<hr>")
+            addIndented("<hr>")
     }
 
     private fun addProperty(maxKeyLength: Int, key: String, value: Any?) {
         val formattedKey = formatKey(key, value)
         val separator = "&nbsp;".repeat(maxKeyLength - formattedKey.length)
-        addIndentedText(keyToHTML(formattedKey) + ": " + separator + formatValue(key, value))
+        addIndented(keyToHTML(formattedKey) + ": " + separator + formatValue(key, value))
     }
 
     private fun addClaimFooter(claim: Document) {
-        addIndentedText("<br>")
+        addIndented("<br>")
     }
 
     private fun addPageHeader() {
@@ -351,9 +377,9 @@ class Claims835ToHtml(val db: MongoDatabase,
         } else {
             if (count != 1 && cq != null) {
                 if (count == maxCount) {
-                    addIndentedText("found $count claims (or more)")
+                    addIndented("found $count claims (or more)")
                 } else {
-                    addIndentedText("found $count claims")
+                    addIndented("found $count claims")
                 }
             }
         }
@@ -362,8 +388,9 @@ class Claims835ToHtml(val db: MongoDatabase,
 
     private fun keyToHTML(key: String) = "<span style='color:gray'>${key.esc}</span>"
 
-    private fun addIndentedText(html: String) {
-        this.html.append("<div style='text-indent: ${indent}em;'>$html</div>\n")
+    private fun addIndented(html: String) {
+        //language=HTML
+        this.html.append("<div style='padding-left: ${indent}em;'>$html</div>\n")
     }
 
     private fun addLink(href: String = "", html: String, separator: String = "\n", fragment: String = "") {
@@ -377,6 +404,21 @@ class Claims835ToHtml(val db: MongoDatabase,
         else -> toString().esc
     }
     private val Any?.asHTML: String get() = this?.toString() ?: ""
+
+    @Language("HTML")
+    private fun String.graySpan(): String =
+        """<span style="color:gray">$esc</span>"""
+
+    @Language("HTML")
+    private fun Document.strongAmount(key: String, caption: String = "") =
+        """$caption<strong title="${formatKey(key).esc}">${'$'}${this[key].esc}</strong>"""
+
+
+    @Language("HTML")
+    private fun Document.strongValue(key: String, caption: String = "", default: String = "___"): String {
+        val html = this[key]?.let { formatValue(key, it) } ?: default
+        return """$caption<strong title="${formatKey(key).esc}">$html</strong>"""
+    }
 
     private fun StringBuilder.claimFrame(inner: () -> Unit) {
         //language=HTML
