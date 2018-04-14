@@ -16,12 +16,14 @@ import javax.json.JsonString
  * <p>
  * Created by alexei.vylegzhanin@gmail.com on 3/14/2017.
  */
-class Claims835ToHtml(val db: MongoDatabase,
-                      val cq: ClaimQuery?,
-                      val maxCount: Int = 100,
-                      val paging: Paging = Paging(0, 0),
-                      val root: String,
-                      val queryString: String) {
+class Claims835ToHtml(
+    val db: MongoDatabase,
+    val cq: ClaimQuery?,
+    val maxCount: Int = 100,
+    val paging: Paging = Paging(0, 0),
+    val root: String,
+    val queryString: String
+) {
     private var count = 0
     private var indent = 0
     private val html = StringBuilder()
@@ -103,13 +105,15 @@ class Claims835ToHtml(val db: MongoDatabase,
             })
         }
 
-        private fun loadAsMap(name: String, map: (JsonObject) -> Pair<String, String>?): Map<String, String> = mutableMapOf<String, String>().apply {
-            Claims835ToHtml::class.java.getResourceAsStream(name).use { Json.createReader(it).readArray() }.forEach {
-                if (it is JsonObject) {
-                    map(it)?.let { this += it }
-                }
+        private fun loadAsMap(name: String, map: (JsonObject) -> Pair<String, String>?): Map<String, String> =
+            mutableMapOf<String, String>().apply {
+                Claims835ToHtml::class.java.getResourceAsStream(name).use { Json.createReader(it).readArray() }
+                    .forEach {
+                        if (it is JsonObject) {
+                            map(it)?.let { this += it }
+                        }
+                    }
             }
-        }
 
         private fun Map<String, String>.optString(key: String, def: String = ""): String {
             return this[key] ?: def
@@ -131,21 +135,21 @@ class Claims835ToHtml(val db: MongoDatabase,
                 val c835procDate = doc["procDate"] as? Date
                 if (c835procDate != null) {
                     val c837 = db["claims_837"]
-                            .find(doc {
-                                `+`("acn", doc["acn"])
-                                `+$lt`("sendDate", c835procDate)
-                            })
-                            .projection(doc {
-                                `+`("dx", 1)
-                                `+`("npi", 1)
-                                `+`("drFirsN", 1)
-                                `+`("drLastN", 1)
-                                `+`("sendDate", 1)
-                            })
-                            .sort(doc {
-                                `+`("sendDate", -1)
-                            })
-                            .first()
+                        .find(doc {
+                            `+`("acn", doc["acn"])
+                            `+$lt`("sendDate", c835procDate)
+                        })
+                        .projection(doc {
+                            `+`("dx", 1)
+                            `+`("npi", 1)
+                            `+`("drFirsN", 1)
+                            `+`("drLastN", 1)
+                            `+`("sendDate", 1)
+                        })
+                        .sort(doc {
+                            `+`("sendDate", -1)
+                        })
+                        .first()
                     if (c837 != null) {
                         claim835["c837"] = Document(c837)
                     }
@@ -169,12 +173,12 @@ class Claims835ToHtml(val db: MongoDatabase,
             """
             <div style="padding: 5pt; background-color: #d4d4d4">
                 <a name="${claim._id}"></a>
-                <strong>${claim._id} | ${claim["prn"].esc}</strong>
-                    (${claim.strongAmount("clmAsk")}
-                    | ${claim.strongAmount("clmPayTotal")}
-                    | ${claim.strongAmount("clmPay")}
-                    | ${claim.strongAmount("pr")})
-
+                <strong>${claim._id} | ${claim["prn"].esc}
+                    (${claim.amountSpan("clmAsk")}
+                    | ${claim.amountSpan("clmPayTotal")}
+                    | ${claim.amountSpan("clmPay")}
+                    | ${claim.amountSpan("pr")})
+                </strong>
             </div>
             """
         )
@@ -189,8 +193,8 @@ class Claims835ToHtml(val db: MongoDatabase,
         for (key in keys.orderedKeys(doc)) {
             val value = doc[key]
             when (value) {
-                is Document -> addDocBody(key, value)
-                is List<*> -> addArray(key, value)
+                is Document -> addDocBody(key, value, context)
+                is List<*> -> addArray(key, value, context)
                 else -> addProperty(maxKeyLength, key, value)
             }
         }
@@ -220,9 +224,9 @@ class Claims835ToHtml(val db: MongoDatabase,
                     when (it) {
                         is Document -> """
                             <li>
-                                ${it.strongValue("adjGrp")} |
-                                ${it.strongValue("adjReason", caption = "Reason: ".graySpan())} |
-                                ${it.strongAmount("adjAmt", caption = "Amount: ".graySpan())}
+                                ${it.valueSpan("adjGrp")} |
+                                ${it.valueSpan("adjReason", caption = "Reason: ".graySpan())} |
+                                ${it.amountSpan("adjAmt", caption = "Amount: ".graySpan())}
                             </li>
                             """
                         else -> null
@@ -244,6 +248,7 @@ class Claims835ToHtml(val db: MongoDatabase,
         html.arrayFrame {
             when (key) {
                 "eob" -> addArrayBody837eob(key, value)
+                "svc" -> addArrayBodySvc(key, value)
                 else -> addArrayBodyAny(key, value)
             }
         }
@@ -298,6 +303,46 @@ class Claims835ToHtml(val db: MongoDatabase,
         }
     }
 
+    private fun addArrayBodySvc(key: String, value: List<*>) {
+        fun addSvcBody(key: String, value: Document, context: ParentContext) {
+            addDocBody("", value, context) { doc, ctx ->
+                val amountKeys = listOf("cptAsk", "cptAll", "cptPay", "cptPr")
+                fun String.toProp(): String? = doc[this]?.let { value ->
+                    val caption = formatKey(this, value).esc.graySpan()
+                    val text = formatValue(this, value)
+                    if (text.isBlank()) null else when (this) {
+                        in amountKeys -> "$caption: \$$text"
+                        else -> "$caption: $text"
+                    }
+                }
+
+                val adjKey = "adj"
+                val mainKeys = listOf( "cpt", "cptMod1", "qty" ) + amountKeys
+                addIndented(mainKeys
+                    .mapNotNull { it.toProp() }
+                    .joinToString(separator = " | ")
+                )
+                addCptAdjustments(adjKey, doc[adjKey] as? List<*> ?: emptyList<Any>(), ctx)
+                addIndented((doc.keys - mainKeys - adjKey)
+                    .mapNotNull { it.toProp() }
+                    .joinToString(separator = " | "))
+            }
+        }
+
+        value.forEachIndexed { index, item ->
+            val context = ParentContext(
+                true,
+                index == 0,
+                value.size == index + 1
+            )
+            when (item) {
+                is Document -> addSvcBody(key, item, context)
+                is List<*> -> addArray(key, item, context)
+                else -> addArrayScalar(key, item, context)
+            }
+        }
+    }
+
     private fun addArrayDocBody(key: String, value: Document, context: ParentContext) {
         addDocBody("", value, context)
     }
@@ -322,10 +367,15 @@ class Claims835ToHtml(val db: MongoDatabase,
         }
     }
 
-    private fun addDocBody(key: String, value: Document, context: ParentContext = ParentContext.DOC) {
+    private fun addDocBody(
+        key: String,
+        value: Document,
+        context: ParentContext = ParentContext.DOC,
+        addDocAction: (Document, ParentContext) -> Unit = { doc, ctx -> addDoc(doc, ctx) }
+    ) {
         addDocHeader(key, value, context)
         indent++
-        addDoc(value, context)
+        addDocAction(value, context)
         indent--
         addDocFooter(key, value, context)
     }
@@ -346,11 +396,13 @@ class Claims835ToHtml(val db: MongoDatabase,
     }
 
     private fun addPageHeader() {
-        html.append("""<body style='font-family:monospace'>
+        html.append(
+            """<body style='font-family:monospace'>
             <br>
             <br>
             <div style="position: fixed; overflow: auto; top: 0; left: 0; right: 0; background-color: #fff; padding: 5px">
-        """)
+        """
+        )
         addPageNavigator()
         html.append("<hr></div>\n")
     }
@@ -363,16 +415,21 @@ class Claims835ToHtml(val db: MongoDatabase,
     private fun addPageNavigator() {
         fun href(ps: Long, pn: Long): String {
             val query = queryString
-                    .split("&")
-                    .filter { !(it.startsWith("pn=") || it.startsWith("ps=")) }
-                    .joinToString(separator = "&")
+                .split("&")
+                .filter { !(it.startsWith("pn=") || it.startsWith("ps=")) }
+                .joinToString(separator = "&")
             val paging = "ps=$ps&pn=$pn"
             val separator = if (query.isEmpty()) "" else "&"
             return "$root?$query$separator$paging"
         }
         if (paging.isPageable) {
             if (paging.pn > 0) addLink(href(paging.ps, paging.pn - 1), "<- Previous ${paging.ps}".esc)
-            html.append(" Records ${paging.pn * paging.ps + 1}-${min(paging.found, (paging.pn + 1) * paging.ps)} of ${paging.found} ")
+            html.append(
+                " Records ${paging.pn * paging.ps + 1}-${min(
+                    paging.found,
+                    (paging.pn + 1) * paging.ps
+                )} of ${paging.found} "
+            )
             if (paging.pn + 1 < paging.pageCount) addLink(href(paging.ps, paging.pn + 1), "Next ${paging.ps} ->".esc)
         } else {
             if (count != 1 && cq != null) {
@@ -386,7 +443,7 @@ class Claims835ToHtml(val db: MongoDatabase,
     }
 
 
-    private fun keyToHTML(key: String) = "<span style='color:gray'>${key.esc}</span>"
+    private fun keyToHTML(key: String) = key.esc.graySpan()
 
     private fun addIndented(html: String) {
         //language=HTML
@@ -398,11 +455,12 @@ class Claims835ToHtml(val db: MongoDatabase,
     }
 
     private val String.esc get() = this.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    private val Any?.esc get() = when(this) {
-        is String -> esc
-        null -> ""
-        else -> toString().esc
-    }
+    private val Any?.esc
+        get() = when (this) {
+            is String -> esc
+            null -> ""
+            else -> toString().esc
+        }
     private val Any?.asHTML: String get() = this?.toString() ?: ""
 
     @Language("HTML")
@@ -410,30 +468,37 @@ class Claims835ToHtml(val db: MongoDatabase,
         """<span style="color:gray">$esc</span>"""
 
     @Language("HTML")
-    private fun Document.strongAmount(key: String, caption: String = "") =
-        """$caption<strong title="${formatKey(key).esc}">${'$'}${this[key].esc}</strong>"""
+    private fun Document.amountSpan(key: String, caption: String = ""): String =
+        "${'$'}${this[key].esc}".span(caption, formatKey(key).esc)
 
+
+    private fun Document.valueSpan(key: String, caption: String = "", default: String = "___"): String {
+        val html = this[key]?.let { formatValue(key, it) }
+        val title = formatKey(key).esc
+        return html.span(caption, title, default)
+    }
 
     @Language("HTML")
-    private fun Document.strongValue(key: String, caption: String = "", default: String = "___"): String {
-        val html = this[key]?.let { formatValue(key, it) } ?: default
-        return """$caption<strong title="${formatKey(key).esc}">$html</strong>"""
-    }
+    private fun String?.span(
+        caption: String = "",
+        title: String = "",
+        default: String = "___"
+    ) = """$caption<span title="$title">${this ?: default}</span>"""
 
     private fun StringBuilder.claimFrame(inner: () -> Unit) {
         //language=HTML
         append("""<div style="padding-left: 32pt">""")
         inner()
         //language=HTML
-        append( """</div>""" )
+        append("""</div>""")
     }
 
     private fun StringBuilder.arrayFrame(inner: () -> Unit) {
         //language=HTML
-        append("""<div style="border: solid darkgrey 1pt; padding: 8pt">""")
+        append("""<div style="border: solid darkgrey 1pt; padding-top: 8pt; padding-bottom: 8pt; margin-bottom: 8pt">""")
         inner()
         //language=HTML
-        append( """</div>""" )
+        append("""</div>""")
     }
 }
 
