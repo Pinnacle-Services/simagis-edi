@@ -19,17 +19,18 @@ import javax.json.JsonArray
  * Created by alexei.vylegzhanin@gmail.com on 3/24/2017.
  */
 data class ClaimQuery(
-        var _id: Any? = null,
-        var name: String = "New Claim Query",
-        var path: String = UUID.randomUUID().toString(),
-        var description: String = "",
-        var type: String = "835",
-        var find: String = "{}",
-        var projection: String = "{}",
-        var sort: String = "{}",
-        var pageSize: Int = 20,
-        var created: Date = Date(),
-        var modified: Date = Date()
+    var _id: Any? = null,
+    var name: String = "New Claim Query",
+    var path: String = UUID.randomUUID().toString(),
+    var description: String = "",
+    var type: String = "835",
+    var find: String = "{}",
+    var projection: String = "{}",
+    var viewer: String = "{}",
+    var sort: String = "{}",
+    var pageSize: Int = 20,
+    var created: Date = Date(),
+    var modified: Date = Date()
 ) {
     companion object {
         private val encoder: Base64.Encoder = Base64.getUrlEncoder()
@@ -51,6 +52,7 @@ data class ClaimQuery(
         append("type", type)
         append("find", find)
         append("projection", projection)
+        append("viewer", viewer)
         append("sort", sort)
         append("pageSize", pageSize)
         append("created", created)
@@ -63,17 +65,18 @@ data class ClaimQuery(
 }
 
 fun Document.toClaimQuery(): ClaimQuery = ClaimQuery(
-        _id = get("_id"),
-        name = getString("name") ?: "",
-        path = getString("path") ?: "",
-        description = getString("description") ?: "",
-        type = getString("type") ?: "Invalid",
-        find = getString("find") ?: "{}",
-        projection = getString("projection") ?: "{}",
-        sort = getString("sort") ?: "{}",
-        pageSize = getInteger("pageSize") ?: 20,
-        created = getDate("created") ?: Date(),
-        modified = getDate("modified") ?: Date()
+    _id = get("_id"),
+    name = getString("name") ?: "",
+    path = getString("path") ?: "",
+    description = getString("description") ?: "",
+    type = getString("type") ?: "Invalid",
+    find = getString("find") ?: "{}",
+    projection = getString("projection") ?: "{}",
+    viewer = getString("viewer") ?: "{}",
+    sort = getString("sort") ?: "{}",
+    pageSize = getInteger("pageSize") ?: 20,
+    created = getDate("created") ?: Date(),
+    modified = getDate("modified") ?: Date()
 )
 
 private val jsonWriterSettings = JsonWriterSettings(JsonMode.STRICT, true)
@@ -83,35 +86,35 @@ fun String.toJsonFormatted(): String {
 }
 
 fun Grid<ClaimQuery>.refresh() = setDataProvider(
-        { _: List<QuerySortOrder>, offset, limit ->
-            val sort = doc {
-                fun SortDirection.toInt(): Int = when (this) {
-                    SortDirection.DESCENDING -> 1
-                    SortDirection.ASCENDING -> -1
-                }
-                if (sortOrder.isEmpty()) `+`("name", 1)
-                sortOrder.forEach {
-                    when (it.sorted.caption) {
-                        "Name" -> `+`("name", it.direction.toInt())
-                        "Path" -> `+`("path", it.direction.toInt())
-                        "Type" -> `+`("type", it.direction.toInt())
-                        "Created" -> `+`("created", it.direction.toInt())
-                        "Modified" -> `+`("modified", it.direction.toInt())
-                        "page size" -> `+`("pageSize", it.direction.toInt())
-                    }
+    { _: List<QuerySortOrder>, offset, limit ->
+        val sort = doc {
+            fun SortDirection.toInt(): Int = when (this) {
+                SortDirection.DESCENDING -> 1
+                SortDirection.ASCENDING -> -1
+            }
+            if (sortOrder.isEmpty()) `+`("name", 1)
+            sortOrder.forEach {
+                when (it.sorted.caption) {
+                    "Name" -> `+`("name", it.direction.toInt())
+                    "Path" -> `+`("path", it.direction.toInt())
+                    "Type" -> `+`("type", it.direction.toInt())
+                    "Created" -> `+`("created", it.direction.toInt())
+                    "Modified" -> `+`("modified", it.direction.toInt())
+                    "page size" -> `+`("pageSize", it.direction.toInt())
                 }
             }
-            ClaimDb.cq.find()
-                    .sort(sort)
-                    .skip(offset)
-                    .limit(limit)
-                    .toList()
-                    .map { it.toClaimQuery() }
-                    .stream()
-        },
-        {
-            ClaimDb.cq.find().count()
-        })
+        }
+        ClaimDb.cq.find()
+            .sort(sort)
+            .skip(offset)
+            .limit(limit)
+            .toList()
+            .map { it.toClaimQuery() }
+            .stream()
+    },
+    {
+        ClaimDb.cq.find().count()
+    })
 
 
 private val DATE4 by lazy { SimpleDateFormat("yyyy") }
@@ -144,33 +147,30 @@ private fun String.toParameter(): ClaimQuery.Parameter? {
     return ClaimQuery.Parameter(name, operator, default)
 }
 
-private fun Document.toParameters(): Set<ClaimQuery.Parameter>
-        = mutableMapOf<String, ClaimQuery.Parameter>()
-        .apply map@ {
-            fun Document.searchParameters() {
-                values.forEach {
-                    when (it) {
-                        is String -> it.toParameter()?.let {
-                            this@map[it.name] = it
-                        }
-                        is Document -> it.searchParameters()
-                        is List<*> -> it.forEach {
-                            if (it is Document) it.searchParameters()
-                        }
+private fun Document.toParameters(): Set<ClaimQuery.Parameter> = mutableMapOf<String, ClaimQuery.Parameter>()
+    .apply map@{
+        fun Document.searchParameters() {
+            values.forEach {
+                when (it) {
+                    is String -> it.toParameter()?.let {
+                        this@map[it.name] = it
                     }
+                    is Document -> it.searchParameters()
+                    is List<*> -> it.forEach { (it as? Document)?.searchParameters() }
                 }
             }
-            this@toParameters.searchParameters()
         }
-        .toSortedMap().values.toSet()
+        this@toParameters.searchParameters()
+    }
+    .toSortedMap().values.toSet()
 
 internal fun Document.applyParameters(request: (String) -> String?): Document = apply {
     Document(this).forEach { key, value ->
         when (value) {
-            is String -> value.toParameter()?.let { (name, operator, default) ->
+            is String -> value.toParameter()?.let { (name, operator) ->
 
                 fun apply(map: (String?) -> Any?) {
-                    val mapped = map(request(name) ?: default)
+                    val mapped = map(request(name))
                     if (mapped != null)
                         this[key] = mapped else
                         this.remove(key)
@@ -181,7 +181,7 @@ internal fun Document.applyParameters(request: (String) -> String?): Document = 
                     `+$options`(options)
                 }
 
-                fun String.toDate(): Date? = when(length) {
+                fun String.toDate(): Date? = when (length) {
                     10 -> DATE10.parse(this)
                     7 -> DATE7.parse(this)
                     4 -> DATE4.parse(this)
@@ -207,9 +207,7 @@ internal fun Document.applyParameters(request: (String) -> String?): Document = 
                 }
             }
             is Document -> value.applyParameters(request)
-            is List<*> -> value.forEach {
-                if (it is Document) it.applyParameters(request)
-            }
+            is List<*> -> value.forEach { (it as? Document)?.applyParameters(request) }
         }
     }
 }

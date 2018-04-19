@@ -8,9 +8,6 @@ import org.intellij.lang.annotations.Language
 import java.lang.Long.min
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.json.Json
-import javax.json.JsonObject
-import javax.json.JsonString
 
 /**
  * <p>
@@ -43,77 +40,8 @@ class Claims835ToHtml(
         else -> value.asHTML.esc
     }
 
-    private class Keys(private val order: List<String>, val map: Map<String, String>) {
-
-        fun orderedKeys(claim: Document): List<String> = mutableListOf<String>().apply {
-            val inst = claim.keys.sorted()
-            this += order.filter { inst.contains(it) }
-            this += inst.filter { !order.contains(it) }
-        }
-
-    }
-
     companion object {
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-
-        private val keys: Keys by lazy {
-            val order = mutableListOf<String>()
-            val map = loadAsMap("claim835.keyNames.json", {
-                val key = it.getString("key")
-                order += key
-                key to it.getString("name")
-            })
-            Keys(order, map)
-        }
-
-        private val cptCodes: Map<String, String> by lazy {
-            loadAsMap("claim835-cpt-codes.json", {
-                it.getString("cpt_code") to it.getString("short_description")
-            })
-        }
-        private val statusCodes: Map<String, String> by lazy {
-            loadAsMap("claim835-status-codes.json", {
-                it.getString("id") to it.getString("caption")
-            })
-        }
-        private val adjGrpCodes: Map<String, String> by lazy {
-            loadAsMap("claim835-adjGrp-codes.json", {
-                it.getString("id") to it.getString("caption")
-            })
-        }
-        private val adjReasonCodes: Map<String, String> by lazy {
-            loadAsMap("claim835-adjReason-codes.json", { json ->
-                val reason = json.getString("Reason")
-                val description = json["Description"]
-                if (reason is String && description is JsonString)
-                    reason to description.string else null
-            })
-        }
-        private val remCodes: Map<String, String> by lazy {
-            loadAsMap("claim835-rem-codes.json", {
-                it.getString("Remark") to it.getString("Description")
-            })
-        }
-        private val icd10Codes: Map<String, String> by lazy {
-            loadAsMap("icd10-codes.json", {
-                it.getString("icd10_code_id") to it.getString("description")
-            })
-        }
-        private val dxT: Map<String, String> by lazy {
-            loadAsMap("dxT-codes.json", {
-                it.getString("id") to it.getString("caption")
-            })
-        }
-
-        private fun loadAsMap(name: String, map: (JsonObject) -> Pair<String, String>?): Map<String, String> =
-            mutableMapOf<String, String>().apply {
-                Claims835ToHtml::class.java.getResourceAsStream(name).use { Json.createReader(it).readArray() }
-                    .forEach {
-                        if (it is JsonObject) {
-                            map(it)?.let { this += it }
-                        }
-                    }
-            }
 
         private fun Map<String, String>.optString(key: String, def: String = ""): String {
             return this[key] ?: def

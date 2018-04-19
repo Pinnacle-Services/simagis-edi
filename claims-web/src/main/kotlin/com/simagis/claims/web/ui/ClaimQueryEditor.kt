@@ -4,6 +4,7 @@ import com.mongodb.client.model.FindOneAndReplaceOptions
 import com.mongodb.client.model.ReturnDocument
 import com.simagis.claims.clientName
 import com.simagis.claims.rest.api.ClaimDb
+import com.simagis.claims.rest.api.toJsonObject
 import com.simagis.edi.mdb._id
 import com.simagis.edi.mdb.`+$set`
 import com.simagis.edi.mdb.`+`
@@ -27,6 +28,7 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.net.URLEncoder
 import java.util.*
+import javax.json.JsonArray
 
 /**
  *
@@ -63,13 +65,17 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
         description = "Open Query Link in new window"
     }
 
+    private val viewerLink = Label("", ContentMode.HTML).apply {
+        description = "Open Claim Viewer in new window"
+    }
+
     init {
         margin = margins()
         val jsonValidator = Validator<String> { value, _ ->
             try {
                 Document.parse(value)
                 ValidationResult.ok()
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 ValidationResult.error("json error: ${e.message}")
             }
         }
@@ -81,18 +87,18 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
             widthK1 = size100pc
             rows = 3
             binder.forField(this)
-                    .withValidator(jsonValidator)
-                    .bind(name)
+                .withValidator(jsonValidator)
+                .bind(name)
 
             addFocusListener {
                 jsonTextAreaCurrent = this
                 (parent as? AbstractOrderedLayout)?.let { layout ->
                     jsonTextAreaList
-                            .filter { compactable && it !== this && layout === it.parent }
-                            .forEach {
-                                it.setHeightUndefined()
-                                layout.setExpandRatio(it, 0f)
-                            }
+                        .filter { compactable && it !== this && layout === it.parent }
+                        .forEach {
+                            it.setHeightUndefined()
+                            layout.setExpandRatio(it, 0f)
+                        }
                     heightK1 = size100pc
                     layout.setExpandRatio(this, 1f)
                 }
@@ -105,14 +111,14 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
             value = current
         }
 
-        fun Binder.BindingBuilder<ClaimQuery, String>.withNameValidator(): Binder.BindingBuilder<ClaimQuery, String>
-                = withValidator(StringLengthValidator("Invalid length of Name", 1, 2048))
+        fun Binder.BindingBuilder<ClaimQuery, String>.withNameValidator(): Binder.BindingBuilder<ClaimQuery, String> =
+            withValidator(StringLengthValidator("Invalid length of Name", 1, 2048))
                 .withValidator { value, _ ->
                     when {
                         value.startsWith("/") -> try {
                             URI(value)
                             ValidationResult.ok()
-                        } catch(e: URISyntaxException) {
+                        } catch (e: URISyntaxException) {
                             ValidationResult.error("URL syntax error: " + e.reason)
                         }
                         else -> ValidationResult.ok()
@@ -135,10 +141,12 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 if (override) {
                     val filter = doc { `+`("name", current.name) }
                     val document = current.toDocument()
-                    ClaimDb.cq.findOneAndReplace(filter, document,
-                            FindOneAndReplaceOptions()
-                                    .upsert(true)
-                                    .returnDocument(ReturnDocument.AFTER)).let {
+                    ClaimDb.cq.findOneAndReplace(
+                        filter, document,
+                        FindOneAndReplaceOptions()
+                            .upsert(true)
+                            .returnDocument(ReturnDocument.AFTER)
+                    ).let {
                         current._id = it._id
                     }
                 } else {
@@ -154,8 +162,8 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 val nameField = TextField("Name", current.name).apply {
                     setSizeFull()
                     nameBinder.forField(this)
-                            .withNameValidator()
-                            .bind("name")
+                        .withNameValidator()
+                        .bind("name")
                     focus()
                 }
                 val override = CheckBox("Override").apply { isVisible = false }
@@ -164,10 +172,11 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                     margin = margins()
                 }
                 showConfirmationDialog(
-                        "Saving Claim Query",
-                        actionType = ConfirmationActionType.PRIMARY,
-                        actionCaption = "Save",
-                        body = nameEditor) {
+                    "Saving Claim Query",
+                    actionType = ConfirmationActionType.PRIMARY,
+                    actionCaption = "Save",
+                    body = nameEditor
+                ) {
 
                     val validate = nameBinder.validate()
                     if (validate.isOk) {
@@ -179,11 +188,12 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                             true
                         } else {
                             val exists = ClaimDb.cq.find(doc { `+`("name", new.name) })
-                                    .first() != null
+                                .first() != null
                             if (exists) {
                                 showError(
-                                        """Claim Query "${new.name}" already exists""",
-                                        "Use the Override")
+                                    """Claim Query "${new.name}" already exists""",
+                                    "Use the Override"
+                                )
                                 override.isVisible = true
                             } else {
                                 insert(false)
@@ -245,8 +255,8 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                     val nameField = TextField("Name", current.name).apply {
                         setSizeFull()
                         nameBinder.forField(this)
-                                .withNameValidator()
-                                .bind("name")
+                            .withNameValidator()
+                            .bind("name")
                         focus()
                     }
                     val nameEditor = VerticalLayout(nameField).apply {
@@ -255,10 +265,10 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                     }
 
                     showConfirmationDialog(
-                            "Renaming Claim Query",
-                            actionType = ConfirmationActionType.FRIENDLY,
-                            actionCaption = "Rename",
-                            body = nameEditor
+                        "Renaming Claim Query",
+                        actionType = ConfirmationActionType.FRIENDLY,
+                        actionCaption = "Rename",
+                        body = nameEditor
                     )
                     {
                         val validate = nameBinder.validate()
@@ -266,14 +276,14 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                             val new = ClaimQuery()
                             nameBinder.writeBean(new)
                             val exists = ClaimDb.cq.find(doc { `+`("name", new.name) })
-                                    .first() != null
+                                .first() != null
                             if (exists) {
                                 showError("""Claim Query "${new.name}" already exists""")
                             } else {
                                 current.name = new.name
                                 ClaimDb.cq.updateOne(
-                                        doc(current._id),
-                                        doc { `+$set` { `+`("name", new.name) } })
+                                    doc(current._id),
+                                    doc { `+$set` { `+`("name", new.name) } })
                                 reload(current)
                             }
                             !exists
@@ -296,8 +306,9 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 addClickListener {
                     val claimQuery = explorer.cqGrid.selectedItems.first()
                     showConfirmationDialog(
-                            "Delete Claim Query",
-                            """Do you wish to delete "${claimQuery.name}"""") {
+                        "Delete Claim Query",
+                        """Do you wish to delete "${claimQuery.name}""""
+                    ) {
                         ClaimDb.cq.deleteOne(Document("_id", claimQuery._id))
                         explorer.cqGrid.refresh()
                         true
@@ -316,7 +327,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
 
         with(nameField) {
             binder.forField(this)
-                    .bind("name")
+                .bind("name")
         }
 
         with(descriptionField) {
@@ -324,7 +335,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 descriptionLabel.value = it.value
             }
             binder.forField(this)
-                    .bind("description")
+                .bind("description")
         }
 
         val content = VerticalLayout().apply {
@@ -347,19 +358,20 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
 
             addComponent(sectionCaption("Description", sectionMenu().apply {
                 addItem("", null).addItem("Edit", VaadinIcons.EDIT, MenuBar.Command {
-                            val richTextArea = RichTextArea().apply {
-                                value = descriptionField.value
-                                widthK1 = size100pc
-                            }
-                            showConfirmationDialog(
-                                    "Description",
-                                    body = richTextArea,
-                                    actionType = ConfirmationActionType.PRIMARY,
-                                    actionCaption = "Ok")
-                            {
-                                descriptionField.value = richTextArea.value
-                                true
-                            }
+                    val richTextArea = RichTextArea().apply {
+                        value = descriptionField.value
+                        widthK1 = size100pc
+                    }
+                    showConfirmationDialog(
+                        "Description",
+                        body = richTextArea,
+                        actionType = ConfirmationActionType.PRIMARY,
+                        actionCaption = "Ok"
+                    )
+                    {
+                        descriptionField.value = richTextArea.value
+                        true
+                    }
                 })
             }))
             addComponent(VerticalLayout().apply {
@@ -383,6 +395,14 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 addComponent(Label())
             })
 
+            addComponent(sectionCaption("Viewer"))
+            addComponent(VerticalLayout().apply {
+                margin = margins(left = true)
+                isSpacing = false
+                addComponent(viewerLink)
+                addComponent(Label())
+            })
+
             val codeMenu = sectionMenu()
             addComponent(sectionCaption("Code", codeMenu))
             addComponentsAndExpand(VerticalLayout().apply {
@@ -398,38 +418,40 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                                 setSizeFull()
                                 margin = margins(right = true, bottom = true)
                                 addComponents(
-                                        jsonTextArea("find").apply { find = this; focus() },
-                                        jsonTextArea("sort"))
+                                    jsonTextArea("find").apply { find = this; focus() },
+                                    jsonTextArea("sort"),
+                                    jsonTextArea("viewer"))
                             }
                             secondComponent = VerticalLayout().apply {
                                 setSizeFull()
                                 margin = margins(left = true, right = true, bottom = true)
                                 addComponentsAndExpand(
-                                        jsonTextArea("projection", false).apply { heightK1 = size100pc })
+                                    jsonTextArea("projection", false).apply { heightK1 = size100pc }
+                                )
                                 addComponents(
-                                        ComboBox<String>("EDI Document Type").apply {
-                                            setItems("835", "835c", "837", "835a", "837a")
-                                            isEmptySelectionAllowed = false
-                                            isTextInputAllowed = false
-                                            itemCaptionGenerator = ItemCaptionGenerator {
-                                                if (it.endsWith("a")) "$it (archive)" else it
-                                            }
-                                            binder.forField(this)
-                                                    .bind("type")
-
-                                        },
-                                        TextField("Page Size").apply {
-                                            binder.forField(this)
-                                                    .withValidator(StringLengthValidator("Must enter a number 1-100", 1, 3))
-                                                    .withConverter(StringToIntegerConverter("Must enter a number"))
-                                                    .withValidator(IntegerRangeValidator("Out of range", 1, 100))
-                                                    .bind("pageSize")
-                                        },
-                                        TextField("URL Path").apply {
-                                            widthK1 = size100pc
-                                            binder.forField(this)
-                                                    .bind("path")
+                                    ComboBox<String>("EDI Document Type").apply {
+                                        setItems("835", "835c", "837", "835a", "837a")
+                                        isEmptySelectionAllowed = false
+                                        isTextInputAllowed = false
+                                        itemCaptionGenerator = ItemCaptionGenerator {
+                                            if (it.endsWith("a")) "$it (archive)" else it
                                         }
+                                        binder.forField(this)
+                                            .bind("type")
+
+                                    },
+                                    TextField("Page Size").apply {
+                                        binder.forField(this)
+                                            .withValidator(StringLengthValidator("Must enter a number 1-100", 1, 3))
+                                            .withConverter(StringToIntegerConverter("Must enter a number"))
+                                            .withValidator(IntegerRangeValidator("Out of range", 1, 100))
+                                            .bind("pageSize")
+                                    },
+                                    TextField("URL Path").apply {
+                                        widthK1 = size100pc
+                                        binder.forField(this)
+                                            .bind("path")
+                                    }
                                 )
                             }
                         })
@@ -474,32 +496,35 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
         updateURL()
     }
 
-    private fun updateURL() = with(ClaimQuery()) {
+    private fun updateURL() = with(value) {
         val valid = binder.validate().isOk
         parametersLayout.removeAllComponents()
         urlLink.componentError = null
         urlLink.isEnabled = valid
+        viewerLink.isEnabled = valid && hasViewerFilters()
         fun URI.toHtml() = """<a
             target="_blank"
             href="${toASCIIString()}"
             >${toString()}&nbsp;${VaadinIcons.EXTERNAL_LINK.html}</a>"""
         if (valid) {
             binder.writeBean(this)
-            fun updateLink(href: String) {
+            fun Label.updateLink(href: String) {
                 try {
                     val uri = URI(href)
-                    urlLink.value = Page.getCurrent().location.resolve(uri).toHtml()
-                } catch(e: URISyntaxException) {
-                    urlLink.componentError = UserError("Invalid URL: ${e.reason}")
-                    urlLink.isEnabled = false
-                    urlLink.value = URI("#").toHtml()
+                    value = if (isEnabled)
+                        Page.getCurrent().location.resolve(uri).toHtml() else
+                        uri.toASCIIString()
+                } catch (e: URISyntaxException) {
+                    componentError = UserError("Invalid URL: ${e.reason}")
+                    isEnabled = false
+                    value = URI("#").toHtml()
                 }
             }
-            val href = when {
+            urlLink.updateLink(when {
                 path.isNotBlank() && value_id != null -> {
                     val parameters = toParameters()
-                    fun toHRef() :String {
-                        return  "/$clientName/query/$path?" + parameters.joinToString(separator = "&") {
+                    fun toHRef(): String {
+                        return "/$clientName/query/$path?" + parameters.joinToString(separator = "&") {
                             "${it.name}=${it.default?.let { URLEncoder.encode(it, "UTF-8") } ?: ""}"
                         }
                     }
@@ -512,18 +537,26 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                             valueChangeMode = ValueChangeMode.EAGER
                             addValueChangeListener {
                                 parameter.default = it.value
-                                updateLink(toHRef())
+                                urlLink.updateLink(toHRef())
                             }
                         }
                     }
                     toHRef()
                 }
                 else -> "/$clientName/claim/$type/=${encode()}?ps=$pageSize"
-            }
-            updateLink(href)
-
+            })
+            viewerLink.updateLink("/$clientName/cv#$path")
         } else {
             urlLink.value = URI("#").toHtml()
+            viewerLink.value = URI("#").toHtml()
         }
     }
+
+    private fun ClaimQuery.hasViewerFilters() =
+        try {
+            val result = viewer.toJsonObject()["filters"] is JsonArray
+            result
+        } catch (e: Exception) {
+            false
+        }
 }
