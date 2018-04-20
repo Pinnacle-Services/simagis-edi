@@ -420,7 +420,8 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                                 addComponents(
                                     jsonTextArea("find").apply { find = this; focus() },
                                     jsonTextArea("sort"),
-                                    jsonTextArea("viewer"))
+                                    jsonTextArea("viewer")
+                                )
                             }
                             secondComponent = VerticalLayout().apply {
                                 setSizeFull()
@@ -554,8 +555,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
 
     private fun ClaimQuery.hasViewerFilters() =
         try {
-            val result = viewer.toJsonObject()["filters"] is JsonArray
-            result
+            viewer.toJsonObject()["filters"] is JsonArray
         } catch (e: Exception) {
             false
         }

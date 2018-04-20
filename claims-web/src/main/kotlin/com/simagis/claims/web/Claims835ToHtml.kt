@@ -101,7 +101,7 @@ class Claims835ToHtml(
             """
             <div style="padding: 5pt; background-color: #d4d4d4">
                 <a name="${claim._id}"></a>
-                <strong>${claim._id} | ${claim["prn"].esc}
+                <strong>${claim["acn"]} | ${claim["prn"].esc}
                     (${claim.amountSpan("clmAsk")}
                     | ${claim.amountSpan("clmPayTotal")}
                     | ${claim.amountSpan("clmPay")}
@@ -324,8 +324,9 @@ class Claims835ToHtml(
     }
 
     private fun addPageHeader() {
+        //language=HTML
         html.append(
-            """<body style='font-family:monospace'>
+            """<body style="font-family: Consolas, monospace; font-size: 14px;">
             <br>
             <br>
             <div style="position: fixed; overflow: auto; top: 0; left: 0; right: 0; background-color: #fff; padding: 5px">
