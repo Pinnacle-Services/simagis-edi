@@ -1,5 +1,9 @@
 [
   {
+    "id": "PI",
+    "caption": "Payer Initiated Reductions"
+  },
+  {
     "id": "CO",
     "caption": "Contractual Adjustment"
   },
