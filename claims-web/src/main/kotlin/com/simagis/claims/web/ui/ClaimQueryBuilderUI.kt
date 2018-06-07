@@ -1,6 +1,6 @@
 package com.simagis.claims.web.ui
 
-import com.simagis.claims.clientName
+import com.simagis.claims.clientRoot
 import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.claims.rest.api.toJsonObject
 import com.simagis.claims.rest.api.toStringPP
@@ -245,7 +245,7 @@ class ClaimQueryBuilderUI : UI() {
                                 binder.readBean(this)
 
                                 link = Link().apply {
-                                    val href = "/$clientName/claim/$type/=${encode()}?ps=$pageSize"
+                                    val href = "${clientRoot}claim/$type/=${encode()}?ps=$pageSize"
                                     caption = href
                                     resource = ExternalResource(href)
                                     targetName = "_blank"

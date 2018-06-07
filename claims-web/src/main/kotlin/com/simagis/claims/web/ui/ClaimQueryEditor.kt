@@ -2,7 +2,7 @@ package com.simagis.claims.web.ui
 
 import com.mongodb.client.model.FindOneAndReplaceOptions
 import com.mongodb.client.model.ReturnDocument
-import com.simagis.claims.clientName
+import com.simagis.claims.clientRoot
 import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.claims.rest.api.toJsonObject
 import com.simagis.edi.mdb._id
@@ -525,7 +525,7 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                 path.isNotBlank() && value_id != null -> {
                     val parameters = toParameters()
                     fun toHRef(): String {
-                        return "/$clientName/query/$path?" + parameters.joinToString(separator = "&") {
+                        return "${clientRoot}query/$path?" + parameters.joinToString(separator = "&") {
                             "${it.name}=${it.default?.let { URLEncoder.encode(it, "UTF-8") } ?: ""}"
                         }
                     }
@@ -544,9 +544,9 @@ class ClaimQueryEditor(private val explorer: ClaimQueryExplorerUI) : VerticalLay
                     }
                     toHRef()
                 }
-                else -> "/$clientName/claim/$type/=${encode()}?ps=$pageSize"
+                else -> "${clientRoot}claim/$type/=${encode()}?ps=$pageSize"
             })
-            viewerLink.updateLink("/$clientName/cv#$path")
+            viewerLink.updateLink("${clientRoot}cv#$path")
         } else {
             urlLink.value = URI("#").toHtml()
             viewerLink.value = URI("#").toHtml()

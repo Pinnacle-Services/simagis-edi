@@ -26,3 +26,12 @@ var clientName: String = "ROOT"
     private set(value) {
         field = value
     }
+
+val clientRoot: String by lazy {
+    clientName.let {
+        when (it) {
+            "ROOT" -> "/"
+            else -> "/$it/"
+        }
+    }
+}

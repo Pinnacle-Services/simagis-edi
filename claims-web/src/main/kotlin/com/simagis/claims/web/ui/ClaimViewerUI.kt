@@ -1,6 +1,6 @@
 package com.simagis.claims.web.ui
 
-import com.simagis.claims.clientName
+import com.simagis.claims.clientRoot
 import com.simagis.claims.rest.api.ClaimDb
 import com.simagis.claims.rest.api.toJsonObject
 import com.simagis.claims.web.codes
@@ -123,7 +123,7 @@ class ClaimViewerUI : UI() {
                 addStyleName(ValoTheme.BUTTON_PRIMARY)
                 setClickShortcut(ShortcutAction.KeyCode.ENTER)
                 addClickListener {
-                    val src = "/$clientName/query/$path?" + parameters
+                    val src = "${clientRoot}query/$path?" + parameters
                         .mapNotNull { parameter -> filters[parameter.name]?.value?.let { parameter.name to it } }
                         .joinToString(separator = "&") { (name, value) ->
                             "$name=${URLEncoder.encode(value, "UTF-8")}"
