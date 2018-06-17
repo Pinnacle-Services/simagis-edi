@@ -1,4 +1,5 @@
 (: process 835 EDI ERA docs:)
+(: Provider Level Balances PLB :)
 declare namespace functx = "http://www.functx.com";
 declare function functx:if-empty
   ( $arg as item()? ,
@@ -15,7 +16,9 @@ declare option output:method "json";
     for $grp in collection()//group
     (: transmission date:)
     let $date_tr := data($grp/@Date)
+    let $control_grp := data($grp/@Control)
     for $trn in $grp/transaction
+    let $control_trn := data($trn/@Control)
     (: Payer:)
     let $payer_name := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PR"]/element[@Id = "N102"]/text()
     let $payer_id := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PR"]/element[@Id = "N104"]/text()
@@ -31,26 +34,28 @@ declare option output:method "json";
     for $plb in $trn/segment[@Id = "PLB"]
     let $plb1 := $plb/element[@Id="PLB01"]/text()
     let $plb2 := $plb/element[@Id = "PLB02"]/text()
+    let $plb30 := $plb/element[@Id = "PLB03"]/text() (: top value if not composite:)
     let $plb31 := $plb/element[@Id = "PLB03"]/subelement[@Sequence="1"]/text()
     let $plb32 := $plb/element[@Id = "PLB03"]/subelement[@Sequence="2"]/text()
     let $plb4 := $plb/element[@Id = "PLB04"]/text()
  
     return
         <_ type='object'> {
+            <id>{concat($date_tr,"-", $control_grp, "-", $control_trn, "-", $plb30, $plb31)}</id>,
             <procDate-DT8>{$date_tr}</procDate-DT8>,
+            <prn-CC>{$payer_name}</prn-CC>,
+            <prid>{functx:if-empty($payer_id,"Empty")}</prid>,
+            <frmid>{functx:if-empty($from_id,"Empty")}</frmid>,
+            <provNm-CC>{functx:if-empty($from_name,"Empty")}</provNm-CC>,
+            <provId>{$plb1}</provId>,
+            <fiscalDt-DT8>{$plb2}</fiscalDt-DT8>,
+            <adjRsn>{functx:if-empty($plb30, $plb31)}</adjRsn>,
+            <ajdRef>{functx:if-empty($plb32,"Empty")}</ajdRef>,
+            <ajdAmt-C0>{$plb4}</ajdAmt-C0>,
             <payBy>{$payby}</payBy>,
             <accNum>{$payacct}</accNum>,
             <payID>{$checknum}</payID>,            
-            <payDate-DT8>{$paydt}</payDate-DT8>,
-            <frmn-CC>{functx:if-empty($from_name,"Empty")}</frmn-CC>,
-            <frmid>{functx:if-empty($from_id,"Empty")}</frmid>,
-            <prid>{functx:if-empty($payer_id,"Empty")}</prid>,
-            <prn-CC>{$payer_name}</prn-CC>,
-            <plb1>{$plb1}</plb1>,
-            <plb2-DT8>{$plb2}</plb2-DT8>,
-            <plb31>{$plb31}</plb31>,
-            <plb32>{$plb32}</plb32>,
-            <plb4-C0>{$plb4}</plb4-C0>       
+            <payDate-DT8>{$paydt}</payDate-DT8>     
         }</_>
 }
 </json>
