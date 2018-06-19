@@ -88,8 +88,9 @@ fun main(args: Array<String>) {
 
         if (valid) try {
             val xqText = stat.doc.type?.let { type ->
-                xqTypes.getOrPut(type) {
-                    ImportJob.options.xqDir.resolve(xqFile(type)).let { xqFile ->
+                val name = xqFile(type)
+                xqTypes.getOrPut(name) {
+                    ImportJob.options.xqDir.resolve(name).let { xqFile ->
                         if (xqFile.isFile) xqFile.readText() else {
                             warning("$xqFile not found")
                             ""
@@ -143,7 +144,7 @@ fun main(args: Array<String>) {
             claims invalid: ${claimCountInvalid.get()}
 """
     try {
-        fun Document.prepare(logger: LocalLogger): Document {
+        fun Document.prepare(logger: LocalLogger? = null): Document {
             val _id = remove("id")
             append("_id", _id)
             fun Document.fixTypes() {
@@ -184,14 +185,14 @@ fun main(args: Array<String>) {
                             }
                             "DT8" -> getString(key)?.also { value ->
                                 parseDT8(value)?.also { append(key.name(), it) } ?: if (value.isNotEmpty()) {
-                                    logger.warn("Invalid DT8 value at $_id $key: '$value'")
+                                    logger?.warn("Invalid DT8 value at $_id $key: '$value'")
                                 }
                             }
                         }
                     } catch (e: Exception) {
                         when (e) {
-                            is ParseException -> logger.warn("Invalid date format at $_id $key: '${getString(key)}'")
-                            is NumberFormatException -> logger.warn("Invalid number format at $_id $key: '${getString(key)}'")
+                            is ParseException -> logger?.warn("Invalid date format at $_id $key: '${getString(key)}'")
+                            is NumberFormatException -> logger?.warn("Invalid number format at $_id $key: '${getString(key)}'")
                             else -> throw e
                         }
                     }
@@ -205,7 +206,7 @@ fun main(args: Array<String>) {
                 }
             }
             fixTypes()
-            when (logger.isa.type) {
+            when (logger?.isa?.type) {
                 "835" -> augment835()
                 "837" -> augment837()
             }
@@ -319,12 +320,10 @@ fun main(args: Array<String>) {
                     isaCountInvalid.incrementAndGet()
                 }
                 if (isa.type == "835") {
-                    isa.toJsonArray(file) { "isa_claims_835_plb.xq" }
-                        ?.asSequence()
+                    isa.toJsonArray(file, xqFile = { "isa_claims_835_plb.xq" })
                         ?.filterIsInstance<JsonObject>()
                         ?.forEach { json ->
-                            val document = Document.parse(json.toString())
-                            document["_id"] = document["id"]
+                            val document = Document.parse(json.toString()).prepare()
                             document["file"] = file.name
                             try {
                                 ImportJob.options.plb.tempCollection.insertOne(document)
