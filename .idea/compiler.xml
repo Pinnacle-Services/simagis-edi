@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="claims-web" />
+        <module name="do-up-web" />
         <module name="mdb" />
         <module name="rJavaJDBC" />
         <module name="RServe" />
@@ -15,6 +16,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="claims-web" target="1.8" />
+      <module name="do-up-web" target="1.8" />
       <module name="edi" target="1.5" />
       <module name="edireader" target="1.6" />
       <module name="mdb" target="1.8" />
