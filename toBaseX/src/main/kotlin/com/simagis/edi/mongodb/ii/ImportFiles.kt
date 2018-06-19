@@ -247,7 +247,7 @@ private fun ISA.toClaimsJsonArray(): JsonArray? {
         val context = inMemoryBaseX.get()
 
         with(Replace("doc")) {
-            setInput(toXML().inputStream())
+            setInput(xml.inputStream())
             execute(context)
         }
 

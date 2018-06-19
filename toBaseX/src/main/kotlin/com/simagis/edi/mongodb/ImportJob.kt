@@ -3,7 +3,6 @@ package com.simagis.edi.mongodb
 import com.mongodb.MongoNamespace
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.IndexModel
-import com.simagis.edi.mdb.get
 import org.bson.Document
 import java.io.File
 import java.io.FileNotFoundException
@@ -15,6 +14,17 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.GZIPInputStream
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.MutableMap
+import kotlin.collections.Set
+import kotlin.collections.filter
+import kotlin.collections.forEach
+import kotlin.collections.forEachIndexed
+import kotlin.collections.getOrPut
+import kotlin.collections.map
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
 import kotlin.concurrent.withLock
 
 
@@ -41,7 +51,9 @@ internal object ImportJob : AbstractJob() {
                 }
             }
         }
-        val restartMemoryLimit: Long by lazy { (options["restartMemoryLimit"] as? Number)?.toLong() ?: 500 * 1024 * 1024 }
+        val restartMemoryLimit: Long by lazy {
+            (options["restartMemoryLimit"] as? Number)?.toLong() ?: 500 * 1024* 1024
+        }
         val restartMaxDurationM: Long by lazy { (options["restartMaxDurationM"] as? Number)?.toLong() ?: 60 }
 
         object claimTypes {
@@ -66,6 +78,16 @@ internal object ImportJob : AbstractJob() {
             }
         }
 
+        val plb: ClaimType
+            get() =
+                ClaimType(
+                    type = "plb",
+                    temp = "plb.temp",
+                    target = "plb",
+                    createIndexes = false,
+                    db = claims
+                )
+
         object build835c {
             private val build835c: Document by lazy { options["build835c"] as? Document ?: Document() }
             val _835c: ClaimType by lazy {
@@ -87,21 +109,22 @@ internal object ImportJob : AbstractJob() {
         }
 
         data class ClaimType(
-                val type: String,
-                val temp: String,
-                val target: String,
-                val createIndexes: Boolean,
-                val db: MongoDatabase) {
+            val type: String,
+            val temp: String,
+            val target: String,
+            val createIndexes: Boolean,
+            val db: MongoDatabase
+        ) {
             val tempCollection: DocumentCollection by lazy { db.getCollection(temp) }
             val targetCollection: DocumentCollection by lazy { db.getCollection(target) }
 
             companion object {
                 internal fun of(type: String, claimType: Document, db: MongoDatabase = claims) = ClaimType(
-                        type = type,
-                        temp = claimType["temp"] as? String ?: "claims_$type.temp",
-                        target = claimType["target"] as? String ?: "claims_$type.target",
-                        createIndexes = claimType["createIndexes"] as? Boolean ?: true,
-                        db = db
+                    type = type,
+                    temp = claimType["temp"] as? String ?: "claims_$type.temp",
+                    target = claimType["target"] as? String ?: "claims_$type.target",
+                    createIndexes = claimType["createIndexes"] as? Boolean ?: true,
+                    db = db
                 )
             }
         }
@@ -111,12 +134,16 @@ internal object ImportJob : AbstractJob() {
     object ii {
         object sourceClaims {
             fun openSessions(): DocumentCollection = dbs.open("sourceClaims", "sessions")
-                    .indexed("status")
+                .indexed("status")
+
             fun openFiles(): DocumentCollection = dbs.open("sourceClaims", "files")
-                    .indexed("session", "status", "size", "names")
+                .indexed("session", "status", "size", "names")
+
             fun openClaims(): DocumentCollection = dbs.open("sourceClaims", "claims")
-                    .indexed("session", "files", "type",
-                            "claim._id", "claim.procDate", "claim.sendDate")
+                .indexed(
+                    "session", "files", "type",
+                    "claim._id", "claim.procDate", "claim.sendDate"
+                )
         }
 
         object claims {
@@ -144,24 +171,24 @@ internal object ImportJob : AbstractJob() {
                 var prid: Int = -1
                 var prg: Int = -1
                 File("files")
-                        .resolve("xifin_billed_acn.gzip")
-                        .parseAsGzCsv(
-                                { index, name ->
-                                    when (name) {
-                                        "id" -> id = index
-                                        "prid" -> prid = index
-                                        "prg" -> prg = index
-                                    }
-                                },
-                                { record ->
-                                    doc(
-                                            id = record[id],
-                                            prid = record[prid],
-                                            prg = record[prg]
-                                    ).also {
-                                        this[it.id] = it
-                                    }
-                                })
+                    .resolve("xifin_billed_acn.gzip")
+                    .parseAsGzCsv(
+                        { index, name ->
+                            when (name) {
+                                "id" -> id = index
+                                "prid" -> prid = index
+                                "prg" -> prg = index
+                            }
+                        },
+                        { record ->
+                            doc(
+                                id = record[id],
+                                prid = record[prid],
+                                prg = record[prg]
+                            ).also {
+                                this[it.id] = it
+                            }
+                        })
             }
         }
 
@@ -188,6 +215,7 @@ private fun DocumentCollection.indexed(vararg indexes: String): DocumentCollecti
 }
 
 private typealias CsvRecord = List<String>
+
 private fun File.parseAsGzCsv(onHeader: (Int, String) -> Unit, onRecord: (CsvRecord) -> Unit) {
     if (isFile) GZIPInputStream(inputStream()).bufferedReader().use {
         var count = 0
@@ -224,26 +252,26 @@ internal object CreateIndexesJson {
 
     private fun download(type: String): String = URI(url).let { uri ->
         uri.resolve("$type.createIndexes.json")
-                .toURL()
-                .openConnection()
-                .let { connection ->
-                    connection.connect()
-                    try {
-                        connection
-                                .getInputStream()
-                                .reader()
-                                .readText()
-                    } catch (e: Throwable) {
-                        if (e !is FileNotFoundException) throw e
-                        warning("$uri not found", e)
-                        read(type)
-                    }
+            .toURL()
+            .openConnection()
+            .let { connection ->
+                connection.connect()
+                try {
+                    connection
+                        .getInputStream()
+                        .reader()
+                        .readText()
+                } catch (e: Throwable) {
+                    if (e !is FileNotFoundException) throw e
+                    warning("$uri not found", e)
+                    read(type)
                 }
+            }
     }
 
     private fun read(type: String): String = CreateIndexesJson::class.java
-            .getResourceAsStream("$type.createIndexes.json")
-            ?.use { it.reader().readText() }
+        .getResourceAsStream("$type.createIndexes.json")
+        ?.use { it.reader().readText() }
             ?: "{}"
 
     operator fun get(type: String): String = lock.withLock {
@@ -280,13 +308,13 @@ internal fun ImportJob.options.ClaimType.renameToTarget() {
             targetCollection.renameCollection(MongoNamespace(databaseName, newBackupName))
             val database = ImportJob.dbs[databaseName]
             database.listCollectionNames()
-                    .filter { it.startsWith(backupNamePrefix) }
-                    .filter { it.parseAsBackupDate() < now }
-                    .filter { it != newBackupName }
-                    .forEach {
-                        info("drop old backup $databaseName.$it")
-                        database.getCollection(it).drop()
-                    }
+                .filter { it.startsWith(backupNamePrefix) }
+                .filter { it.parseAsBackupDate() < now }
+                .filter { it != newBackupName }
+                .forEach {
+                    info("drop old backup $databaseName.$it")
+                    database.getCollection(it).drop()
+                }
         }
         tempCollection.renameCollection(targetCollection.namespace)
     }

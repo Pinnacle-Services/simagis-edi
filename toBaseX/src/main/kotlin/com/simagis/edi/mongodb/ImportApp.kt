@@ -67,15 +67,19 @@ fun main(args: Array<String>) {
     }
 
 
-    fun ISA.toClaimsJsonArray(file: File, onError: (Throwable?) -> Unit = {}): JsonArray? {
+    fun ISA.toJsonArray(
+        isaContext: Any?,
+        onError: (Throwable?) -> Unit = {},
+        xqFile: (type: String?) -> String = { "isa-claims-$it.xq" }
+    ): JsonArray? {
         fun invalidISA(isa: ISA, e: Throwable? = null) {
             onError(e)
             warning(
-                    "Invalid ISA: ${isa.stat} from $file",
+                    "Invalid ISA: ${isa.stat} from $isaContext",
                     e,
                     details = isa.code,
                     detailsXml = if (e !is EDISyntaxException) try {
-                        isa.toXML().toString(ISA.CHARSET)
+                        isa.xmlCode
                     } catch (e: Exception) {
                         null
                     } else null
@@ -85,7 +89,7 @@ fun main(args: Array<String>) {
         if (valid) try {
             val xqText = stat.doc.type?.let { type ->
                 xqTypes.getOrPut(type) {
-                    ImportJob.options.xqDir.resolve("isa-claims-$type.xq").let { xqFile ->
+                    ImportJob.options.xqDir.resolve(xqFile(type)).let { xqFile ->
                         if (xqFile.isFile) xqFile.readText() else {
                             warning("$xqFile not found")
                             ""
@@ -101,7 +105,7 @@ fun main(args: Array<String>) {
             val context = inMemoryBaseX.get()
 
             with(Replace("doc")) {
-                setInput(toXML().inputStream())
+                setInput(xml.inputStream())
                 execute(context)
             }
 
@@ -251,7 +255,7 @@ fun main(args: Array<String>) {
                 return
             }
             isaList.forEach { isa ->
-                val claims = isa.toClaimsJsonArray(file)
+                val claims = isa.toJsonArray(file)
                 if (claims != null) {
                     isaCount.incrementAndGet()
                     claims.forEach { json ->
@@ -314,6 +318,22 @@ fun main(args: Array<String>) {
                 } else {
                     isaCountInvalid.incrementAndGet()
                 }
+                if (isa.type == "835") {
+                    isa.toJsonArray(file) { "isa_claims_835_plb.xq" }
+                        ?.asSequence()
+                        ?.filterIsInstance<JsonObject>()
+                        ?.forEach { json ->
+                            val document = Document.parse(json.toString())
+                            document["_id"] = document["id"]
+                            document["file"] = file.name
+                            try {
+                                ImportJob.options.plb.tempCollection.insertOne(document)
+                            } catch (e: MongoWriteException) {
+                                if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY)
+                                    throw e
+                            }
+                        }
+                }
             }
         }
 
@@ -334,9 +354,11 @@ fun main(args: Array<String>) {
         val done = importing.upload()
         threads.forEach(Thread::join)
         if (done) {
-            val claimTypes: List<ImportJob.options.ClaimType> = ImportJob.options.archive.types
-                    .map { ImportJob.options.archive[it] } + ImportJob.options.claimTypes.types
-                    .map { ImportJob.options.claimTypes[it] }
+            val claimTypes: List<ImportJob.options.ClaimType> =
+                emptyList<ImportJob.options.ClaimType>() +
+                        ImportJob.options.archive.types.map { ImportJob.options.archive[it] } +
+                        ImportJob.options.claimTypes.types.map { ImportJob.options.claimTypes[it] } +
+                        ImportJob.options.plb
 
             claimTypes
                     .filter { it.createIndexes }
@@ -399,7 +421,7 @@ fun Document.augment837() {
 
 private class LocalLogger(val file: File, val isa: ISA, val json: Any?) {
     fun warn(message: String, error: Throwable? = null, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) {
-        warning(message + " file: $file", error, details, detailsJson ?: json, detailsXml ?: isa.toXmlCode())
+        warning("$message file: $file", error, details, detailsJson ?: json, detailsXml ?: isa.xmlCode)
     }
 
     fun trace(message: String) {

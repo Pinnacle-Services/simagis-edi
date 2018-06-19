@@ -33,6 +33,9 @@ class ISA private constructor(text: String, private val start: Int, private val 
         }
     }
 
+    val xml: ByteArray by lazy { toXML() }
+
+    @Deprecated("use xml", ReplaceWith("xml"))
     fun toXML(): ByteArray {
         val result = ByteArrayOutputStream()
         OutputStreamWriter(result, CHARSET).use { writer ->
@@ -45,11 +48,12 @@ class ISA private constructor(text: String, private val start: Int, private val 
         return result.toByteArray()
     }
 
-    fun toXmlCode(): String? = try {
-        toXML().toString(ISA.CHARSET)
-    } catch(e: Exception) {
-        null
-    }
+    val xmlCode: String?
+        get() = try {
+            xml.toString(ISA.CHARSET)
+        } catch (e: Exception) {
+            null
+        }
 
     override fun toString(): String = code
 
