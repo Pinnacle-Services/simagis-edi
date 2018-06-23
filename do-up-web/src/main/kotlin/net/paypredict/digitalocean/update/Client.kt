@@ -14,4 +14,6 @@ val tagsClient: String by lazy { DigitalOceanMetadata.tags
     ?: throw DigitalOceanUpdateException("DigitalOcean tag pp-* not found")
 }
 
-val tagsClientDir: File by lazy { clientsDir.resolve(tagsClient).also { it.mkdir() } }
+val localClientDir: File by lazy { clientsDir.resolve("claims").also { it.mkdir() } }
+val localClientTmpDir: File by lazy { localClientDir.resolve(".tmp").also { it.mkdir() } }
+val localClientImageDir: File by lazy { localClientDir.resolve("image").also { it.mkdir() } }

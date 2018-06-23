@@ -19,7 +19,7 @@ private constructor(
     private val password: String
 ) {
 
-    fun session(action: ChannelSftp.() -> Unit) {
+    fun <T> session(action: ChannelSftp.() -> T): T {
         val jsch = JSch()
         val session: Session = jsch.getSession(user, host, 22)
         session.setConfig("StrictHostKeyChecking", "no")
@@ -29,7 +29,7 @@ private constructor(
         val channel: Channel = session.openChannel("sftp")
         channel.connect()
         val sftpChannel = channel as ChannelSftp
-        try {
+        return try {
             sftpChannel.action()
         } finally {
             sftpChannel.exit()
