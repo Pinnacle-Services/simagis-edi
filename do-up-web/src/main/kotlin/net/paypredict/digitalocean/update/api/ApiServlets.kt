@@ -17,8 +17,23 @@ import kotlin.concurrent.withLock
  *
  * Created by alexei.vylegzhanin@gmail.com on 6/22/2018.
  */
-@WebServlet(name = "ApiServlet", urlPatterns = ["/api/*"])
+@WebServlet(name = "ApiServlet", urlPatterns = ["/api/*"], loadOnStartup = 1)
 class ApiServlet : HttpServlet() {
+    private val autoUpdateFile = localClientDir.resolve("auto-update")
+
+    override fun init() {
+        daemon("watching auto-update") {
+            while (true) {
+                Thread.sleep(60_000)
+                if (autoUpdateFile.isFile) {
+                    try {
+                        update()
+                    } catch (e: ApiException) {
+                    }
+                }
+            }
+        }
+    }
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         try {
@@ -54,7 +69,7 @@ class ApiServlet : HttpServlet() {
     private fun update(): String = lock.withLock {
         if (status !== Status.Ready) throw ApiException("Invalid status: $status")
         status = Status.Loading
-        thread {
+        daemon("update") {
             try {
                 val localVer = readLocalImageVer()
                 val hostVer = hostVer()
@@ -76,7 +91,7 @@ class ApiServlet : HttpServlet() {
     private fun install(): String = lock.withLock {
         if (status !== Status.Ready) throw ApiException("Invalid status: $status")
         status = Status.Loading
-        thread {
+        daemon("install") {
             try {
                 lock.withLock { status = Status.Installing }
                 installLocalImage()
@@ -91,15 +106,18 @@ class ApiServlet : HttpServlet() {
 
     private fun autoUpdateStart(): String = lock.withLock {
         if (status !== Status.Ready) throw ApiException("Invalid status: $status")
-        status = Status.AutoUpdate
+        autoUpdateFile.writeText("")
         "Auto-Update started"
     }
 
     private fun autoUpdateStop(): String = lock.withLock {
-        if (status !== Status.AutoUpdate) throw ApiException("Invalid status: $status")
-        status = Status.Ready
+        if (status !== Status.Ready) throw ApiException("Invalid status: $status")
+        autoUpdateFile.delete()
         "Auto-Update stopped"
     }
+
+    private fun daemon(name: String? = null, block: () -> Unit) =
+        thread(block = block, isDaemon = true, name = name)
 }
 
 private class ApiException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
@@ -112,7 +130,6 @@ private sealed class Status {
     object Loading : Status()
     object Updating : Status()
     object Installing : Status()
-    object AutoUpdate : Status()
 
     class Error(val x: Throwable) : Status() {
         override val text: String
