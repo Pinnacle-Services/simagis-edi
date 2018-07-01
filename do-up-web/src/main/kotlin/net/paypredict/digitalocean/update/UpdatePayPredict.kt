@@ -2,6 +2,7 @@ package net.paypredict.digitalocean.update
 
 import com.jcraft.jsch.ChannelSftp
 import java.io.File
+import java.io.IOException
 import java.util.*
 import javax.json.JsonObject
 
@@ -78,4 +79,23 @@ fun replaceLocalImage(tmpImageDir: File) {
     val oldVerDir = localClientTmpDir.resolve("old-ver-" + UUID.randomUUID().toString())
     localClientImageDir.renameTo(oldVerDir)
     tmpImageDir.renameTo(localClientImageDir)
+}
+
+fun installLocalImage() {
+    val install: List<String> = when (File.separatorChar) {
+        '/' -> listOf("sudo", "./install-pp-image.sh")
+        else -> listOf("cmd.exe", "/C", "install-pp-image.cmd")
+    }
+
+    val process = ProcessBuilder().run {
+        redirectOutput(ProcessBuilder.Redirect.INHERIT)
+        redirectError(ProcessBuilder.Redirect.INHERIT)
+        directory(localClientDir)
+        command(install)
+        start()
+    }
+
+    process.waitFor()
+    val exitCode = process.exitValue()
+    if (exitCode != 0) throw IOException("Invalid exit code ($exitCode) on " + install.joinToString(separator = " "))
 }

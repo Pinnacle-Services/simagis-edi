@@ -25,10 +25,11 @@ class ApiServlet : HttpServlet() {
             when (request.pathInfo) {
                 "/host-ver" -> response.text = hostVer().toString()
                 "/status" -> response.text = status()
+                "/status-reset" -> response.text = resetStatus()
                 "/update" -> response.text = update()
+                "/install" -> response.text = install()
                 "/auto-update-start" -> response.text = autoUpdateStart()
                 "/auto-update-stop" -> response.text = autoUpdateStop()
-                "/reset" -> response.text = reset()
                 else -> throw ApiException("Invalid command: ${request.pathInfo}")
             }
         } catch (e: Throwable) {
@@ -45,7 +46,7 @@ class ApiServlet : HttpServlet() {
 
     private fun status(): String = lock.withLock { status.text }
 
-    private fun reset(): String = lock.withLock {
+    private fun resetStatus(): String = lock.withLock {
         status = Status.Ready
         status.text
     }
@@ -61,13 +62,31 @@ class ApiServlet : HttpServlet() {
                     val tmpImageDir = downloadPayPredict(hostVer)
                     lock.withLock { status = Status.Updating }
                     replaceLocalImage(tmpImageDir)
-                    lock.withLock { status = Status.Ready }
+                    installLocalImage()
                 }
+                lock.withLock { status = Status.Ready }
             } catch (e: Throwable) {
                 lock.withLock { status = Status.Error(e) }
+                e.printStackTrace()
             }
         }
         "Update started"
+    }
+
+    private fun install(): String = lock.withLock {
+        if (status !== Status.Ready) throw ApiException("Invalid status: $status")
+        status = Status.Loading
+        thread {
+            try {
+                lock.withLock { status = Status.Installing }
+                installLocalImage()
+                lock.withLock { status = Status.Ready }
+            } catch (e: Throwable) {
+                lock.withLock { status = Status.Error(e) }
+                e.printStackTrace()
+            }
+        }
+        "Install started"
     }
 
     private fun autoUpdateStart(): String = lock.withLock {
@@ -92,6 +111,7 @@ private sealed class Status {
     object Ready : Status()
     object Loading : Status()
     object Updating : Status()
+    object Installing : Status()
     object AutoUpdate : Status()
 
     class Error(val x: Throwable) : Status() {
