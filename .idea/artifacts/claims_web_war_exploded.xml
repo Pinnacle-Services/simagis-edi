@@ -26,6 +26,9 @@
           <element id="archive" name="mdb-0.1.0.0.jar">
             <element id="module-output" name="mdb" />
           </element>
+          <element id="archive" name="pp-api-0.1.0.0.jar">
+            <element id="module-output" name="pp-api" />
+          </element>
         </element>
       </element>
       <element id="directory" name="META-INF">

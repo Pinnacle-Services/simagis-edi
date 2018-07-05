@@ -5,9 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.simagis.edi</groupId>
-    <artifactId>claims-web</artifactId>
+    <artifactId>pp-api</artifactId>
     <version>0.1.0.0</version>
-    <packaging>war</packaging>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -17,9 +16,7 @@
         <kotlin.version>1.2.10</kotlin.version>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
 
-        <mongodb.version>3.4.2</mongodb.version>
         <junit.version>4.12</junit.version>
-        <vaadin.version>8.0.3</vaadin.version>
     </properties>
 
     <dependencies>
@@ -42,32 +39,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver</artifactId>
-            <version>${mongodb.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-server</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-client-compiled</artifactId>
-            <version>${vaadin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-themes</artifactId>
-            <version>${vaadin.version}</version>
         </dependency>
 
         <dependency>
@@ -81,17 +56,6 @@
             <version>1.0.4</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.simagis.edi</groupId>
-            <artifactId>mdb</artifactId>
-            <version>0.1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.simagis.edi</groupId>
-            <artifactId>pp-api</artifactId>
-            <version>0.1.0.0</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -122,4 +86,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

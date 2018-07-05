@@ -25,6 +25,7 @@
             var xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
             xhr.setRequestHeader("Content-type", "application/mongo-json");
+            xhr.setRequestHeader("PP-API-KEY", e("ppApiKey").value);
             xhr.onreadystatechange = toLogger(xhr);
             xhr.send(JSON.stringify(json));
         }
@@ -53,6 +54,7 @@
 <table width="100%">
     <tr>
         <td nowrap valign="top">
+            <label accesskey="K" for="ppApiKey">PP-API-<u>K</u>EY</label>: <input id="ppApiKey" type="text" style="width: 32em; -webkit-text-security: disc;" title="PP-API-KEY"><br>
             <a href="#" onclick="POST('/api/jobs', {})">api/jobs</a> {}<br>
             <a href="#" onclick="POST('/api/jobs', {type: 'Import'})">api/jobs</a> {type: 'Import'}<br>
             <a href="#" onclick="POST('/api/jobs', {status: 'NEW'})">api/jobs</a> {status: 'NEW'}<br>

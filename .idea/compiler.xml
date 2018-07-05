@@ -9,6 +9,7 @@
         <module name="claims-web" />
         <module name="do-up-web" />
         <module name="mdb" />
+        <module name="pp-api" />
         <module name="rJavaJDBC" />
         <module name="RServe" />
         <module name="toBaseX" />
@@ -20,6 +21,7 @@
       <module name="edi" target="1.5" />
       <module name="edireader" target="1.6" />
       <module name="mdb" target="1.8" />
+      <module name="pp-api" target="1.8" />
       <module name="rJavaJDBC" target="1.8" />
       <module name="RServe" target="1.8" />
       <module name="toBaseX" target="1.8" />

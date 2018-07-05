@@ -64,5 +64,6 @@
     <orderEntry type="library" name="Maven: javax.json:javax.json-api:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.4" level="project" />
     <orderEntry type="module" module-name="mdb" />
+    <orderEntry type="module" module-name="pp-api" />
   </component>
 </module>

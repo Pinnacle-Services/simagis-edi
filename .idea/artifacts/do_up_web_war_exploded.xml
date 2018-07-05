@@ -21,6 +21,9 @@
           <element id="library" level="project" name="Maven: com.vaadin:vaadin-themes:8.0.3" />
           <element id="library" level="project" name="Maven: javax.json:javax.json-api:1.0" />
           <element id="library" level="project" name="Maven: org.glassfish:javax.json:1.0.4" />
+          <element id="archive" name="pp-api-0.1.0.0.jar">
+            <element id="module-output" name="pp-api" />
+          </element>
         </element>
       </element>
       <element id="directory" name="META-INF">
