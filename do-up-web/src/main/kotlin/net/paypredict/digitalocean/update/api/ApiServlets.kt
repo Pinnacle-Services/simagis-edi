@@ -37,6 +37,7 @@ class ApiServlet : HttpServlet() {
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         try {
+            request.checkUserRole("pp-api-admins")
             when (request.pathInfo) {
                 "/host-ver" -> response.text = hostVer().toString()
                 "/status" -> response.text = status()
@@ -51,6 +52,10 @@ class ApiServlet : HttpServlet() {
             lock.withLock { status = Status.Error(e) }
             response.text = status()
         }
+    }
+
+    private fun HttpServletRequest.checkUserRole(role: String) {
+        if (!isUserInRole(role)) throw ApiException("$role user role required")
     }
 
     private val lock = ReentrantLock()
