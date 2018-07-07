@@ -17,8 +17,8 @@ import kotlin.concurrent.withLock
  *
  * Created by alexei.vylegzhanin@gmail.com on 6/22/2018.
  */
-@WebServlet(name = "ApiServlet", urlPatterns = ["/api/*"], loadOnStartup = 1)
-class ApiServlet : HttpServlet() {
+@WebServlet(name = "UpdateApiServlet", urlPatterns = ["/api/*"], loadOnStartup = 1)
+class UpdateApiServlet : HttpServlet() {
     private val autoUpdateFile = localClientDir.resolve("auto-update")
 
     override fun init() {
@@ -28,7 +28,7 @@ class ApiServlet : HttpServlet() {
                 if (autoUpdateFile.isFile) {
                     try {
                         update()
-                    } catch (e: ApiException) {
+                    } catch (e: UpdateApiException) {
                     }
                 }
             }
@@ -46,7 +46,7 @@ class ApiServlet : HttpServlet() {
                 "/install" -> response.text = install()
                 "/auto-update-start" -> response.text = autoUpdateStart()
                 "/auto-update-stop" -> response.text = autoUpdateStop()
-                else -> throw ApiException("Invalid command: ${request.pathInfo}")
+                else -> throw UpdateApiException("Invalid command: ${request.pathInfo}")
             }
         } catch (e: Throwable) {
             lock.withLock { status = Status.Error(e) }
@@ -55,7 +55,7 @@ class ApiServlet : HttpServlet() {
     }
 
     private fun HttpServletRequest.checkUserRole(role: String) {
-        if (!isUserInRole(role)) throw ApiException("$role user role required")
+        if (!isUserInRole(role)) throw UpdateApiException("$role user role required")
     }
 
     private val lock = ReentrantLock()
@@ -72,7 +72,7 @@ class ApiServlet : HttpServlet() {
     }
 
     private fun update(): String = lock.withLock {
-        if (status !== Status.Ready) throw ApiException("Invalid status: $status")
+        if (status !== Status.Ready) throw UpdateApiException("Invalid status: $status")
         status = Status.Loading
         daemon("update") {
             try {
@@ -94,7 +94,7 @@ class ApiServlet : HttpServlet() {
     }
 
     private fun install(): String = lock.withLock {
-        if (status !== Status.Ready) throw ApiException("Invalid status: $status")
+        if (status !== Status.Ready) throw UpdateApiException("Invalid status: $status")
         status = Status.Loading
         daemon("install") {
             try {
@@ -110,13 +110,13 @@ class ApiServlet : HttpServlet() {
     }
 
     private fun autoUpdateStart(): String = lock.withLock {
-        if (status !== Status.Ready) throw ApiException("Invalid status: $status")
+        if (status !== Status.Ready) throw UpdateApiException("Invalid status: $status")
         autoUpdateFile.writeText("")
         "Auto-Update started"
     }
 
     private fun autoUpdateStop(): String = lock.withLock {
-        if (status !== Status.Ready) throw ApiException("Invalid status: $status")
+        if (status !== Status.Ready) throw UpdateApiException("Invalid status: $status")
         autoUpdateFile.delete()
         "Auto-Update stopped"
     }
@@ -125,7 +125,7 @@ class ApiServlet : HttpServlet() {
         thread(block = block, isDaemon = true, name = name)
 }
 
-private class ApiException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
+private class UpdateApiException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
 private sealed class Status {
     open val text: String get() = javaClass.simpleName

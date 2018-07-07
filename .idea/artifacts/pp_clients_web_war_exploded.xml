@@ -1,0 +1,28 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="pp-clients-web:war exploded">
+    <output-path>$PROJECT_DIR$/pp-clients-web/target/pp-clients-web-0.1.0.0</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="pp-clients-web" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.2.10" />
+          <element id="library" level="project" name="Maven: org.jetbrains:annotations:13.0" />
+          <element id="library" level="project" name="Maven: javax.json:javax.json-api:1.0" />
+          <element id="library" level="project" name="Maven: org.glassfish:javax.json:1.0.4" />
+          <element id="archive" name="pp-api-0.1.0.0.jar">
+            <element id="module-output" name="pp-api" />
+          </element>
+          <element id="archive" name="pp-clients-0.1.0.0.jar">
+            <element id="module-output" name="pp-clients" />
+          </element>
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/pp-clients-web/target/pp-clients-web-0.1.0.0/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="pp-clients-web/web/Web" />
+    </root>
+  </artifact>
+</component>

@@ -8,6 +8,8 @@
       <module fileurl="file://$PROJECT_DIR$/edi.iml" filepath="$PROJECT_DIR$/edi.iml" />
       <module fileurl="file://$PROJECT_DIR$/mdb/mdb.iml" filepath="$PROJECT_DIR$/mdb/mdb.iml" />
       <module fileurl="file://$PROJECT_DIR$/pp-api/pp-api.iml" filepath="$PROJECT_DIR$/pp-api/pp-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pp-clients/pp-clients.iml" filepath="$PROJECT_DIR$/pp-clients/pp-clients.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pp-clients-web/pp-clients-web.iml" filepath="$PROJECT_DIR$/pp-clients-web/pp-clients-web.iml" />
       <module fileurl="file://$PROJECT_DIR$/rJavaJDBC/rJavaJDBC.iml" filepath="$PROJECT_DIR$/rJavaJDBC/rJavaJDBC.iml" />
       <module fileurl="file://$PROJECT_DIR$/toBaseX/toBaseX.iml" filepath="$PROJECT_DIR$/toBaseX/toBaseX.iml" />
     </modules>

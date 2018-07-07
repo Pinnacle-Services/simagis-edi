@@ -4,12 +4,15 @@
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/claim-db" />
+      <excludeFolder url="file://$MODULE_DIR$/RServe" />
       <excludeFolder url="file://$MODULE_DIR$/claims-web" />
+      <excludeFolder url="file://$MODULE_DIR$/do-up-web" />
       <excludeFolder url="file://$MODULE_DIR$/edireader" />
-      <excludeFolder url="file://$MODULE_DIR$/logs" />
       <excludeFolder url="file://$MODULE_DIR$/mdb" />
-      <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/pp-api" />
+      <excludeFolder url="file://$MODULE_DIR$/pp-clients" />
+      <excludeFolder url="file://$MODULE_DIR$/pp-clients-web" />
+      <excludeFolder url="file://$MODULE_DIR$/rJavaJDBC" />
       <excludeFolder url="file://$MODULE_DIR$/toBaseX" />
     </content>
     <orderEntry type="inheritedJdk" />

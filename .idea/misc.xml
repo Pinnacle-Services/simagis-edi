@@ -3,6 +3,8 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/claims-web" />
     <file type="web" url="file://$PROJECT_DIR$/do-up-web" />
+    <file type="web" url="file://$PROJECT_DIR$/pp-clients" />
+    <file type="web" url="file://$PROJECT_DIR$/pp-clients-web" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
