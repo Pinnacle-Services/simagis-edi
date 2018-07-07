@@ -1,4 +1,3 @@
-
 (: process 835 EDI ERA docs:)
 declare namespace functx = "http://www.functx.com";
 declare function functx:if-empty
@@ -14,21 +13,26 @@ declare option output:method "json";
 
 <json type='array'>{
     for $grp in collection()//group
-    (: transmission date:)
+   (: transmission date:)
     let $date_tr := data($grp/@Date)
     for $trn in $grp/transaction
-    (: Payer:)
-    let $payer_name := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PR"]/element[@Id = "N102"]/text()
-    let $payer_id := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PR"]/element[@Id = "N104"]/text()
-    (:Payment:)
+   (: Payer:)
+    let $payer_name := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element[@Id="N101"] = "PR"]/element[@Id = "N102"]/text()
+    let $payer_id1 := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:elementt[@Id="N101"] = "PR"]/element[@Id = "N104"]/text()
+    let $payer_id2 := $trn/loop[@Id = "1000"]/segment[@Id = "REF" and *:element[@Id="REF01"] = "2U"]/element[@Id = "REF02"]/text()
+    let $payer_id := functx:if-empty( data($payer_id2), data($payer_id1))
+   (: Payer Contact:)
+    let $payer_contact := $trn/loop[@Id = "1000"]/segment[@Id = "PER" and *:element[@Id="PER01"] = "CX"]/element[@Id = "PER02"]/text()
+    let $payer_phone := $trn/loop[@Id = "1000"]/segment[@Id = "PER" and *:element[@Id="PER01"] = "CX"]/element[@Id = "PER04"]/text()
+   (:Payment:)
     let $payby := $trn/segment[@Id="BPR"]/element[@Id="BPR04"]/text()
     let $paydt := $trn/segment[@Id="BPR"]/element[@Id="BPR16"]/text()
     let $payacct := $trn/segment[@Id="BPR"]/element[@Id="BPR15"]/text()
     let $checknum := $trn/segment[@Id="TRN"]/element[@Id="TRN02"]/text()
-    (: Sender:)
-    let $from_name := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PE"]/element[@Id = "N102"]/text()
-    let $from_id := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element = "PE"]/element[@Id = "N104"]/text()
-    (: Accession Data :)
+   (: Sender:)
+    let $from_name := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element[@Id="N101"] = "PE"]/element[@Id = "N102"]/text()
+    let $from_id := $trn/loop[@Id = "1000"]/segment[@Id = "N1" and *:element[@Id="N101"] = "PE"]/element[@Id = "N104"]/text()
+   (: Accession Data :)
     for $clp in $trn/loop[@Id = "2000"]/loop[@Id = "2100"]
     let $acn_id := $clp/segment[@Id = "CLP"]/element[@Id = "CLP01"]/text()
     let $status := $clp/segment[@Id = "CLP"]/element[@Id = "CLP02"]/text()
@@ -77,6 +81,8 @@ declare option output:method "json";
             <frmid>{functx:if-empty($from_id,"Empty")}</frmid>,
             <prid>{functx:if-empty($payer_id,"Empty")}</prid>,
             <prn-CC>{$payer_name}</prn-CC>,
+            <prc-CC>{functx:if-empty($payer_contact,"Empty")}</prc-CC>,
+            <prcph>{functx:if-empty($payer_phone,"Empty")}</prcph>,
             <fCode>{$filing}</fCode>,
             <clmAsk-C0>{$ask_amt}</clmAsk-C0>,
             <clmPay-C0>{$pay_amt}</clmPay-C0>,           
