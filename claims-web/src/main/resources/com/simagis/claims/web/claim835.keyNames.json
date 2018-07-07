@@ -40,5 +40,7 @@
   {"key": "payBy", "name": "Payment Method"},
   {"key": "payDate", "name": "Date of Payment"},
   {"key": "accNum", "name": "Bank Account"},
+  {"key": "prc", "name": "Payer Contact"},
+  {"key": "prcph", "name": "Payer Contact Phone"},
   {"key": "payID", "name": "Check Number or Wire ID"}  
 ]
