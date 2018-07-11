@@ -42,5 +42,6 @@
   {"key": "accNum", "name": "Bank Account"},
   {"key": "prc", "name": "Payer Contact"},
   {"key": "prcph", "name": "Payer Contact Phone"},
+  {"key": "cptRem", "name": "Remark"},
   {"key": "payID", "name": "Check Number or Wire ID"}  
 ]
