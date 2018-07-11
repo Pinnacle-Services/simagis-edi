@@ -94,11 +94,13 @@ declare option output:method "json";
             (:Claim Remarks:)            
             <remarks type='array'>{
               for $rem in $clp/segment[@Id="MOA" or @Id="MIA"]/element
+              let $rem_id := $rem/text()
               return
               <_ type = 'object'>{
-                <rem>{$rem/text()}</rem>
+                <rem>{$rem_id}</rem>
               }</_>
-            }</remarks>,
+            }</remarks>
+            ,
             
             (: CPT Level:)
             <svc type='array'>{
@@ -110,6 +112,8 @@ declare option output:method "json";
                 let $cpt_ask := $cpt/segment[@Id = "SVC"]/element[@Id = "SVC02"]/text()
                 let $cpt_pay := $cpt/segment[@Id = "SVC"]/element[@Id = "SVC03"]/text()
                 let $cpt_qty := $cpt/segment[@Id = "SVC"]/element[@Id = "SVC05"]/text()
+                let $cpt_rem := $cpt/segment[@Id = "LQ"]/element[@Id = "LQ02"]/text()
+                
                 (: Dates:)
                 let $date_srv := $cpt/segment[@Id = "DTM" and *:element[. = "472"]]/element[@Id = "DTM02"]/text()
 
@@ -125,6 +129,8 @@ declare option output:method "json";
                         <cptAsk-C0>{$cpt_ask}</cptAsk-C0>,
                         <cptPay-C0>{$cpt_pay}</cptPay-C0>,
                         <srvDate-DT8>{$date_srv[1]}</srvDate-DT8>,
+                        <cptRem>{$cpt_rem}</cptRem>,
+                        
                         (: adjustments information:)
                         <adj type = 'array'> {
                         for $adj in $cpt/segment[@Id="CAS"]
