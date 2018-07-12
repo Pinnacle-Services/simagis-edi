@@ -1,10 +1,9 @@
 package net.paypredict.clients
 
 import java.io.File
-import javax.json.Json
-import javax.json.JsonNumber
-import javax.json.JsonObject
-import javax.json.JsonString
+import java.io.StringWriter
+import javax.json.*
+import javax.json.stream.JsonGenerator
 
 /**
  * <p>
@@ -53,6 +52,22 @@ class PPClients {
 fun ppClients(): PPClients = PPClients()
 
 
-private val clientsDir = File("/PayPredict/clients")
+internal val clientsDir = File("/PayPredict/clients")
 
 
+private val jsonPP: JsonWriterFactory by lazy {
+    Json.createWriterFactory(mapOf<String, Any>(JsonGenerator.PRETTY_PRINTING to true))
+}
+
+fun JsonObject.toStringPP(): String =
+    StringWriter().use { jsonPP.createWriter(it).write(this); it }.toString().trimStart()
+
+operator fun JsonValue?.get(vararg path: String): JsonValue? {
+    var result: JsonValue = this ?: return null
+    for (key in path) {
+        if (result is JsonObject)
+            result = result[key] ?: return null else
+            return null
+    }
+    return result
+}

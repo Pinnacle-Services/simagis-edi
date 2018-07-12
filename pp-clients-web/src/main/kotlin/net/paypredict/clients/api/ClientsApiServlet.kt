@@ -1,10 +1,12 @@
 package net.paypredict.clients.api
 
 import net.paypredict.clients.ppClients
-import java.io.StringWriter
+import net.paypredict.clients.toStringPP
 import java.util.*
-import javax.json.*
-import javax.json.stream.JsonGenerator
+import javax.json.Json
+import javax.json.JsonArray
+import javax.json.JsonObject
+import javax.json.JsonValue
 import javax.servlet.annotation.WebServlet
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -81,12 +83,5 @@ private fun Throwable.toErrorResponse(id: String): JsonObject =
                 .add("id", id)
         )
         .build()
-
-private val jsonPP: JsonWriterFactory by lazy {
-    Json.createWriterFactory(mapOf<String, Any>(JsonGenerator.PRETTY_PRINTING to true))
-}
-
-private fun JsonObject.toStringPP(): String =
-    StringWriter().use { jsonPP.createWriter(it).write(this); it }.toString()
 
 private class ClientsApiException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
