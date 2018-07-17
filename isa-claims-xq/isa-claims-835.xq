@@ -133,9 +133,9 @@ declare option output:method "json";
                         (: CPT Remarks:)
                         <cptRem type="array"> {
                          for $cpt_remarks in $cpt/segment[@Id = "LQ"]
-                         let $cpt_rem := $cpt_remarks/element[@Id = "LQ02"]/text()
-                         return<_>{$cpt_rem}</_>
-                        }</cptRem>,
+                         let $cpt_rem := $cpt_remarks/element[@Id = "LQ02"]/text()                    
+                          return <_ type = 'object'>{<rem>{$cpt_rem}</rem>}</_>                                      
+                          }</cptRem>,
                         
                         (: adjustments information:)
                         <adj type = 'array'> {
