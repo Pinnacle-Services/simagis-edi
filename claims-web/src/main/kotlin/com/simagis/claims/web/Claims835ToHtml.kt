@@ -34,6 +34,7 @@ class Claims835ToHtml(
         key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value).esc
         key == "adjReason" && value is String -> value + " " + adjReasonCodes.optString(value).esc
         key == "rem" && value is String -> value + " " + remCodes.optString(value).esc
+        key == "cptRem" && value is String -> value + " " + remCodes.optString(value).esc
         key == "dxT" && value is String -> value + " " + dxT.optString(value).esc
         key == "dxV" && value is String -> value + " " + icd10Codes.optString(value).esc
         value is Date -> dateFormat.format(value).esc

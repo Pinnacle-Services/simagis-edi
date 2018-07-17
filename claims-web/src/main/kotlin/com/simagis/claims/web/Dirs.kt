@@ -54,6 +54,7 @@ val codes: Map<String, Dir> by lazy {
         "adjGrp" to adjGrpCodes,
         "adjReason" to adjReasonCodes,
         "rem" to remCodes,
+        "cptRem" to remCodes,
         "icd10" to icd10Codes,
         "dxT" to dxT
     )
