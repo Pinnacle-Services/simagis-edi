@@ -78,15 +78,27 @@ internal object ImportJob : AbstractJob() {
             }
         }
 
-        val plb: ClaimType
-            get() =
-                ClaimType(
-                    type = "plb",
-                    temp = "plb.temp",
-                    target = "plb",
-                    createIndexes = false,
-                    db = claims
-                )
+        val plb: ClaimType by lazy {
+            ClaimType(
+                type = "plb",
+                temp = "plb.temp",
+                target = "plb",
+                createIndexes = false,
+                db = claims
+            )
+        }
+
+        val ptnXQ: Boolean by lazy { options["ptnXQ"] as? Boolean ?: false }
+
+        val ptn_835: ClaimType by lazy {
+            ClaimType(
+                type = "ptn_835",
+                temp = "ptn_835.temp",
+                target = "ptn_835",
+                createIndexes = false,
+                db = ptn
+            )
+        }
 
         object build835c {
             private val build835c: Document by lazy { options["build835c"] as? Document ?: Document() }

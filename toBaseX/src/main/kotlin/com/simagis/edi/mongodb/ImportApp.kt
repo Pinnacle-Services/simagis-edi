@@ -332,6 +332,19 @@ fun main(args: Array<String>) {
                                     throw e
                             }
                         }
+                    if (ImportJob.options.ptnXQ) {
+                        isa.toJsonArray(file, xqFile = { "isa_claims_835_ptn.xq" })
+                            ?.filterIsInstance<JsonObject>()
+                            ?.forEach { json ->
+                                val document = Document.parse(json.toString()).prepare()
+                                try {
+                                    ImportJob.options.ptn_835.tempCollection.insertOne(document)
+                                } catch (e: MongoWriteException) {
+                                    if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY)
+                                        throw e
+                                }
+                            }
+                    }
                 }
             }
         }
@@ -357,7 +370,11 @@ fun main(args: Array<String>) {
                 emptyList<ImportJob.options.ClaimType>() +
                         ImportJob.options.archive.types.map { ImportJob.options.archive[it] } +
                         ImportJob.options.claimTypes.types.map { ImportJob.options.claimTypes[it] } +
-                        ImportJob.options.plb
+                        ImportJob.options.plb +
+                        if (ImportJob.options.ptnXQ)
+                            listOf(ImportJob.options.ptn_835) else
+                            emptyList()
+
 
             claimTypes
                     .filter { it.createIndexes }
