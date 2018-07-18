@@ -34,7 +34,6 @@ class Claims835ToHtml(
         key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value).esc
         key == "adjReason" && value is String -> value + " " + adjReasonCodes.optString(value).esc
         key == "rem" && value is String -> value + " " + remCodes.optString(value).esc
-        key == "cptRem" && value is String -> value + " " + remCodes.optString(value).esc
         key == "dxT" && value is String -> value + " " + dxT.optString(value).esc
         key == "dxV" && value is String -> value + " " + icd10Codes.optString(value).esc
         value is Date -> dateFormat.format(value).esc
@@ -252,9 +251,23 @@ class Claims835ToHtml(
                     .joinToString(separator = " | ")
                 )
                 addCptAdjustments(adjKey, doc[adjKey] as? List<*> ?: emptyList<Any>(), ctx)
-                addIndented((doc.keys - mainKeys - adjKey)
-                    .mapNotNull { it.toProp() }
-                    .joinToString(separator = " | "))
+
+                val keysLeft = doc.keys - mainKeys - adjKey
+                val arrays = keysLeft
+                    .map { it to doc[it] }
+                    .filter {it.second is List<*>}
+                    .toMap()
+
+                addIndented(
+                    (keysLeft - arrays.keys)
+                        .mapNotNull { it.toProp() }
+                        .joinToString(separator = " | "))
+
+                arrays.forEach { key, list ->
+                    withPadding {
+                        addArray(key, list as List<*>)
+                    }
+                }
             }
         }
 
@@ -378,6 +391,14 @@ class Claims835ToHtml(
     private fun addIndented(html: String) {
         //language=HTML
         this.html.append("<div style='padding-left: ${indent}em;'>$html</div>\n")
+    }
+
+    private fun withPadding(left: String = "2em", right: String = left, innerHtml: () -> Unit) {
+        //language=HTML
+        this.html.append("<div style='padding-left: $left; padding-right: $right;'>\n")
+        innerHtml()
+        //language=HTML
+        this.html.append("</div>\n")
     }
 
     private fun addLink(href: String = "", html: String, separator: String = "\n", fragment: String = "") {
