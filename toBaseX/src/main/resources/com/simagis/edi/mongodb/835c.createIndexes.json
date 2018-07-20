@@ -1,7 +1,6 @@
 {
   "indexes": [
     {"acn": 1},
-    {"sys": 1},
     {"ref": 1},
     {"procDate": -1},
     {"prn": 1},
