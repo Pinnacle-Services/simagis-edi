@@ -8,6 +8,7 @@
     {"status": 1},
     {"clmAsk": 1},
     {"svc.cpt": 1},
+    {"svc.cptMod1": 1},
     {"svc.cptAsk": 1},
     {"svc.adj.adjGrp": 1},
     {"svc.adj.adjReason": 1},
