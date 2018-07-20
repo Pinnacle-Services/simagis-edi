@@ -151,6 +151,9 @@ fun main(args: Array<String>) {
                                     c835["npi"] = value
                                     c835["client"] = npiMapClient[value]?.doc
                                 }
+                                "authNum" -> {
+                                    c835["authNum"] = value
+                                }
                                 !in skipKeys -> c835[key] = value
                             }
                         }
