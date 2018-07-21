@@ -112,6 +112,7 @@ fun main(args: Array<String>) {
                     `+`("acn", 1)
                     `+`("sendDate", 1)
                     `+`("eob", 1)
+                    `+`("authNum", 1)
                 })
                 .sort(doc {
                     `+`("sendDate", -1)
