@@ -6,6 +6,7 @@ import com.simagis.edi.mdb.*
 import org.bson.Document
 import org.intellij.lang.annotations.Language
 import java.lang.Long.min
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,6 +37,7 @@ class Claims835ToHtml(
         key == "rem" && value is String -> value + " " + remCodes.optString(value).esc
         key == "dxT" && value is String -> value + " " + dxT.optString(value).esc
         key == "dxV" && value is String -> value + " " + icd10Codes.optString(value).esc
+        key == "npi" && value is String -> NPI.format(value)
         value is Date -> dateFormat.format(value).esc
         else -> value.asHTML.esc
     }
@@ -46,6 +48,24 @@ class Claims835ToHtml(
         private fun Map<String, String>.optString(key: String, def: String = ""): String {
             return this[key] ?: def
         }
+
+        private val String.esc get() = this.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        private val Any?.esc
+            get() = when (this) {
+                is String -> esc
+                null -> ""
+                else -> toString().esc
+            }
+
+        object NPI {
+            private const val uri = "https://npiregistry.cms.hhs.gov/registry/provider-view/"
+
+            @Language("HTML")
+            fun format(value: String): String =
+                "<a href='$uri${URLEncoder.encode(value, "UTF-8")}' target='_blank'>${value.esc}</a>"
+        }
+
     }
 
     init {
@@ -405,13 +425,6 @@ class Claims835ToHtml(
         this.html.append("<a href='$href#$fragment'>$html</a>$separator")
     }
 
-    private val String.esc get() = this.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    private val Any?.esc
-        get() = when (this) {
-            is String -> esc
-            null -> ""
-            else -> toString().esc
-        }
     private val Any?.asHTML: String get() = this?.toString() ?: ""
 
     @Language("HTML")
