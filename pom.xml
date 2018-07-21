@@ -16,6 +16,7 @@
         <module>rJavaJDBC</module>
         <module>RServe</module>
         <module>do-up-web</module>
+        <module>pp-mail</module>
         <module>pp-api</module>
         <module>pp-clients</module>
         <module>pp-clients-web</module>

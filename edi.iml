@@ -12,6 +12,7 @@
       <excludeFolder url="file://$MODULE_DIR$/pp-api" />
       <excludeFolder url="file://$MODULE_DIR$/pp-clients" />
       <excludeFolder url="file://$MODULE_DIR$/pp-clients-web" />
+      <excludeFolder url="file://$MODULE_DIR$/pp-mail" />
       <excludeFolder url="file://$MODULE_DIR$/rJavaJDBC" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/toBaseX" />
