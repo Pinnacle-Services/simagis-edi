@@ -151,7 +151,9 @@ class ClaimDbApiServlet : HttpServlet() {
                     delete()
                     throw e
                 }
-                renameTo(claimDbRootDir.resolve("files").apply { mkdir() }.resolve(name))
+                val file = claimDbRootDir.resolve("files").apply { mkdir() }.resolve(name)
+                file.delete()
+                renameTo(file)
                 response.status = HTTP_OK
             }
             else ->  throw ClaimDbApiException("invalid file command: $command")
