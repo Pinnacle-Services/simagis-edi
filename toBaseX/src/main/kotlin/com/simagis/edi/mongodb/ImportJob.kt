@@ -212,7 +212,7 @@ internal object ImportJob : AbstractJob() {
                 var nameId: Int = -1
                 var daysId: Int = -1
                 File("files")
-                    .resolve("payers.csv")
+                    .resolve("payers.tsv")
                     .parseAsCsv(
                         { index, name ->
                             when (name) {
