@@ -19,6 +19,9 @@ class Claims835ToHtml(
     val cq: ClaimQuery?,
     val maxCount: Int = 100,
     val paging: Paging = Paging(0, 0),
+    val contextPath: String,
+    val servletPath: String,
+    val pathInfo: String,
     val root: String,
     val queryString: String
 ) {
@@ -30,6 +33,7 @@ class Claims835ToHtml(
 
     private fun formatValue(key: String, value: Any?): String = when {
         key == "_id" && value is String -> value
+        key == "acn" && value is String -> ACN835.format(cq, contextPath, servletPath, pathInfo, value)
         key == "cpt" && value is String -> value + " " + cptCodes.optString(value).esc
         key == "status" && value is String -> value + " " + statusCodes.optString(value).esc
         key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value).esc
@@ -58,14 +62,33 @@ class Claims835ToHtml(
                 else -> toString().esc
             }
 
+        object ACN835 {
+            @Language("HTML")
+            fun format(
+                cq: ClaimQuery?,
+                contextPath: String,
+                servletPath: String,
+                pathInfo: String,
+                value: String): String =
+                when {
+                    cq?.type?.startsWith("835") == true
+                            || (servletPath == "/claim" && pathInfo.startsWith("/835")) ->
+                        "<a href='$contextPath/claim/837/${value.urlEnc}?ps=20' target='_blank'>${value.esc}</a>"
+                    else ->
+                        value.esc
+                }
+        }
+
         object NPI {
             private const val uri = "https://npiregistry.cms.hhs.gov/registry/provider-view/"
 
             @Language("HTML")
             fun format(value: String): String =
-                "<a href='$uri${URLEncoder.encode(value, "UTF-8")}' target='_blank'>${value.esc}</a>"
+                "<a href='$uri${value.urlEnc}' target='_blank'>${value.esc}</a>"
         }
 
+        private val String.urlEnc: String
+            get() = URLEncoder.encode(this, "UTF-8")
     }
 
     init {
