@@ -39,16 +39,15 @@ class UpdateApiServlet : HttpServlet() {
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         try {
-            request.checkUserRole("pp-api-admins")
-            when (request.pathInfo) {
-                "/host-ver" -> response.json = hostVer()
-                "/local-ver" -> response.json = localVer()
-                "/status" -> response.json = status()
-                "/status-reset" -> response.json = resetStatus()
-                "/update" -> response.json = update()
-                "/install" -> response.json = install()
-                "/auto-update-start" -> response.json = autoUpdateStart()
-                "/auto-update-stop" -> response.json = autoUpdateStop()
+            response.json = when (request.pathInfo) {
+                "/local-ver" -> request.role("read") { localVer() }
+                "/host-ver" -> request.role("read.host") { hostVer() }
+                "/status" -> request.role("read") { status() }
+                "/status-reset" -> request.role("admin") { resetStatus() }
+                "/update" -> request.role("admin") { update() }
+                "/install" -> request.role("admin") { install() }
+                "/auto-update-start" -> request.role("admin") { autoUpdateStart() }
+                "/auto-update-stop" -> request.role("admin") { autoUpdateStop() }
                 else -> throw UpdateApiException("Invalid command: ${request.pathInfo}")
             }
         } catch (e: Throwable) {
@@ -59,8 +58,9 @@ class UpdateApiServlet : HttpServlet() {
         }
     }
 
-    private fun HttpServletRequest.checkUserRole(role: String) {
+    private fun HttpServletRequest.role(role: String, action: () -> JsonObject?): JsonObject? {
         if (!isUserInRole(role)) throw UpdateApiException("$role user role required")
+        return action()
     }
 
     private val lock = ReentrantLock()
@@ -183,8 +183,11 @@ private var HttpServletResponse.json: JsonObject?
         outputStream.write(bytes)
     }
 
-private val jsonPP: JsonWriterFactory = Json.createWriterFactory(mapOf(
-    JsonGenerator.PRETTY_PRINTING to true))
+private val jsonPP: JsonWriterFactory = Json.createWriterFactory(
+    mapOf(
+        JsonGenerator.PRETTY_PRINTING to true
+    )
+)
 
 private fun JsonObject?.toStringPP(): String = when {
     this == null -> "{}"
