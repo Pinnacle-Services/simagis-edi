@@ -12,7 +12,7 @@ import java.net.URI
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.Period
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
@@ -198,11 +198,7 @@ internal object ImportJob : AbstractJob() {
         operator fun get(procDate: Date?, prn: String?): Date? {
             if (procDate == null || prn == null) return null
             val days = map[prn]?.days ?: 90
-            val result = procDate
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate() + Period.ofDays(days)
-            return Date.from(result.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+            return Date.from((procDate.toInstant().atZone(ZoneOffset.UTC) + Period.ofDays(days)).toInstant())
         }
 
         private class doc(val prn: String, val days: Int)
