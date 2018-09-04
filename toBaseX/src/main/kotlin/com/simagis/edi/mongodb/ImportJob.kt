@@ -93,6 +93,16 @@ internal object ImportJob : AbstractJob() {
             )
         }
 
+        val ptn_837: ClaimType by lazy {
+            ClaimType(
+                type = "ptn_837",
+                temp = "ptn_837.temp",
+                target = "ptn_837",
+                createIndexes = false,
+                db = ptn
+            )
+        }
+
         object build835c {
             private val build835c: Document by lazy { options["build835c"] as? Document ?: Document() }
             val _835c: ClaimType by lazy {

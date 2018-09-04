@@ -40,17 +40,6 @@ internal abstract class AbstractJob {
     lateinit var claimsA: MongoDatabase
 
     val ptn: MongoDatabase by lazy {
-        val confFile = File("/PayPredict/conf/mongo-ptn.json")
-        val conf = if (confFile.isFile)
-            Json.createReader(confFile.reader()).use { it.readObject() } else
-            Json.createObjectBuilder().build()
-        val mongo = (conf["mongo"] as? JsonObject) ?: Json.createObjectBuilder().build()
-        val dbs = JobDBS(
-            ServerAddress(
-                mongo.getString("host", ServerAddress.defaultHost()),
-                mongo.getInt("port", ServerAddress.defaultPort())
-            )
-        )
         dbs["ptn"]
     }
 

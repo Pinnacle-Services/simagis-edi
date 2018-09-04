@@ -75,14 +75,14 @@ fun main(args: Array<String>) {
         fun invalidISA(isa: ISA, e: Throwable? = null) {
             onError(e)
             warning(
-                    "Invalid ISA: ${isa.stat} from $isaContext",
-                    e,
-                    details = isa.code,
-                    detailsXml = if (e !is EDISyntaxException) try {
-                        isa.xmlCode
-                    } catch (e: Exception) {
-                        null
-                    } else null
+                "Invalid ISA: ${isa.stat} from $isaContext",
+                e,
+                details = isa.code,
+                detailsXml = if (e !is EDISyntaxException) try {
+                    isa.xmlCode
+                } catch (e: Exception) {
+                    null
+                } else null
             )
         }
 
@@ -178,10 +178,10 @@ fun main(args: Array<String>) {
 
                             "CC" -> append(getString(key)) {
                                 it.split("[\\s,;.]".toRegex())
-                                        .filter(String::isNotEmpty)
-                                        .map(String::toLowerCase)
-                                        .map(String::capitalize)
-                                        .joinToString(separator = " ")
+                                    .filter(String::isNotEmpty)
+                                    .map(String::toLowerCase)
+                                    .map(String::capitalize)
+                                    .joinToString(separator = " ")
                             }
                             "DT8" -> getString(key)?.also { value ->
                                 parseDT8(value)?.also { append(key.name(), it) } ?: if (value.isNotEmpty()) {
@@ -191,17 +191,21 @@ fun main(args: Array<String>) {
                         }
                     } catch (e: Exception) {
                         when (e) {
-                            is ParseException -> logger?.warn("Invalid date format at $_id $key: '${getString(key)}'")
-                            is NumberFormatException -> logger?.warn("Invalid number format at $_id $key: '${getString(key)}'")
+                            is ParseException -> logger?.warn(
+                                "Invalid date format at $_id $key: '${getString(key)}'"
+                            )
+                            is NumberFormatException -> logger?.warn(
+                                "Invalid number format at $_id $key: '${getString(key)}'"
+                            )
                             else -> throw e
                         }
                     }
                 }
                 keys.removeIf(String::isTyped)
-                values.forEach {
-                    when (it) {
-                        is Document -> it.fixTypes()
-                        is List<*> -> it.forEach { (it as? Document)?.fixTypes() }
+                values.forEach { value ->
+                    when (value) {
+                        is Document -> value.fixTypes()
+                        is List<*> -> value.forEach { (it as? Document)?.fixTypes() }
                     }
                 }
             }
@@ -214,6 +218,7 @@ fun main(args: Array<String>) {
         }
 
         data class DuplicatesKey(val claimType: String, val claimId: String)
+
         val duplicates = mutableMapOf<DuplicatesKey, Date>()
         val duplicatesLock = ReentrantLock()
 
@@ -225,7 +230,13 @@ fun main(args: Array<String>) {
 
         fun ImportJob.options.ClaimType.key(claimId: String): DuplicatesKey = DuplicatesKey(type, claimId)
 
-        fun ImportJob.options.ClaimType.tryReplace(collection: DocumentCollection, newClaimDocument: Document, newClaimDate: Date, isa: ISA, logger: LocalLogger) {
+        fun ImportJob.options.ClaimType.tryReplace(
+            collection: DocumentCollection,
+            newClaimDocument: Document,
+            newClaimDate: Date,
+            isa: ISA,
+            logger: LocalLogger
+        ) {
             claimCountDuplicate.incrementAndGet()
             val claimId = newClaimDocument._id.toString()
             val oldClaimDate = collection.find(doc(claimId)).first().claimDate(isa)!!
@@ -255,6 +266,12 @@ fun main(args: Array<String>) {
                 warning("Invalid file $file", e)
                 return
             }
+
+            fun MongoWriteException.ignoreDuplicates() {
+                if (ErrorCategory.fromErrorCode(code) != ErrorCategory.DUPLICATE_KEY)
+                    throw this
+            }
+
             isaList.forEach { isa ->
                 val claims = isa.toJsonArray(file)
                 if (claims != null) {
@@ -299,9 +316,16 @@ fun main(args: Array<String>) {
                                     if (insertMode) try {
                                         collection.insertOne(document)
                                     } catch (e: MongoWriteException) {
-                                        if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY)
-                                            throw e
-                                        duplicatesLock.withLock { tryReplace(collection, document, claimDate, isa, logger) }
+                                        e.ignoreDuplicates()
+                                        duplicatesLock.withLock {
+                                            tryReplace(
+                                                collection,
+                                                document,
+                                                claimDate,
+                                                isa,
+                                                logger
+                                            )
+                                        }
                                     }
                                     claimCount.incrementAndGet()
                                 } else {
@@ -328,23 +352,27 @@ fun main(args: Array<String>) {
                             try {
                                 ImportJob.options.plb.tempCollection.insertOne(document)
                             } catch (e: MongoWriteException) {
-                                if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY)
-                                    throw e
+                                e.ignoreDuplicates()
                             }
                         }
-                    if (ImportJob.options.ptnXQ) {
-                        isa.toJsonArray(file, xqFile = { "isa_claims_835_ptn.xq" })
+                }
+                if (ImportJob.options.ptnXQ) {
+                    fun ImportJob.options.ClaimType.ptnXQ(xqName: String) {
+                        isa.toJsonArray(file, xqFile = { xqName })
                             ?.filterIsInstance<JsonObject>()
                             ?.forEach { json ->
                                 val document = Document.parse(json.toString()).prepare()
                                 try {
-                                    ImportJob.options.ptn_835.tempCollection.insertOne(document)
+                                    tempCollection.insertOne(document)
                                 } catch (e: MongoWriteException) {
-                                    if (ErrorCategory.fromErrorCode(e.code) != ErrorCategory.DUPLICATE_KEY)
-                                        throw e
+                                    e.ignoreDuplicates()
                                 }
                             }
                     }
+                    if (isa.type == "835")
+                        ImportJob.options.ptn_835.ptnXQ("isa_claims_835_ptn.xq")
+                    if (isa.type == "837")
+                        ImportJob.options.ptn_837.ptnXQ("isa_claims_837_ptn.xq")
                 }
             }
         }
@@ -377,12 +405,12 @@ fun main(args: Array<String>) {
 
 
             claimTypes
-                    .filter { it.createIndexes }
-                    .forEach { it.createIndexes() }
+                .filter { it.createIndexes }
+                .forEach { it.createIndexes() }
 
             claimTypes
-                    .filter { it.target.isNotEmpty() }
-                    .forEach { it.renameToTarget() }
+                .filter { it.target.isNotEmpty() }
+                .forEach { it.renameToTarget() }
 
             info("DONE for ${ImportJob.options.sourceDir} into $ImportJob ${details()}")
         } else {
@@ -407,11 +435,11 @@ fun parseDT8(text: String): Date? {
 
 fun Document.augment835() {
     // https://github.com/vylegzhanin/simagis-edi/issues/2
-    (this["svc"] as? List<*>)?.forEach {
-        (it as? Document)?.let { cpt ->
+    (this["svc"] as? List<*>)?.forEach { svcDoc ->
+        (svcDoc as? Document)?.let { cpt ->
             var cptPr = 0.0
-            (cpt["adj"] as? List<*>)?.forEach {
-                (it as? Document)?.let { adj ->
+            (cpt["adj"] as? List<*>)?.forEach { adjDoc ->
+                (adjDoc as? Document)?.let { adj ->
                     if (adj["adjGrp"] == "PR") {
                         (adj["adjAmt"] as? Number)?.let { adjAmt ->
                             cptPr += adjAmt.toDouble()
@@ -441,7 +469,13 @@ fun Document.augment837() {
 }
 
 private class LocalLogger(val file: File, val isa: ISA, val json: Any?) {
-    fun warn(message: String, error: Throwable? = null, details: String? = null, detailsJson: Any? = null, detailsXml: String? = null) {
+    fun warn(
+        message: String,
+        error: Throwable? = null,
+        details: String? = null,
+        detailsJson: Any? = null,
+        detailsXml: String? = null
+    ) {
         warning("$message file: $file", error, details, detailsJson ?: json, detailsXml ?: isa.xmlCode)
     }
 
@@ -534,12 +568,12 @@ private class MFiles {
                             })
                             val collectionNames = ImportJob.claims.listCollectionNames()
                             ImportJob.options.claimTypes.types
-                                    .map { ImportJob.options.claimTypes[it] }
-                                    .filter { collectionNames.contains(it.temp) }
-                                    .forEach {
-                                        warning("temp collection already exists -> ${it.tempCollection.namespace}.drop()")
-                                        it.tempCollection.drop()
-                                    }
+                                .map { ImportJob.options.claimTypes[it] }
+                                .filter { collectionNames.contains(it.temp) }
+                                .forEach {
+                                    warning("temp collection already exists -> ${it.tempCollection.namespace}.drop()")
+                                    it.tempCollection.drop()
+                                }
 
                         } else {
                             info("continue processing")
@@ -583,13 +617,14 @@ private class MFiles {
                 info("loading importFiles")
 
                 ImportJob.importFiles
-                        .find(doc { `+`("job", ImportJob.jobId) })
-                        .forEach { document ->
-                            list += MFile(
-                                    id = document._id as? ObjectId,
-                                    file = File(document.getString("file")),
-                                    fileTime = document.getLong("fileTime"))
-                        }
+                    .find(doc { `+`("job", ImportJob.jobId) })
+                    .forEach { document ->
+                        list += MFile(
+                            id = document._id as? ObjectId,
+                            file = File(document.getString("file")),
+                            fileTime = document.getLong("fileTime")
+                        )
+                    }
                 info("loading done")
             }
             list.sortByDescending { it.fileTime }
