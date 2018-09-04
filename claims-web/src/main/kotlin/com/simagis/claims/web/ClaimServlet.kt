@@ -61,16 +61,20 @@ class ClaimServlet : HttpServlet() {
         }
 
         val html = Claims835ToHtml(
-                db = claimsDb,
-                cq = cq,
-                paging = paging,
-                root = request.contextPath + servletPath + request.pathInfo,
-                queryString = queryString)
-                .apply {
-                    documents.forEach { document ->
-                        if (!append(document)) return@apply
-                    }
+            db = claimsDb,
+            cq = cq,
+            paging = paging,
+            contextPath = request.contextPath,
+            servletPath = servletPath,
+            pathInfo = request.pathInfo,
+            root = request.contextPath + servletPath + request.pathInfo,
+            queryString = queryString
+        )
+            .apply {
+                documents.forEach { document ->
+                    if (!append(document)) return@apply
                 }
+            }
 
         response.send(HTTP_OK, html.toBytes())
     }

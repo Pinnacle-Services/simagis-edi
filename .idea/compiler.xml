@@ -12,6 +12,7 @@
         <module name="pp-api" />
         <module name="pp-clients" />
         <module name="pp-clients-web" />
+        <module name="pp-mail" />
         <module name="rJavaJDBC" />
         <module name="RServe" />
         <module name="toBaseX" />
@@ -26,6 +27,7 @@
       <module name="pp-api" target="1.8" />
       <module name="pp-clients" target="1.8" />
       <module name="pp-clients-web" target="1.8" />
+      <module name="pp-mail" target="1.8" />
       <module name="rJavaJDBC" target="1.8" />
       <module name="RServe" target="1.8" />
       <module name="toBaseX" target="1.8" />

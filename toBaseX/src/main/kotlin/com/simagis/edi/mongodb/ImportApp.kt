@@ -424,6 +424,11 @@ fun Document.augment835() {
             cpt["cptAll"] = cptPr + cptPay
         }
     }
+
+    this["ftlDate"] = ImportJob.payers2ftlDate[
+            this["procDate"] as? Date,
+            this["prn"] as? String
+    ]
 }
 
 fun Document.augment837() {

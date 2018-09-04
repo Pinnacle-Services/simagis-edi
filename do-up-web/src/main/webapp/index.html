@@ -2,16 +2,67 @@
 <html>
 <head>
     <title>index</title>
+    <script>
+        function e(id) {
+            return document.getElementById(id);
+        }
+
+        function toLogger(xhr) {
+            return function () {
+                if (xhr.readyState === 4) {
+                    var log = e("response");
+                    if (xhr.status === 200) {
+                        log.innerText = xhr.responseText + "\n";
+                    } else {
+                        log.innerText = "ERROR response status: " + xhr.status + "\n";
+                        log.innerText += xhr.responseText + "\n";
+                    }
+                }
+            }
+        }
+
+        function GET(url) {
+            var index = location.href.lastIndexOf("/");
+            url = location.href.substring(0, index) + url;
+            e("request").innerText = url;
+            e("response").innerText = "Waiting...";
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.setRequestHeader("PP-API-KEY", e("ppApiKey").value);
+            xhr.onreadystatechange = toLogger(xhr);
+            xhr.send();
+        }
+
+    </script>
+    <style>
+        .get {
+            text-decoration-line: underline;
+            color: blue;
+            cursor: pointer;
+        }
+        pre {
+            border: solid black 1px;
+            padding: 8pt;
+        }
+    </style>
 </head>
 <body>
 <ul>
-    <li><a href="api/host-ver">api/host-ver</a></li>
-    <li><a href="api/status">api/status</a></li>
-    <li><a href="api/status-reset">api/status-reset</a></li>
-    <li><a href="api/update">api/update</a></li>
-    <li><a href="api/install">api/install</a></li>
-    <li><a href="api/auto-update-start">api/auto-update-start</a></li>
-    <li><a href="api/auto-update-stop">api/auto-update-stop</a></li>
+    <li><span class="get" onclick="GET(this.innerText)">/api/local-ver</span></li>
+    <li><span class="get" onclick="GET(this.innerText)">/api/host-ver</span></li>
+    <li><span class="get" onclick="GET(this.innerText)">/api/status</span></li>
+    <li><span class="get" onclick="GET(this.innerText)">/api/status-reset</span></li>
+    <li><span class="get" onclick="GET(this.innerText)">/api/update</span></li>
+    <li><span class="get" onclick="GET(this.innerText)">/api/install</span></li>
+    <li><span class="get" onclick="GET(this.innerText)">/api/auto-update-start</span></li>
+    <li><span class="get" onclick="GET(this.innerText)">/api/auto-update-stop</span></li>
 </ul>
+<label accesskey="K"
+       for="ppApiKey">PP-API-<u>K</u>EY</label>: <input
+        id="ppApiKey" type="text"
+        style="width: 32em; -webkit-text-security: disc;"
+        title="PP-API-KEY">
+<pre id="request"></pre>
+<pre id="response"></pre>
 </body>
 </html>

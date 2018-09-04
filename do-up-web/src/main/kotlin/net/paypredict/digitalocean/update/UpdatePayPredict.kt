@@ -17,20 +17,26 @@ fun main(args: Array<String>) {
 
 data class VerData(val id: String = "", val time: String = "", val exists: Boolean = false)
 
-fun readLocalImageVer(): VerData =
+fun readLocalImageVerJson(): JsonObject? =
     localClientImageDir
         .resolve("ver.json")
         .let { file ->
             if (file.exists())
-                file.reader().use { it.readJson() }.toVerData()
+                file.reader().use { it.readJson() }
             else
-                VerData(exists = false)
+                null
         }
 
-fun ChannelSftp.readHostVer(): VerData {
+fun readLocalImageVer(): VerData =
+    readLocalImageVerJson()?.toVerData() ?: VerData(exists = false)
+
+fun ChannelSftp.readHostVerJson(): JsonObject {
     cd("/clients/$tagsClient/upload")
-    return get("ver.json").reader().use { it.readJson() }.toVerData()
+    return get("ver.json").reader().use { it.readJson() }
 }
+
+fun ChannelSftp.readHostVer(): VerData =
+    readHostVerJson().toVerData()
 
 private fun JsonObject.toVerData(): VerData {
     val time = getString("time")

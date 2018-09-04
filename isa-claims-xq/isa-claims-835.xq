@@ -112,11 +112,11 @@ declare option output:method "json";
                 let $cpt_ask := $cpt/segment[@Id = "SVC"]/element[@Id = "SVC02"]/text()
                 let $cpt_pay := $cpt/segment[@Id = "SVC"]/element[@Id = "SVC03"]/text()
                 let $cpt_qty := $cpt/segment[@Id = "SVC"]/element[@Id = "SVC05"]/text()
-                let $cpt_rem := $cpt/segment[@Id = "LQ"]/element[@Id = "LQ02"]/text()
                 
                 (: Dates:)
                 let $date_srv := $cpt/segment[@Id = "DTM" and *:element[. = "472"]]/element[@Id = "DTM02"]/text()
 
+                (: CPT Data:)
                 return
                     <_ type='object'>{
                         <cptId >{concat($cpt_id,$cpt_mod)}</cptId>,
@@ -129,7 +129,13 @@ declare option output:method "json";
                         <cptAsk-C0>{$cpt_ask}</cptAsk-C0>,
                         <cptPay-C0>{$cpt_pay}</cptPay-C0>,
                         <srvDate-DT8>{$date_srv[1]}</srvDate-DT8>,
-                        <cptRem>{$cpt_rem}</cptRem>,
+                        
+                        (: CPT Remarks:)
+                        <cptRem type="array"> {
+                         for $cpt_remarks in $cpt/segment[@Id = "LQ"]
+                         let $cpt_rem := $cpt_remarks/element[@Id = "LQ02"]/text()                    
+                          return <_ type = 'object'>{<rem>{$cpt_rem}</rem>}</_>                                      
+                          }</cptRem>,
                         
                         (: adjustments information:)
                         <adj type = 'array'> {

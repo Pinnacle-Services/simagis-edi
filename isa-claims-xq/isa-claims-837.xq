@@ -1,12 +1,12 @@
+(: claim 837 doc :)
 declare namespace functx = "http://www.functx.com";
 declare function functx:if-empty
   ( $arg as item()? ,
     $value as item()* )  as item()* {
-
   if (string($arg) != '')
   then data($arg)
   else $value
- } ;
+ };
 
 declare option output:method "json" ;
 <json type='array'>{
@@ -33,18 +33,25 @@ let $ein := $trn//loop[@Id="2010"]/segment[@Id="REF" and element[@Id="REF01" and
 for $bl in $trn/loop[@Id="2000"]
 
 (: Demographics:)
-let $ptn_bd := $bl/loop[@Id="2010"]//segment[@Id="DMG"]/element[@Id="DMG02"]/text()
-let $ptn_g := $bl/loop[@Id="2010"]//segment[@Id="DMG"]/element[@Id="DMG03"]/text()
+let $ptn_bd := $bl/loop[@Id="2010"]/segment[@Id="DMG"]/element[@Id="DMG02"]/text()
+let $ptn_g := $bl/loop[@Id="2010"]/segment[@Id="DMG"]/element[@Id="DMG03"]/text()
 
 (: Payer:)
-let $payer_name := $bl/loop[@Id="2010"]//segment[@Id="NM1" and *:element="PR"]/element[@Id="NM103"]/text()
-let $payer_id := $bl/loop[@Id="2010"]//segment[@Id="NM1" and *:element="PR"]/element[@Id="NM109"]/text()
+let $payer_name := $bl/loop[@Id="2010"]/segment[@Id="NM1" and *:element="PR"]/element[@Id="NM103"]/text()
+let $payer_id := $bl/loop[@Id="2010"]/segment[@Id="NM1" and *:element="PR"]/element[@Id="NM109"]/text()
+
+(: Filing Code :)
+let $fCode := $bl/segment[@Id="SBR"]/element[@Id="SBR09"]/text()
 
 (:Claim:)
 for $clm in $bl/loop[@Id=2300]
 let $acn_id:= $clm/segment[@Id="CLM"]/element[@Id="CLM01"]/text()
 let $freq :=  $clm/segment[@Id="CLM"]/element[@Id="CLM05"]/subelement[@Sequence =3]/text()
 let $ask_amt:= $clm/segment[@Id="CLM"]/element[@Id="CLM02"]/text()
+
+(: Prior Authorization or Reffereal:)
+let $auth_num := $clm/segment[@Id="REF" and element[@Id="REF01"]="G1"]/element[@Id="REF02"]/text()
+let $refferal_num := $clm/segment[@Id="REF" and element[@Id="REF01"]="9F"]/element[@Id="REF02"]/text()
 
 (:billing system:)
 let $sys := "U"
@@ -66,7 +73,12 @@ return
 <recId>{functx:if-empty($rec_id,"Empty")}</recId>,
 <prn-CC>{functx:if-empty($payer_name,"Empty")}</prn-CC>,
 <prid>{functx:if-empty($payer_id,"Empty")}</prid>,
+<fCode>{$fCode}</fCode>,
 <clmAsk-C0>{ $ask_amt}</clmAsk-C0>,
+
+(:Prior Auth:)
+<refrlNum>{$refferal_num}</refrlNum>,
+<authNum>{$auth_num}</authNum>,
 
 (:Billing Provider:)
 <billN-CC>{functx:if-empty($bill_name[1],"Empty")}</billN-CC>,

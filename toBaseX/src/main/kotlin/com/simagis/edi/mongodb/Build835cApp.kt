@@ -112,6 +112,7 @@ fun main(args: Array<String>) {
                     `+`("acn", 1)
                     `+`("sendDate", 1)
                     `+`("eob", 1)
+                    `+`("authNum", 1)
                 })
                 .sort(doc {
                     `+`("sendDate", -1)
@@ -150,6 +151,9 @@ fun main(args: Array<String>) {
                                 "npi" -> {
                                     c835["npi"] = value
                                     c835["client"] = npiMapClient[value]?.doc
+                                }
+                                "authNum" -> {
+                                    c835["authNum"] = value
                                 }
                                 !in skipKeys -> c835[key] = value
                             }

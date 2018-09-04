@@ -4,6 +4,10 @@ import net.paypredict.digitalocean.update.*
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.concurrent.locks.ReentrantLock
+import javax.json.Json
+import javax.json.JsonObject
+import javax.json.JsonWriterFactory
+import javax.json.stream.JsonGenerator
 import javax.servlet.annotation.WebServlet
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -13,8 +17,6 @@ import kotlin.concurrent.thread
 import kotlin.concurrent.withLock
 
 /**
- *
- *
  * Created by alexei.vylegzhanin@gmail.com on 6/22/2018.
  */
 @WebServlet(name = "UpdateApiServlet", urlPatterns = ["/api/*"], loadOnStartup = 1)
@@ -37,47 +39,56 @@ class UpdateApiServlet : HttpServlet() {
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         try {
-            request.checkUserRole("pp-api-admins")
-            when (request.pathInfo) {
-                "/host-ver" -> response.text = hostVer().toString()
-                "/status" -> response.text = status()
-                "/status-reset" -> response.text = resetStatus()
-                "/update" -> response.text = update()
-                "/install" -> response.text = install()
-                "/auto-update-start" -> response.text = autoUpdateStart()
-                "/auto-update-stop" -> response.text = autoUpdateStop()
+            response.json = when (request.pathInfo) {
+                "/local-ver" -> request.role("read") { localVer() }
+                "/host-ver" -> request.role("read.host") { hostVer() }
+                "/status" -> request.role("read") { status() }
+                "/status-reset" -> request.role("admin") { resetStatus() }
+                "/update" -> request.role("admin") { update() }
+                "/install" -> request.role("admin") { install() }
+                "/auto-update-start" -> request.role("admin") { autoUpdateStart() }
+                "/auto-update-stop" -> request.role("admin") { autoUpdateStop() }
                 else -> throw UpdateApiException("Invalid command: ${request.pathInfo}")
             }
         } catch (e: Throwable) {
-            lock.withLock { status = Status.Error(e) }
-            response.text = status()
+            response.json = lock.withLock {
+                status = Status.Error(e)
+                status.toJson()
+            }
         }
     }
 
-    private fun HttpServletRequest.checkUserRole(role: String) {
+    private fun HttpServletRequest.role(role: String, action: () -> JsonObject?): JsonObject? {
         if (!isUserInRole(role)) throw UpdateApiException("$role user role required")
+        return action()
     }
 
     private val lock = ReentrantLock()
     private var status: Status = Status.Ready
 
-    private fun hostVer(): VerData =
+    private fun hostVerData(): VerData =
         HostSFTP.new().session { readHostVer() }
 
-    private fun status(): String = lock.withLock { status.text }
+    private fun hostVer(): JsonObject =
+        HostSFTP.new().session { readHostVerJson() }
 
-    private fun resetStatus(): String = lock.withLock {
+    private fun localVer(): JsonObject? =
+        readLocalImageVerJson()
+
+    private fun status(): JsonObject = lock.withLock { status.toJson() }
+
+    private fun resetStatus(): JsonObject = lock.withLock {
         status = Status.Ready
-        status.text
+        status.toJson()
     }
 
-    private fun update(): String = lock.withLock {
+    private fun update(): JsonObject = lock.withLock {
         if (status !== Status.Ready) throw UpdateApiException("Invalid status: $status")
         status = Status.Loading
         daemon("update") {
             try {
                 val localVer = readLocalImageVer()
-                val hostVer = hostVer()
+                val hostVer = hostVerData()
                 if (localVer != hostVer) {
                     val tmpImageDir = downloadPayPredict(hostVer)
                     lock.withLock { status = Status.Updating }
@@ -90,10 +101,10 @@ class UpdateApiServlet : HttpServlet() {
                 e.printStackTrace()
             }
         }
-        "Update started"
+        status.toJson()
     }
 
-    private fun install(): String = lock.withLock {
+    private fun install(): JsonObject = lock.withLock {
         if (status !== Status.Ready) throw UpdateApiException("Invalid status: $status")
         status = Status.Loading
         daemon("install") {
@@ -106,19 +117,19 @@ class UpdateApiServlet : HttpServlet() {
                 e.printStackTrace()
             }
         }
-        "Install started"
+        status.toJson()
     }
 
-    private fun autoUpdateStart(): String = lock.withLock {
+    private fun autoUpdateStart(): JsonObject = lock.withLock {
         if (status !== Status.Ready) throw UpdateApiException("Invalid status: $status")
         autoUpdateFile.writeText("")
-        "Auto-Update started"
+        status.toJson()
     }
 
-    private fun autoUpdateStop(): String = lock.withLock {
+    private fun autoUpdateStop(): JsonObject = lock.withLock {
         if (status !== Status.Ready) throw UpdateApiException("Invalid status: $status")
         autoUpdateFile.delete()
-        "Auto-Update stopped"
+        status.toJson()
     }
 
     private fun daemon(name: String? = null, block: () -> Unit) =
@@ -130,6 +141,10 @@ private class UpdateApiException(message: String, cause: Throwable? = null) : Ru
 private sealed class Status {
     open val text: String get() = javaClass.simpleName
     override fun toString(): String = text
+    open fun toJson(): JsonObject =
+        Json.createObjectBuilder()
+            .add("status", javaClass.simpleName)
+            .build()
 
     object Ready : Status()
     object Loading : Status()
@@ -147,15 +162,34 @@ private sealed class Status {
             }.toString()
 
         override fun toString(): String = "Error: ${x.message}"
+
+        override fun toJson(): JsonObject =
+            Json.createObjectBuilder()
+                .add("status", javaClass.simpleName)
+                .add("error", x.javaClass.name)
+                .add("message", x.message)
+                .build()
+
     }
 }
 
-private var HttpServletResponse.text: String
-    get() = ""
+private var HttpServletResponse.json: JsonObject?
+    get() = null
     set(value) {
-        val bytes = value.toByteArray()
+        val bytes = value.toStringPP().toByteArray()
         status = SC_OK
         contentType = "text/plain;charset=UTF-8"
         setContentLength(bytes.size)
         outputStream.write(bytes)
     }
+
+private val jsonPP: JsonWriterFactory = Json.createWriterFactory(
+    mapOf(
+        JsonGenerator.PRETTY_PRINTING to true
+    )
+)
+
+private fun JsonObject?.toStringPP(): String = when {
+    this == null -> "{}"
+    else -> StringWriter().use { jsonPP.createWriter(it).write(this); it.toString().trim() }
+}

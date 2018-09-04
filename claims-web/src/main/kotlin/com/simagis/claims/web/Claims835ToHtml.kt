@@ -6,6 +6,7 @@ import com.simagis.edi.mdb.*
 import org.bson.Document
 import org.intellij.lang.annotations.Language
 import java.lang.Long.min
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -18,6 +19,9 @@ class Claims835ToHtml(
     val cq: ClaimQuery?,
     val maxCount: Int = 100,
     val paging: Paging = Paging(0, 0),
+    val contextPath: String,
+    val servletPath: String,
+    val pathInfo: String,
     val root: String,
     val queryString: String
 ) {
@@ -29,6 +33,7 @@ class Claims835ToHtml(
 
     private fun formatValue(key: String, value: Any?): String = when {
         key == "_id" && value is String -> value
+        key == "acn" && value is String -> ACN835.format(cq, contextPath, servletPath, pathInfo, value)
         key == "cpt" && value is String -> value + " " + cptCodes.optString(value).esc
         key == "status" && value is String -> value + " " + statusCodes.optString(value).esc
         key == "adjGrp" && value is String -> value + " " + adjGrpCodes.optString(value).esc
@@ -36,6 +41,7 @@ class Claims835ToHtml(
         key == "rem" && value is String -> value + " " + remCodes.optString(value).esc
         key == "dxT" && value is String -> value + " " + dxT.optString(value).esc
         key == "dxV" && value is String -> value + " " + icd10Codes.optString(value).esc
+        key == "npi" && value is String -> NPI.format(value)
         value is Date -> dateFormat.format(value).esc
         else -> value.asHTML.esc
     }
@@ -46,6 +52,43 @@ class Claims835ToHtml(
         private fun Map<String, String>.optString(key: String, def: String = ""): String {
             return this[key] ?: def
         }
+
+        private val String.esc get() = this.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+        private val Any?.esc
+            get() = when (this) {
+                is String -> esc
+                null -> ""
+                else -> toString().esc
+            }
+
+        object ACN835 {
+            @Language("HTML")
+            fun format(
+                cq: ClaimQuery?,
+                contextPath: String,
+                servletPath: String,
+                pathInfo: String,
+                value: String): String =
+                when {
+                    cq?.type?.startsWith("835") == true
+                            || (servletPath == "/claim" && pathInfo.startsWith("/835")) ->
+                        "<a href='$contextPath/claim/837/${value.urlEnc}?ps=20' target='_blank'>${value.esc}</a>"
+                    else ->
+                        value.esc
+                }
+        }
+
+        object NPI {
+            private const val uri = "https://npiregistry.cms.hhs.gov/registry/provider-view/"
+
+            @Language("HTML")
+            fun format(value: String): String =
+                "<a href='$uri${value.urlEnc}' target='_blank'>${value.esc}</a>"
+        }
+
+        private val String.urlEnc: String
+            get() = URLEncoder.encode(this, "UTF-8")
     }
 
     init {
@@ -251,9 +294,23 @@ class Claims835ToHtml(
                     .joinToString(separator = " | ")
                 )
                 addCptAdjustments(adjKey, doc[adjKey] as? List<*> ?: emptyList<Any>(), ctx)
-                addIndented((doc.keys - mainKeys - adjKey)
-                    .mapNotNull { it.toProp() }
-                    .joinToString(separator = " | "))
+
+                val keysLeft = doc.keys - mainKeys - adjKey
+                val arrays = keysLeft
+                    .map { it to doc[it] }
+                    .filter {it.second is List<*>}
+                    .toMap()
+
+                addIndented(
+                    (keysLeft - arrays.keys)
+                        .mapNotNull { it.toProp() }
+                        .joinToString(separator = " | "))
+
+                arrays.forEach { key, list ->
+                    withPadding {
+                        addArray(key, list as List<*>)
+                    }
+                }
             }
         }
 
@@ -379,17 +436,18 @@ class Claims835ToHtml(
         this.html.append("<div style='padding-left: ${indent}em;'>$html</div>\n")
     }
 
+    private fun withPadding(left: String = "2em", right: String = left, innerHtml: () -> Unit) {
+        //language=HTML
+        this.html.append("<div style='padding-left: $left; padding-right: $right;'>\n")
+        innerHtml()
+        //language=HTML
+        this.html.append("</div>\n")
+    }
+
     private fun addLink(href: String = "", html: String, separator: String = "\n", fragment: String = "") {
         this.html.append("<a href='$href#$fragment'>$html</a>$separator")
     }
 
-    private val String.esc get() = this.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    private val Any?.esc
-        get() = when (this) {
-            is String -> esc
-            null -> ""
-            else -> toString().esc
-        }
     private val Any?.asHTML: String get() = this?.toString() ?: ""
 
     @Language("HTML")

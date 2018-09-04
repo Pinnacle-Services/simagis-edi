@@ -4,26 +4,19 @@ import com.mongodb.MongoNamespace
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.IndexModel
 import org.bson.Document
+import java.io.BufferedReader
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.URI
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.Period
+import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.zip.GZIPInputStream
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.MutableMap
-import kotlin.collections.Set
-import kotlin.collections.filter
-import kotlin.collections.forEach
-import kotlin.collections.forEachIndexed
-import kotlin.collections.getOrPut
-import kotlin.collections.map
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 import kotlin.concurrent.withLock
 
@@ -212,6 +205,40 @@ internal object ImportJob : AbstractJob() {
             else -> null
         }
     }
+
+    object payers2ftlDate {
+        operator fun get(procDate: Date?, prn: String?): Date? {
+            if (procDate == null || prn == null) return null
+            val days = map[prn]?.days ?: 90
+            return Date.from((procDate.toInstant().atZone(ZoneOffset.UTC) + Period.ofDays(days)).toInstant())
+        }
+
+        private class doc(val prn: String, val days: Int)
+
+        private val map: Map<String, doc> by lazy {
+            mutableMapOf<String, doc>().apply {
+                var nameId: Int = -1
+                var daysId: Int = -1
+                File("files")
+                    .resolve("payers.tsv")
+                    .parseAsCsv(
+                        { index, name ->
+                            when (name) {
+                                "NAME" -> nameId = index
+                                "APPEAL_TIME_LIMIT" -> daysId = index
+                            }
+                        },
+                        { record ->
+                            doc(
+                                prn = record[nameId],
+                                days = record[daysId].toInt()
+                            ).also {
+                                this[it.prn] = it
+                            }
+                        })
+            }
+        }
+    }
 }
 
 val clientName: String by lazy { System.getProperty("paypredict.client") }
@@ -228,16 +255,26 @@ private fun DocumentCollection.indexed(vararg indexes: String): DocumentCollecti
 
 private typealias CsvRecord = List<String>
 
-private fun File.parseAsGzCsv(onHeader: (Int, String) -> Unit, onRecord: (CsvRecord) -> Unit) {
-    if (isFile) GZIPInputStream(inputStream()).bufferedReader().use {
-        var count = 0
-        it.forEachLine { line ->
-            val record: CsvRecord = line.split('\t').map { it.removeSurrounding("\"") }
-            if (count == 0)
-                record.forEachIndexed(onHeader) else
-                onRecord(record)
-            count++
-        }
+private fun File.parseAsGzCsv(onHeader: (Int, String) -> Unit, onRecord: (CsvRecord) -> Unit, delimiter: Char = '\t') {
+    if (isFile) GZIPInputStream(inputStream()).bufferedReader().use { reader ->
+        reader.parseAsCsv(onHeader, onRecord, delimiter)
+    }
+}
+
+private fun File.parseAsCsv(onHeader: (Int, String) -> Unit, onRecord: (CsvRecord) -> Unit, delimiter: Char = '\t') {
+    if (isFile) bufferedReader().use { reader ->
+        reader.parseAsCsv(onHeader, onRecord, delimiter)
+    }
+}
+
+private fun BufferedReader.parseAsCsv(onHeader: (Int, String) -> Unit, onRecord: (CsvRecord) -> Unit, delimiter: Char = '\t') {
+    var count = 0
+    forEachLine { line ->
+        val record: CsvRecord = line.split(delimiter).map { it.removeSurrounding("\"") }
+        if (count == 0)
+            record.forEachIndexed(onHeader) else
+            onRecord(record)
+        count++
     }
 }
 
