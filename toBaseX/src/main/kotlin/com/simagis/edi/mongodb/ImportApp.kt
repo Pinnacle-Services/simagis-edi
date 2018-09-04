@@ -400,7 +400,7 @@ fun main(args: Array<String>) {
                         ImportJob.options.claimTypes.types.map { ImportJob.options.claimTypes[it] } +
                         ImportJob.options.plb +
                         if (ImportJob.options.ptnXQ)
-                            listOf(ImportJob.options.ptn_835) else
+                            listOf(ImportJob.options.ptn_835, ImportJob.options.ptn_837) else
                             emptyList()
 
 
