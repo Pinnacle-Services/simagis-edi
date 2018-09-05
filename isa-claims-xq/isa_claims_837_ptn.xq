@@ -48,7 +48,8 @@ for $sbrl in $bl//loop[@Id="2010" and segment[@Id="NM1" and *:element="IL"] ]
 
     (: Subscriber Name:)
     for $sbr_name in $sbrl/segment[@Id="NM1" and element[@Id="NM101" and .="IL"]]
-         let $insured_Id := $sbr_name//element[@Id = "NM108"]/text()
+         let $insured_Id_type := $sbr_name//element[@Id = "NM108"]/text()
+         let $insured_Id := $sbr_name//element[@Id = "NM109"]/text()
          let $insured_Suff := $sbr_name//element[@Id = "NM107"]/text()
          let $insured_Pref := $sbr_name//element[@Id = "NM106"]/text()
          let $insured_MI := $sbr_name//element[@Id = "NM105"]/text()
@@ -97,10 +98,12 @@ return
   <ein>{functx:if-empty($ein[1],"Empty")}</ein>
 
 (: Subscriber Info:)
-  ,<sbrResp>{$sbr_responsibility}</sbrResp>
-  ,<sbrRel>{$sbr_relationships}</sbrRel>
+  ,<sbrId>{$insured_Id}</sbrId>
+  ,<sbrIdType>{$insured_Id_type}</sbrIdType>
   ,<sbrPolicyId>{$sbr_policyId}</sbrPolicyId>
   ,<sbrGroupName-CC>{$sbr_groupName }</sbrGroupName-CC>
+  ,<sbrResp>{$sbr_responsibility}</sbrResp>
+  ,<sbrRel>{$sbr_relationships}</sbrRel>
   ,<sbrInsType>{$sbr_insType}</sbrInsType>  
   ,<sbrCOOB>{$sbr_coob}</sbrCOOB> 
   ,<sbrYN>{$sbr_yesNo}</sbrYN>
@@ -109,7 +112,6 @@ return
 
      
 (: Subscriber Name:)
-  ,<sbrId>{$insured_Id}</sbrId>
   ,<sbrSfx-CC>{$insured_Suff}</sbrSfx-CC>
   ,<sbrPfx-CC>{$insured_Pref}</sbrPfx-CC>
   ,<sbrMI-CC>{$insured_MI}</sbrMI-CC>
